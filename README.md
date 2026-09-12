@@ -1,6 +1,6 @@
 # 🇨🇺 CubaCell Connect
 
-> The app is named **Cuba-cell** (with double "L") to avoid any legal conflicts or trademark issues with Cubacel.
+> The app is named **Cuba-Cell** (with double "L") to avoid any legal conflicts or trademark issues with Cubacel.
 
 [![Platform](https://img.shields.io/badge/platform-iOS%2017.0%2B-blue.svg)](https://developer.apple.com/ios/)
 [![Swift](https://img.shields.io/badge/swift-5.9%2B-orange.svg)](https://swift.org)
