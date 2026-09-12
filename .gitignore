@@ -1,4 +1,4 @@
-.ignore/
+.ignore/*
 
 # macOS
 .DS_Store
