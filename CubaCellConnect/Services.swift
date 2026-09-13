@@ -417,12 +417,19 @@ enum DirectoryDatabase {
         return names
     }
 
-    /// Case-insensitive substring match on name, or prefix match on number — capped at `limit`
-    /// results. Returns `[]` for a query under 3 characters.
+    /// Separate number/name inputs instead of one combined field: a number search is a prefix
+    /// match that rides `number`'s index (cheap even for a 1-digit prefix, since `LIMIT` stops
+    /// the index range scan early); a name search is `LIKE '%x%'`, which can't use any index and
+    /// is a genuine full-table scan. Filling both ANDs them — SQLite narrows via the number index
+    /// first and only checks `name` against that already-small result set, so it stays cheap.
+    /// A name-only search below 3 characters is refused (an unbounded scan for near-zero signal);
+    /// a number-only search has no minimum since the index bounds its cost regardless of length.
     /// Synchronous and potentially slow (see type-level note) — call from a background task.
-    static func search(_ query: String, in file: DirectoryDatabaseFile, limit: Int32 = 100) -> [DirectoryEntry] {
-        let trimmed = query.trimmingCharacters(in: .whitespaces)
-        guard trimmed.count >= 3 else { return [] }
+    static func search(numberQuery: String, nameQuery: String, in file: DirectoryDatabaseFile, limit: Int32 = 100) -> [DirectoryEntry] {
+        let number = numberQuery.trimmingCharacters(in: .whitespaces)
+        let name = nameQuery.trimmingCharacters(in: .whitespaces)
+        guard !number.isEmpty || !name.isEmpty else { return [] }
+        guard !number.isEmpty || name.count >= 3 else { return [] }
 
         var db: OpaquePointer?
         guard sqlite3_open_v2(file.url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
@@ -430,32 +437,29 @@ enum DirectoryDatabase {
         }
         defer { sqlite3_close(db) }
 
-        let namePattern = "%\(trimmed)%"
-        let numberPattern = "\(trimmed)%"
+        var clauses: [String] = []
+        var patterns: [String] = []
+        if !number.isEmpty {
+            clauses.append("number LIKE ?")
+            patterns.append("\(number)%")
+        }
+        if !name.isEmpty {
+            clauses.append("name LIKE ?")
+            patterns.append("%\(name)%")
+        }
+        let whereClause = clauses.joined(separator: " AND ")
 
         switch file.version {
         case .v1:
-            return rows(
-                db: db,
-                table: "contacts",
-                namePattern: namePattern,
-                numberPattern: numberPattern,
-                limit: limit
-            )
+            return rows(db: db, table: "contacts", whereClause: whereClause, patterns: patterns, limit: limit)
         case .v2:
-            let mobile = rows(
-                db: db,
-                table: "movil",
-                namePattern: namePattern,
-                numberPattern: numberPattern,
-                limit: limit
-            )
+            let mobile = rows(db: db, table: "movil", whereClause: whereClause, patterns: patterns, limit: limit)
             guard mobile.count < limit else { return mobile }
             let landline = rows(
                 db: db,
                 table: "fix",
-                namePattern: namePattern,
-                numberPattern: numberPattern,
+                whereClause: whereClause,
+                patterns: patterns,
                 limit: limit - Int32(mobile.count)
             )
             return mobile + landline
@@ -465,20 +469,21 @@ enum DirectoryDatabase {
     private static func rows(
         db: OpaquePointer,
         table: String,
-        namePattern: String,
-        numberPattern: String,
+        whereClause: String,
+        patterns: [String],
         limit: Int32
     ) -> [DirectoryEntry] {
-        let sql = "SELECT number, name FROM \(table) WHERE name LIKE ? OR number LIKE ? LIMIT ?;"
+        let sql = "SELECT number, name FROM \(table) WHERE \(whereClause) LIMIT ?;"
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
             return []
         }
         defer { sqlite3_finalize(statement) }
 
-        sqlite3_bind_text(statement, 1, namePattern, -1, transientDestructor)
-        sqlite3_bind_text(statement, 2, numberPattern, -1, transientDestructor)
-        sqlite3_bind_int(statement, 3, limit)
+        for (index, pattern) in patterns.enumerated() {
+            sqlite3_bind_text(statement, Int32(index) + 1, pattern, -1, transientDestructor)
+        }
+        sqlite3_bind_int(statement, Int32(patterns.count) + 1, limit)
 
         var results: [DirectoryEntry] = []
         while sqlite3_step(statement) == SQLITE_ROW {

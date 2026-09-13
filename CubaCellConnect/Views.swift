@@ -886,15 +886,18 @@ struct DirectorySearchView: View {
     @State private var showingImporter = false
     @State private var importErrorMessage: String?
 
-    @State private var query = ""
+    @State private var numberQuery = ""
+    @State private var nameQuery = ""
     @State private var results: [DirectoryEntry] = []
     @State private var isSearching = false
 
-    /// Below this length a name search would be an unbounded full-table scan over millions of
-    /// rows for almost no signal — `DirectoryDatabase.search` refuses it too; this just keeps the
-    /// empty-state message from flashing "sin resultados" while the user is still typing.
-    private var queryIsLongEnough: Bool {
-        query.trimmingCharacters(in: .whitespaces).count >= 3
+    /// A number search rides `number`'s index (cheap at any length — `LIMIT` bounds it), but a
+    /// name search alone is an unbounded full-table scan; `DirectoryDatabase.search` refuses a
+    /// name-only query under 3 characters, and this mirrors that so the empty-state message
+    /// doesn't flash "sin resultados" while the user is still typing a short name.
+    private var hasSearchableInput: Bool {
+        !numberQuery.trimmingCharacters(in: .whitespaces).isEmpty
+            || nameQuery.trimmingCharacters(in: .whitespaces).count >= 3
     }
 
     var body: some View {
@@ -952,23 +955,30 @@ struct DirectorySearchView: View {
                 }
             } else {
                 List {
-                    ForEach(results) { entry in
-                        DirectoryEntryRowView(entry: entry)
+                    Section {
+                        TextField("Número", text: $numberQuery)
+                            .keyboardType(.phonePad)
+                        TextField("Nombre", text: $nameQuery)
                     }
 
-                    if isSearching {
-                        HStack {
-                            Spacer()
-                            ProgressView()
-                            Spacer()
+                    Section {
+                        ForEach(results) { entry in
+                            DirectoryEntryRowView(entry: entry)
                         }
-                    } else if queryIsLongEnough, results.isEmpty {
-                        Text("Sin resultados")
-                            .foregroundStyle(.secondary)
+
+                        if isSearching {
+                            HStack {
+                                Spacer()
+                                ProgressView()
+                                Spacer()
+                            }
+                        } else if hasSearchableInput, results.isEmpty {
+                            Text("Sin resultados")
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .listStyle(.insetGrouped)
-                .searchable(text: $query, prompt: "Nombre o número")
             }
         }
         .navigationTitle("Buscar en Directorio")
@@ -978,8 +988,8 @@ struct DirectorySearchView: View {
             databaseFile = DirectoryDatabase.discoverDatabase()
             hasSearchedForDatabase = true
         }
-        .task(id: query) {
-            guard let file = databaseFile, queryIsLongEnough else {
+        .task(id: "\(numberQuery)|\(nameQuery)") {
+            guard let file = databaseFile, hasSearchableInput else {
                 isSearching = false
                 results = []
                 return
@@ -990,9 +1000,10 @@ struct DirectorySearchView: View {
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled else { return }
 
-            let searchQuery = query
+            let searchNumber = numberQuery
+            let searchName = nameQuery
             let found = await Task.detached(priority: .userInitiated) {
-                DirectoryDatabase.search(searchQuery, in: file)
+                DirectoryDatabase.search(numberQuery: searchNumber, nameQuery: searchName, in: file)
             }.value
 
             guard !Task.isCancelled else { return }
