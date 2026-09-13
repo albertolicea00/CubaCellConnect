@@ -78,6 +78,8 @@ Ajustes › Buscar en Directorio lets you query a phone directory (Truecaller-st
 
 Results show a mobile/landline icon in place of a real contact photo (the dump carries no photos, only line type) and a **copy-to-clipboard** button instead of a call button — also intentional: these are numbers from a scraped third-party dump, not something the user typed in or picked from their own address book, so this app doesn't offer one-tap dialing straight out of a directory search.
 
+**Known limitation — not integrated with Caller ID (`*99`):** the directory database is intentionally kept separate from `CallerIDStore`/`CallDirectoryHandler` (see [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification)), which only ever loads from the device's own Contacts. A CallKit Call Directory Extension has a hard cap on how many identification entries it can register (historically on the order of 100k–200k) — the directory dump has millions of rows (v1: ~4.6M; v2: ~4.8M combined), so registering it wholesale would get the extension rejected/disabled by iOS. Feeding it in would need a drastic filter (e.g. only numbers already in the device's own contacts, which is exactly what happens today) to fit under that ceiling.
+
 ## 🛜 Navigation Rooms & Public WIFI Spaces
 
 Ajustes › Salas y Zonas WiFi is a bundled, read-only copy of ETECSA's own public "Navigation rooms and public spaces (WIFI)" directory — unlike the reverse-lookup directory above, this is official public service-location data (room/hotspot names and addresses), not customer data, so it ships inside the app like `codes.json` does.
