@@ -7,15 +7,18 @@ import SwiftUI
 /// other: Líneas de Ayuda, Contactos, Home, Compras, Ajustes.
 struct HomeView: View {
     @Environment(USSDCodeStore.self) private var store
+    @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
+    @State private var selectedTab = HomeTab.home.rawValue
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             if let helplines = store.tabCategories.first(where: { $0.id == "helplines" }) {
                 CategoryListView(category: helplines)
                     .tabItem {
                         Image(systemName: helplines.icon)
                             .accessibilityLabel(helplines.name)
                     }
+                    .tag(HomeTab.helplines.rawValue)
             }
 
             ContactsListView()
@@ -23,12 +26,14 @@ struct HomeView: View {
                     Image(systemName: "person.crop.circle.fill")
                         .accessibilityLabel("Contactos")
                 }
+                .tag(HomeTab.contacts.rawValue)
 
             HomeQuickActionsView()
                 .tabItem {
                     Image(systemName: "house.fill")
                         .accessibilityLabel("Home")
                 }
+                .tag(HomeTab.home.rawValue)
 
             if let purchase = store.tabCategories.first(where: { $0.id == "purchase" }) {
                 CategoryListView(category: purchase)
@@ -36,6 +41,7 @@ struct HomeView: View {
                         Image(systemName: purchase.icon)
                             .accessibilityLabel(purchase.name)
                     }
+                    .tag(HomeTab.purchase.rawValue)
             }
 
             SettingsView()
@@ -43,8 +49,28 @@ struct HomeView: View {
                     Image(systemName: "gearshape.fill")
                         .accessibilityLabel("Ajustes")
                 }
+                .tag(HomeTab.settings.rawValue)
         }
         .tint(.brandCyan)
+        .onAppear { selectedTab = defaultTab }
+    }
+}
+
+/// The 5 tabs, keyed by a stable string so it can be stored in `@AppStorage` (as "Pestaña
+/// inicial" in Ajustes › Preferencias) and used as the `TabView` selection tag.
+enum HomeTab: String, CaseIterable, Identifiable {
+    case helplines, contacts, home, purchase, settings
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .helplines: return "Líneas de Ayuda"
+        case .contacts: return "Contactos"
+        case .home: return "Home"
+        case .purchase: return "Compras"
+        // case .settings: return "Ajustes"
+        }
     }
 }
 
@@ -564,6 +590,7 @@ struct SettingsView: View {
 private struct PreferencesSettingsView: View {
     @AppStorage("darkModePreference") private var darkMode: Int = 0
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
+    @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
 
     var body: some View {
         Form {
@@ -581,6 +608,18 @@ private struct PreferencesSettingsView: View {
                 Text("General")
             } footer: {
                 Text("Muestra un aviso cuando no hay señal celular o es débil. El USSD necesita señal de voz, no datos ni Wi-Fi.")
+            }
+
+            Section {
+                Picker("Pestaña Inicial", selection: $defaultTab) {
+                    ForEach(HomeTab.allCases) { tab in
+                        Text(tab.displayName).tag(tab.rawValue)
+                    }
+                }
+            } header: {
+                Text("Inicio")
+            } footer: {
+                Text("La pestaña que se muestra al abrir la app.")
             }
         }
         .navigationTitle("Preferencias")
