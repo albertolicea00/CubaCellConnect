@@ -32,11 +32,14 @@ struct HomeView: View {
 // MARK: - Category Screen
 
 /// One tab's content: the codes belonging to a single category.
+/// Tapping a row dials it directly — iOS itself confirms before the call is placed.
+/// Codes that need an extra value (card number, phone number, ...) prompt for it first via an alert.
 struct CategoryListView: View {
     let category: USSDCategory
 
     @Environment(USSDCodeStore.self) private var store
-    @State private var selectedCode: USSDCode?
+    @State private var pendingInputCode: USSDCode?
+    @State private var inputText = ""
 
     var body: some View {
         NavigationStack {
@@ -44,7 +47,7 @@ struct CategoryListView: View {
                 ForEach(store.codes(in: category)) { code in
                     CodeRowView(code: code)
                         .contentShape(Rectangle())
-                        .onTapGesture { selectedCode = code }
+                        .onTapGesture { select(code) }
                 }
             }
             .listStyle(.insetGrouped)
@@ -52,115 +55,41 @@ struct CategoryListView: View {
             .toolbarBackground(Color.brandNavy, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .sheet(item: $selectedCode) { code in
-                CodeDetailView(code: code)
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
-            }
-        }
-    }
-}
-
-// MARK: - Code Detail Sheet
-
-/// Detail sheet for a code: description, optional input field, copy and dial actions.
-struct CodeDetailView: View {
-    let code: USSDCode
-
-    @State private var input = ""
-    @State private var copied = false
-    @Environment(\.dismiss) private var dismiss
-
-    private var resolvedCode: String {
-        code.resolvedCode(input: input.trimmingCharacters(in: .whitespaces))
-    }
-
-    private var isDialDisabled: Bool {
-        code.requiresInput && input.trimmingCharacters(in: .whitespaces).isEmpty
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            header
-
-            Text(code.details)
-                .font(.body)
-                .foregroundStyle(Color.appForeground)
-
-            if let mnemonic = code.mnemonic {
-                Label(mnemonic, systemImage: "lightbulb.fill")
-                    .font(.footnote)
-                    .foregroundStyle(Color.brandCyan)
-            }
-
-            if code.requiresInput {
-                TextField(code.inputPlaceholder ?? "Input", text: $input)
+            .alert(
+                pendingInputCode?.title ?? "",
+                isPresented: Binding(
+                    get: { pendingInputCode != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            pendingInputCode = nil
+                            inputText = ""
+                        }
+                    }
+                ),
+                presenting: pendingInputCode
+            ) { code in
+                TextField(code.inputPlaceholder ?? "Input", text: $inputText)
                     .keyboardType(.phonePad)
-                    .textFieldStyle(.roundedBorder)
-                    .font(AppTheme.codeFont(size: 16))
+                Button("Dial") { dial(code, input: inputText) }
+                Button("Cancel", role: .cancel) {}
+            } message: { code in
+                Text(code.details)
             }
-
-            Spacer()
-
-            actions
-        }
-        .padding(24)
-        .background(Color.appBackground)
-    }
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(code.title)
-                .font(.title2.bold())
-                .foregroundStyle(Color.brandNavy)
-            Text(resolvedCode)
-                .font(AppTheme.codeFont(size: 22))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(Color.brandNavy, in: RoundedRectangle(cornerRadius: 10))
         }
     }
 
-    private var actions: some View {
-        HStack(spacing: 12) {
-            Button {
-                UIPasteboard.general.string = resolvedCode
-                copied = true
-            } label: {
-                Label(copied ? "Copied" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .tint(.brandNavy)
-
-            Button {
-                DialService.dial(resolvedCode)
-                dismiss()
-            } label: {
-                Label(code.type == .call ? "Call" : "Dial", systemImage: "phone.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.brandCyan)
-            .disabled(isDialDisabled)
+    private func select(_ code: USSDCode) {
+        if code.requiresInput {
+            inputText = ""
+            pendingInputCode = code
+        } else {
+            DialService.dial(code.code)
         }
-        .controlSize(.large)
     }
-}
 
-#Preview {
-    CodeDetailView(code: USSDCode(
-        id: "recharge-card",
-        code: "*662*{input}#",
-        title: "Recharge with Card",
-        details: "Manually recharge your balance with a scratch card.",
-        category: "purchase",
-        type: .ussd,
-        requiresInput: true,
-        inputPlaceholder: "Card number",
-        mnemonic: nil
-    ))
+    private func dial(_ code: USSDCode, input: String) {
+        DialService.dial(code.resolvedCode(input: input))
+    }
 }
 
 // MARK: - Settings / Help Screen
@@ -183,15 +112,11 @@ struct SettingsView: View {
                 Section("How USSD Works") {
                     SettingsInfoRow(
                         title: "What is USSD?",
-                        text: "USSD is a phone protocol that lets you interact with your carrier by dialing special codes like *222#. It needs cellular signal, not data or Wi-Fi. Tap a code in the app and the system dialer opens with it ready to send — just confirm the call."
+                        text: "USSD is a phone protocol that lets you interact with your carrier by dialing special codes like *222#. It needs cellular signal, not data or Wi-Fi. Tap any code in the list and the system dialer opens with it ready to send — iOS itself asks you to confirm before the call actually goes through."
                     )
                     SettingsInfoRow(
                         title: "Codes that need input",
-                        text: "Some codes, like recharging with a card, ask for extra digits (e.g. *662*{card}#). The app shows a field for that value and fills it into the code before dialing."
-                    )
-                    SettingsInfoRow(
-                        title: "Copy vs. Dial",
-                        text: "Copy puts the resolved code on the clipboard so you can paste it elsewhere. Dial hands it straight to the system dialer, which asks you to confirm before it actually places the call."
+                        text: "A few codes, like recharging with a card, need an extra number (e.g. *662*{card}#). Tapping one of those first asks for that value, then dials the completed code."
                     )
                     SettingsInfoRow(
                         title: "Mnemonics",
