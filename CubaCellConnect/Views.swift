@@ -97,6 +97,7 @@ struct HomeQuickActionsView: View {
     @State private var amount = ""
     @State private var cardNumber = ""
     @State private var showingContactPicker = false
+    @State private var debugShowSpeedTest = false
     @State private var showsInvalidNumberWarning = false
 
     /// `true` while `pin` holds the value just loaded from `TransferPinStore` and not yet typed
@@ -275,7 +276,13 @@ struct HomeQuickActionsView: View {
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .sheet(isPresented: $debugShowSpeedTest) {
+            NavigationStack {
+                SpeedTestView()
+            }
+        }
         .onAppear {
+            debugShowSpeedTest = true
             if pin.isEmpty, let saved = TransferPinStore.load() {
                 isLoadingStoredPin = true
                 pin = saved
@@ -822,6 +829,14 @@ struct SettingsView: View {
                         WifiRoomsProvinceListView()
                     } label: {
                         Label("Salas y Zonas WiFi", systemImage: "wifi")
+                    }
+                }
+
+                Section("Prueba de Velocidad") {
+                    NavigationLink {
+                        SpeedTestView()
+                    } label: {
+                        Label("Medir Velocidad de Internet", systemImage: "speedometer")
                     }
                 }
 
@@ -1406,4 +1421,124 @@ struct WifiRoomsDetailView: View {
             ]
         ))
     }
+}
+
+// MARK: - Speed Test
+
+/// Ajustes › Prueba de Velocidad — ping/download/upload against Cloudflare's public speed-test
+/// endpoints (see `SpeedTestRunner`). Works over any connection with internet access; not tied
+/// to Cuban carriers or bundled data the way the rest of Ajustes is.
+struct SpeedTestView: View {
+    @Environment(AccentColorStore.self) private var accentColorStore
+    @State private var runner = SpeedTestRunner()
+    @State private var ringRotation = 0.0
+
+    private var statusText: String {
+        switch runner.phase {
+        case .idle: return "Toca el botón para medir tu conexión."
+        case .testingPing: return "Midiendo ping…"
+        case .testingDownload: return "Midiendo velocidad de descarga…"
+        case .testingUpload: return "Midiendo velocidad de subida…"
+        case .finished: return "Prueba completada."
+        case .failed(let message): return message
+        }
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .stroke(accentColorStore.color.opacity(0.15), lineWidth: 6)
+                            .frame(width: 96, height: 96)
+
+                        if runner.isRunning {
+                            Circle()
+                                .trim(from: 0, to: 0.22)
+                                .stroke(accentColorStore.color, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                                .frame(width: 96, height: 96)
+                                .rotationEffect(.degrees(ringRotation))
+                        }
+
+                        Image(systemName: "speedometer")
+                            .font(.system(size: 40))
+                            .foregroundStyle(accentColorStore.color)
+                            .symbolEffect(.pulse, isActive: runner.isRunning)
+                    }
+                    .onChange(of: runner.isRunning) { _, isRunning in
+                        if isRunning {
+                            withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+                                ringRotation = 360
+                            }
+                        } else {
+                            withAnimation(.default) {
+                                ringRotation = 0
+                            }
+                        }
+                    }
+
+                    Text(statusText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .contentTransition(.opacity)
+                        .animation(.default, value: statusText)
+
+                    if !runner.isRunning {
+                        Button {
+                            runner.start()
+                        } label: {
+                            Label(
+                                isFinishedOrFailed ? "Repetir Prueba" : "Iniciar Prueba",
+                                systemImage: "play.fill"
+                            )
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(accentColorStore.color)
+                        .controlSize(.large)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .listRowBackground(Color.clear)
+            }
+
+            if hasAnyResult {
+                Section("Resultados") {
+                    if let ping = runner.result.pingMs {
+                        LabeledContent("Ping", value: String(format: "%.0f ms", ping))
+                    }
+                    if let download = runner.result.downloadMbps {
+                        LabeledContent("Descarga", value: String(format: "%.1f Mbps", download))
+                    }
+                    if let upload = runner.result.uploadMbps {
+                        LabeledContent("Subida", value: String(format: "%.1f Mbps", upload))
+                    }
+                }
+            }
+        }
+        .navigationTitle("Prueba de Velocidad")
+        .navigationBarTitleDisplayMode(.inline)
+        .task { runner.start() } // TEMP DEBUG — auto-runs for verification, remove after.
+    }
+
+    private var isFinishedOrFailed: Bool {
+        switch runner.phase {
+        case .finished, .failed: return true
+        default: return false
+        }
+    }
+
+    private var hasAnyResult: Bool {
+        runner.result.pingMs != nil || runner.result.downloadMbps != nil || runner.result.uploadMbps != nil
+    }
+}
+
+#Preview {
+    NavigationStack {
+        SpeedTestView()
+    }
+    .environment(AccentColorStore())
 }

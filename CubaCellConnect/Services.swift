@@ -179,6 +179,117 @@ final class CellularMonitor {
     }
 }
 
+// MARK: - Speed Test
+
+/// The three phases a run passes through, in order, plus the terminal states.
+enum SpeedTestPhase {
+    case idle
+    case testingPing
+    case testingDownload
+    case testingUpload
+    case finished
+    case failed(String)
+}
+
+/// Results filled in as each phase completes — `nil` means "not measured yet", not "measured
+/// zero", so the results section only shows rows for what has actually finished.
+struct SpeedTestResult {
+    var pingMs: Double?
+    var downloadMbps: Double?
+    var uploadMbps: Double?
+}
+
+/// Runs a basic internet speed test (ping, download, upload) against Cloudflare's public,
+/// no-API-key speed-test endpoints (the same ones behind speed.cloudflare.com) — there is no
+/// ETECSA-run equivalent, and this needs a real server round-trip either way, not bundled data.
+/// Cellular-only in practice since that's this app's whole context, but works over Wi-Fi too;
+/// nothing here is Cuba-specific.
+@Observable
+final class SpeedTestRunner {
+    private(set) var phase: SpeedTestPhase = .idle
+    private(set) var result = SpeedTestResult()
+
+    var isRunning: Bool {
+        switch phase {
+        case .testingPing, .testingDownload, .testingUpload: return true
+        case .idle, .finished, .failed: return false
+        }
+    }
+
+    /// No-op while a run is already in flight — button that triggers this is hidden during a
+    /// run anyway, but this guards direct callers too.
+    func start() {
+        guard !isRunning else { return }
+        result = SpeedTestResult()
+        Task { await run() }
+    }
+
+    @MainActor
+    private func run() async {
+        do {
+            phase = .testingPing
+            result.pingMs = try await Self.measurePing()
+
+            phase = .testingDownload
+            result.downloadMbps = try await Self.measureDownload()
+
+            phase = .testingUpload
+            result.uploadMbps = try await Self.measureUpload()
+
+            phase = .finished
+        } catch {
+            phase = .failed("No se pudo completar la prueba. Revisa tu conexión e inténtalo de nuevo.")
+        }
+    }
+
+    /// Median round-trip time of a handful of zero-byte requests — rough (a real speed test
+    /// warms up the connection first), but good enough for "is this laggy or not".
+    private static func measurePing() async throws -> Double {
+        let url = URL(string: "https://speed.cloudflare.com/__down?bytes=0")!
+        var samples: [Double] = []
+        for _ in 0..<5 {
+            var request = URLRequest(url: url)
+            request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+            let start = Date()
+            _ = try await URLSession.shared.data(for: request)
+            samples.append(Date().timeIntervalSince(start) * 1000)
+        }
+        samples.sort()
+        return samples[samples.count / 2]
+    }
+
+    private static func measureDownload() async throws -> Double {
+        let byteCount = 25_000_000
+        var request = URLRequest(url: URL(string: "https://speed.cloudflare.com/__down?bytes=\(byteCount)")!)
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+
+        let start = Date()
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let elapsed = Date().timeIntervalSince(start)
+
+        return megabits(forByteCount: data.count, elapsed: elapsed)
+    }
+
+    private static func measureUpload() async throws -> Double {
+        let byteCount = 10_000_000
+        var request = URLRequest(url: URL(string: "https://speed.cloudflare.com/__up")!)
+        request.httpMethod = "POST"
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        let payload = Data(count: byteCount)
+
+        let start = Date()
+        _ = try await URLSession.shared.upload(for: request, from: payload)
+        let elapsed = Date().timeIntervalSince(start)
+
+        return megabits(forByteCount: byteCount, elapsed: elapsed)
+    }
+
+    private static func megabits(forByteCount byteCount: Int, elapsed: TimeInterval) -> Double {
+        guard elapsed > 0 else { return 0 }
+        return (Double(byteCount) * 8 / 1_000_000) / elapsed
+    }
+}
+
 // MARK: - Device Contacts
 
 /// One entry from the device address book: just enough to list and dial it. Uses the first
@@ -436,6 +547,38 @@ enum DirectoryDatabase {
             }
         }
         return names
+    }
+
+    /// Diagnostic twin of `detectVersion` that returns *why* a file wasn't recognized instead of
+    /// just `nil` — the real `sqlite3_open`/`sqlite3_prepare` error, or the actual table names
+    /// found, so a report of "wrong format" on a file that opens fine on a Mac can be traced
+    /// instead of guessed at. Not on the normal discovery path (that one only needs yes/no).
+    static func diagnose(at url: URL) -> String {
+        var db: OpaquePointer?
+        let openResult = sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil)
+        guard openResult == SQLITE_OK, let db else {
+            let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? "unknown error"
+            if let db { sqlite3_close(db) }
+            return "sqlite3_open failed (code \(openResult)): \(message)"
+        }
+        defer { sqlite3_close(db) }
+
+        var statement: OpaquePointer?
+        let prepareResult = sqlite3_prepare_v2(db, "SELECT name FROM sqlite_master WHERE type = 'table';", -1, &statement, nil)
+        guard prepareResult == SQLITE_OK, let statement else {
+            return "sqlite3_prepare failed (code \(prepareResult)): \(String(cString: sqlite3_errmsg(db)))"
+        }
+        defer { sqlite3_finalize(statement) }
+
+        var names: [String] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            if let cString = sqlite3_column_text(statement, 0) {
+                names.append(String(cString: cString))
+            }
+        }
+        return names.isEmpty
+            ? "opened fine but sqlite_master has no tables"
+            : "opened fine, tables found: \(names.joined(separator: ", ")) — none match the expected v1/v2 shape"
     }
 
     /// Separate number/name inputs instead of one combined field: a number search is a prefix
