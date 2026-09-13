@@ -606,6 +606,32 @@ struct DirectoryEntry: Identifiable, Hashable {
     var id: String { number }
     let number: String
     let name: String
+    /// v1's own `is_mobile` column, or which of v2's two tables (`movil`/`fix`) the row came
+    /// from — either way, whether this is a cell number or a landline.
+    let isMobile: Bool
+
+    /// Title-cased for display — the source dump stores names in raw caps (e.g. "ALBERTO
+    /// LICEA") — never mutates `name` itself, just how a view should show it. A few names carry
+    /// a literal U+FFFD (�) baked into the dump itself — some upstream encoding conversion lost
+    /// that character (usually Ñ or an accented letter) before this file was ever created, so
+    /// there's no original byte left to recover; shown as `*` instead of the replacement glyph.
+    var displayName: String {
+        guard !name.isEmpty else { return "Sin Nombre" }
+        return Self.titleCased(name.replacingOccurrences(of: "\u{FFFD}", with: "*"))
+    }
+
+    /// Splits only on spaces (not on `*` or other punctuation) so a name like "CASTA*AL" stays
+    /// one word — `String.capitalized` would treat `*` as a word boundary and wrongly capitalize
+    /// what comes after it too.
+    private static func titleCased(_ string: String) -> String {
+        string
+            .split(separator: " ")
+            .map { word -> String in
+                guard let first = word.first else { return String(word) }
+                return String(first).uppercased() + word.dropFirst().lowercased()
+            }
+            .joined(separator: " ")
+    }
 }
 
 /// Reverse number/name lookup over a Truecaller-style dump the user drops into this app's
@@ -782,29 +808,37 @@ enum DirectoryDatabase {
 
         switch file.version {
         case .v1:
-            return rows(db: db, table: "contacts", whereClause: whereClause, patterns: patterns, limit: limit)
+            // `contacts` carries its own `is_mobile` column — read it per row instead of
+            // assuming one line type for the whole table.
+            return rows(db: db, table: "contacts", whereClause: whereClause, patterns: patterns, limit: limit, knownIsMobile: nil)
         case .v2:
-            let mobile = rows(db: db, table: "movil", whereClause: whereClause, patterns: patterns, limit: limit)
+            let mobile = rows(db: db, table: "movil", whereClause: whereClause, patterns: patterns, limit: limit, knownIsMobile: true)
             guard mobile.count < limit else { return mobile }
             let landline = rows(
                 db: db,
                 table: "fix",
                 whereClause: whereClause,
                 patterns: patterns,
-                limit: limit - Int32(mobile.count)
+                limit: limit - Int32(mobile.count),
+                knownIsMobile: false
             )
             return mobile + landline
         }
     }
 
+    /// `knownIsMobile` is `nil` for v1's `contacts` (read its own `is_mobile` column per row) or
+    /// a fixed value for v2's `movil`/`fix` (neither table has that column — which one it is IS
+    /// the line type).
     private static func rows(
         db: OpaquePointer,
         table: String,
         whereClause: String,
         patterns: [String],
-        limit: Int32
+        limit: Int32,
+        knownIsMobile: Bool?
     ) -> [DirectoryEntry] {
-        let sql = "SELECT number, name FROM \(table) WHERE \(whereClause) LIMIT ?;"
+        let columns = knownIsMobile == nil ? "number, name, is_mobile" : "number, name"
+        let sql = "SELECT \(columns) FROM \(table) WHERE \(whereClause) LIMIT ?;"
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
             return []
@@ -820,7 +854,8 @@ enum DirectoryDatabase {
         while sqlite3_step(statement) == SQLITE_ROW {
             guard let numberCString = sqlite3_column_text(statement, 0) else { continue }
             let name = sqlite3_column_text(statement, 1).map { String(cString: $0) } ?? ""
-            results.append(DirectoryEntry(number: String(cString: numberCString), name: name))
+            let isMobile = knownIsMobile ?? (sqlite3_column_int(statement, 2) != 0)
+            results.append(DirectoryEntry(number: String(cString: numberCString), name: name, isMobile: isMobile))
         }
         return results
     }

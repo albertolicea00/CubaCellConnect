@@ -76,6 +76,8 @@ Ajustes › Buscar en Directorio lets you query a phone directory (Truecaller-st
 
 **Name search is intentionally disabled for privacy and security.** Only number search is allowed — this avoids turning the app into a reverse people-search-by-name tool.
 
+Results show a mobile/landline icon in place of a real contact photo (the dump carries no photos, only line type) and a **copy-to-clipboard** button instead of a call button — also intentional: these are numbers from a scraped third-party dump, not something the user typed in or picked from their own address book, so this app doesn't offer one-tap dialing straight out of a directory search.
+
 ## 🛜 Navigation Rooms & Public WIFI Spaces
 
 Ajustes › Salas y Zonas WiFi is a bundled, read-only copy of ETECSA's own public "Navigation rooms and public spaces (WIFI)" directory — unlike the reverse-lookup directory above, this is official public service-location data (room/hotspot names and addresses), not customer data, so it ships inside the app like `codes.json` does.

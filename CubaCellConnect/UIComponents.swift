@@ -1,5 +1,6 @@
 import ContactsUI
 import SwiftUI
+import UIKit
 
 // MARK: - Contact Picker
 
@@ -212,11 +213,21 @@ struct DirectoryEntryRowView: View {
     let entry: DirectoryEntry
 
     @Environment(AccentColorStore.self) private var accentColorStore
+    /// Briefly swaps the copy icon for a checkmark after a tap, then reverts — the only
+    /// confirmation a plain "copy to clipboard" action gets, no in-app dial log to show it in.
+    @State private var didCopy = false
 
     var body: some View {
         HStack(spacing: 12) {
+            // Not a real photo — no contact-photo data exists for a directory dump, only the
+            // line type — so this is a mobile-vs-landline icon standing in for an avatar.
+            Image(systemName: entry.isMobile ? "iphone" : "phone.fill")
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(accentColorStore.color, in: Circle())
+
             VStack(alignment: .leading, spacing: 2) {
-                Text(entry.name.isEmpty ? "Sin Nombre" : entry.name)
+                Text(entry.displayName)
                     .font(.body.weight(.medium))
                     .foregroundStyle(Color.appForeground)
                 Text(entry.number)
@@ -226,12 +237,20 @@ struct DirectoryEntryRowView: View {
 
             Spacer()
 
+            // Copy, not call — see README: numbers here come from a scraped third-party dump,
+            // not something the user typed in themselves, so dialing straight from this list is
+            // intentionally not offered.
             Button {
-                DialService.dial(entry.number)
+                UIPasteboard.general.string = entry.number
+                didCopy = true
+                Task {
+                    try? await Task.sleep(nanoseconds: 1_500_000_000)
+                    didCopy = false
+                }
             } label: {
-                Image(systemName: "phone.circle.fill")
+                Image(systemName: didCopy ? "checkmark.circle.fill" : "doc.on.doc")
                     .font(.title2)
-                    .foregroundStyle(accentColorStore.color)
+                    .foregroundStyle(didCopy ? .green : accentColorStore.color)
             }
             .buttonStyle(.plain)
         }
@@ -240,9 +259,12 @@ struct DirectoryEntryRowView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-    DirectoryEntryRowView(entry: DirectoryEntry(number: "51234567", name: "Juan Pérez"))
-        .padding()
-        .environment(AccentColorStore())
+    VStack {
+        DirectoryEntryRowView(entry: DirectoryEntry(number: "51234567", name: "JUAN PEREZ GOMEZ", isMobile: true))
+        DirectoryEntryRowView(entry: DirectoryEntry(number: "281000", name: "SONIA VERA BROOKS", isMobile: false))
+    }
+    .padding()
+    .environment(AccentColorStore())
 }
 
 // MARK: - Connection Status Banner
