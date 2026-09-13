@@ -209,6 +209,11 @@ final class SpeedTestRunner {
     private(set) var phase: SpeedTestPhase = .idle
     private(set) var result = SpeedTestResult()
 
+    /// Handle to the in-flight run, so leaving the screen can actually stop it instead of
+    /// letting it keep downloading/uploading tens of megabytes in the background and mutating
+    /// `phase`/`result` after nothing is watching them.
+    private var task: Task<Void, Never>?
+
     var isRunning: Bool {
         switch phase {
         case .testingPing, .testingDownload, .testingUpload: return true
@@ -221,7 +226,16 @@ final class SpeedTestRunner {
     func start() {
         guard !isRunning else { return }
         result = SpeedTestResult()
-        Task { await run() }
+        task = Task { await run() }
+    }
+
+    /// Stops the run in progress (if any) — called when the screen disappears. Leaves `phase`
+    /// as-is rather than resetting to `.idle`: if the view comes back (it won't, since it's torn
+    /// down on pop, but this keeps the method safe to call from anywhere), it's clearer to show
+    /// "interrupted mid-test" than a fresh `.idle` implying nothing ever ran.
+    func cancel() {
+        task?.cancel()
+        task = nil
     }
 
     @MainActor
@@ -229,14 +243,19 @@ final class SpeedTestRunner {
         do {
             phase = .testingPing
             result.pingMs = try await Self.measurePing()
+            try Task.checkCancellation()
 
             phase = .testingDownload
             result.downloadMbps = try await Self.measureDownload()
+            try Task.checkCancellation()
 
             phase = .testingUpload
             result.uploadMbps = try await Self.measureUpload()
+            try Task.checkCancellation()
 
             phase = .finished
+        } catch is CancellationError {
+            // Left mid-run on purpose (screen dismissed) — nothing to show an error for.
         } catch {
             phase = .failed("No se pudo completar la prueba. Revisa tu conexión e inténtalo de nuevo.")
         }

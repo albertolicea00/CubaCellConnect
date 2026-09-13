@@ -811,7 +811,7 @@ struct SettingsView: View {
                     }
                 }
 
-                Section {
+                Section("Utilidades") {
                     NavigationLink {
                         DirectorySearchView()
                     } label: {
@@ -823,9 +823,7 @@ struct SettingsView: View {
                     } label: {
                         Label("Salas y Zonas WiFi", systemImage: "wifi")
                     }
-                }
 
-                Section("Prueba de Velocidad") {
                     NavigationLink {
                         SpeedTestView()
                     } label: {
@@ -1526,6 +1524,7 @@ struct SpeedTestView: View {
                                 isFinishedOrFailed ? "Repetir Prueba" : "Iniciar Prueba",
                                 systemImage: "play.fill"
                             )
+                            .labelStyle(.titleAndIcon)
                             .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
@@ -1554,6 +1553,9 @@ struct SpeedTestView: View {
         }
         .navigationTitle("Prueba de Velocidad")
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            runner.cancel()
+        }
     }
 
     private var isFinishedOrFailed: Bool {
