@@ -21,6 +21,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 🌗 **Light and dark mode** support.
 - 👤 **Contactos tab** — reads the device's real address book (with photos) so you can call, transfer balance to, or dial a collect/hidden call for any contact without leaving the app.
 - 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
+- 🛜 **Navigation rooms & public WIFI spaces** — Ajustes › Salas y Zonas WiFi lists every Cuban province; picking one shows ETECSA's own paid navigation rooms (with seat counts) and free public WIFI hotspots by municipality, bundled from [`CubaCellConnect/data/wifi_navigation_rooms.json`](CubaCellConnect/data/wifi_navigation_rooms.json). See sources below.
 
 *The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
@@ -52,7 +53,9 @@ CubaCellConnect/
 ├── Services.swift            # JSON catalog store, Contacts, system dialer bridge
 ├── UIComponents.swift        # Reusable presentational views (code row)
 ├── Views.swift               # Home, Contactos, category, and settings screens
-└── codes.json                # Bundled USSD code catalog
+├── codes.json                # Bundled USSD code catalog
+└── data/
+    └── wifi_navigation_rooms.json  # Bundled ETECSA navigation-room/hotspot directory
 
 CallerIDExtension/             # CallKit Call Directory Extension (labels *99 collect calls)
 └── CallDirectoryHandler.swift
@@ -72,6 +75,33 @@ A weekly GitHub Action ([`ussd-sync-check`](.github/workflows/ussd-sync-check.ym
 Ajustes › Buscar en Directorio lets you query a phone directory (Truecaller-style dump, not bundled with the app) that the user copies into this app's own files (Finder › your iPhone, or the "Importar Base de Datos" button inside the screen). The app never downloads or bundles that file itself — it only detects and reads it if already present.
 
 **Name search is intentionally disabled for privacy and security.** Only number search is allowed — this avoids turning the app into a reverse people-search-by-name tool.
+
+## 🛜 Navigation Rooms & Public WIFI Spaces
+
+Ajustes › Salas y Zonas WiFi is a bundled, read-only copy of ETECSA's own public "Navigation rooms and public spaces (WIFI)" directory — unlike the reverse-lookup directory above, this is official public service-location data (room/hotspot names and addresses), not customer data, so it ships inside the app like `codes.json` does.
+
+Scraped once (2026-09) from ETECSA's public site, one page per province:
+
+| Province | Source |
+|---|---|
+| Pinar del Río | https://www.etecsa.cu/en/rooms-public-spaces?provincia=49 |
+| Artemisa | https://www.etecsa.cu/en/rooms-public-spaces?provincia=33 |
+| La Habana | https://www.etecsa.cu/en/rooms-public-spaces?provincia=27 |
+| Isla de la Juventud | https://www.etecsa.cu/en/rooms-public-spaces?provincia=29 |
+| Mayabeque | https://www.etecsa.cu/en/rooms-public-spaces?provincia=200 |
+| Matanzas | https://www.etecsa.cu/en/rooms-public-spaces?provincia=212 |
+| Cienfuegos | https://www.etecsa.cu/en/rooms-public-spaces?provincia=226 |
+| Villa Clara | https://www.etecsa.cu/en/rooms-public-spaces?provincia=235 |
+| Sancti Spíritus | https://www.etecsa.cu/en/rooms-public-spaces?provincia=249 |
+| Ciego de Ávila | https://www.etecsa.cu/en/rooms-public-spaces?provincia=258 |
+| Camagüey | https://www.etecsa.cu/en/rooms-public-spaces?provincia=269 |
+| Las Tunas | https://www.etecsa.cu/en/rooms-public-spaces?provincia=283 |
+| Granma | https://www.etecsa.cu/en/rooms-public-spaces?provincia=292 |
+| Holguín | https://www.etecsa.cu/en/rooms-public-spaces?provincia=306 |
+| Santiago de Cuba | https://www.etecsa.cu/en/rooms-public-spaces?provincia=321 |
+| Guantánamo | https://www.etecsa.cu/en/rooms-public-spaces?provincia=331 |
+
+Since this data is bundled (not fetched live), it can drift from ETECSA's site over time — there is no sync check for it yet, unlike `codes.json`.
 
 ## 🤝 Contributing
 
