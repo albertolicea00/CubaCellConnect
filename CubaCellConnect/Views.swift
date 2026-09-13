@@ -794,16 +794,35 @@ struct SettingsView: View {
                     }
                 }
 
-                NavigationLink {
-                    HelpSettingsView()
-                } label: {
-                    Label("Ayuda", systemImage: "questionmark.circle.fill")
+                Section("Acerca de") {
+                    NavigationLink {
+                        HelpSettingsView()
+                    } label: {
+                        Label("Ayuda", systemImage: "questionmark.circle.fill")
+                    }
+
+                    Text("CubaCell Connect da acceso rápido a los códigos USSD de servicio de ETECSA (Cubacel): saldo, compras, transferencias y otras utilidades, todo desde una app sin conexión y sin dependencias.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    Label("No está afiliada, avalada ni patrocinada por ETECSA. Los códigos pueden cambiar en cualquier momento a discreción del operador.", systemImage: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect")!) {
+                        Label("Código fuente en GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    }
+                    Link(destination: URL(string: "https://www.linkedin.com/in/albertolicea00")!) {
+                        Label("Alberto Licea (Desarrollador)", systemImage: "person.circle")
+                    }
                 }
 
-                NavigationLink {
-                    AboutSettingsView()
-                } label: {
-                    Label("Información", systemImage: "info.circle.fill")
+                Section {
+                    Text("Versión \(AppVersion) (\(AppBuild))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .listRowBackground(Color.clear)
                 }
             }
             .navigationTitle("Ajustes")
@@ -973,45 +992,7 @@ private struct HelpSettingsView: View {
                 )
             }
         }
-        .navigationTitle("Ayuda")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-/// Ajustes › Información — about the app, links, and version.
-private struct AboutSettingsView: View {
-    var body: some View {
-        Form {
-            Section("Acerca de") {
-                Text("CubaCell Connect da acceso rápido a los códigos USSD de servicio de ETECSA (Cubacel): saldo, compras, transferencias y otras utilidades, todo desde una app sin conexión y sin dependencias.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                Label("No está afiliada, avalada ni patrocinada por ETECSA. Los códigos pueden cambiar en cualquier momento a discreción del operador.", systemImage: "exclamationmark.triangle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Enlaces") {
-                Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect")!) {
-                    Label("Código fuente en GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
-                }
-                Link(destination: URL(string: "https://github.com/albertolicea00/MyUSSDCodes-collection")!) {
-                    Label("Fuente de la verdad de los códigos USSD", systemImage: "checkmark.seal")
-                }
-                Link(destination: URL(string: "https://www.linkedin.com/in/albertolicea00")!) {
-                    Label("Alberto Licea (Desarrollador)", systemImage: "person.circle")
-                }
-            }
-
-            Section {
-                Text("Versión \(AppVersion) (\(AppBuild))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-            }
-        }
-        .navigationTitle("Información")
+        .navigationTitle("Ayuda (Manual de Uso)")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
