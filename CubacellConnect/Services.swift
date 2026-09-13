@@ -1,6 +1,9 @@
 import Foundation
 import UIKit
 
+let AppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+let AppBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+
 // MARK: - Catalog Store
 
 /// Loads and exposes the bundled USSD code catalog.

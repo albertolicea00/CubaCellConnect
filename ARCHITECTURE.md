@@ -13,20 +13,24 @@ It is a single-target, dependency-free SwiftUI app with no backend, no network c
 ```
 ┌─────────────────────────────────────────────────┐
 │                CubaCellConnectApp                │
-│         (App entry point · injects store)        │
+│    (App entry point · injects store · theme)     │
 └───────────────────────────┬───────────────────────┘
                             │
                             ▼
                         HomeView
-              (category list · selects a code)
-                            │
-                            ▼
-                    CodeDetailView (sheet)
-              (input, copy to clipboard, dial)
-                    │                │
-                    ▼                ▼
-              DialService      UIPasteboard
-           (opens tel:// URL)
+                (TabView, one tab per category)
+        ┌──────────┬──────────┬──────────┬──────────┐
+        ▼          ▼          ▼          ▼          ▼
+   CategoryListView (×N, one per USSDCategory)   SettingsView
+   (per-category code list · selects a code)   (theme, about, links)
+        │
+        ▼
+   CodeDetailView (sheet)
+   (input, copy to clipboard, dial)
+        │                │
+        ▼                ▼
+   DialService      UIPasteboard
+(opens tel:// URL)
 
 
           USSDCodeStore ── decodes ──▶ USSDCatalog
@@ -34,7 +38,7 @@ It is a single-target, dependency-free SwiftUI app with no backend, no network c
                   └── loads CubaCellConnect/codes.json (bundled, read-only)
 ```
 
-There is no MVVM view-model layer, no navigation state machine, and no singleton services beyond the one `@Observable` catalog store injected at the app root. State flows one way — store (read-only) → views — and the only mutable state anywhere in the app is `selectedCode` in `HomeView` and `input`/`copied` in `CodeDetailView`. This keeps the codebase intentionally tiny (≈250 lines of Swift across 5 files).
+There is no MVVM view-model layer, no cross-tab navigation state machine, and no singleton services beyond the one `@Observable` catalog store injected at the app root. State flows one way — store (read-only) → views — and the only mutable state anywhere in the app is `selectedCode` (one per `CategoryListView` instance), `input`/`copied` in `CodeDetailView`, and the `darkModePreference` `@AppStorage` flag read by both `SettingsView` and `CubaCellConnectApp`. This keeps the codebase intentionally small (≈380 lines of Swift across 5 files).
 
 ---
 
@@ -46,7 +50,7 @@ There is no MVVM view-model layer, no navigation state machine, and no singleton
 | `CubaCellConnect/Models.swift` | `Codable` catalog models (`USSDCatalog`, `USSDCategory`, `USSDCode`, `USSDActionType`) plus the brand palette (`Color.brandNavy`, `.brandCyan`, `.appBackground`, `.appForeground`) and `AppTheme.codeFont`. |
 | `CubaCellConnect/Services.swift` | `USSDCodeStore` (`@Observable`, loads and decodes `codes.json` from the bundle) and `DialService` (stateless enum that builds and opens `tel://` URLs). |
 | `CubaCellConnect/UIComponents.swift` | Reusable, presentation-only views: `CodeRowView`, a pure function of a `USSDCode`. |
-| `CubaCellConnect/Views.swift` | The two screens: `HomeView` (category list, owns `selectedCode`) and `CodeDetailView` (the sheet with the only real logic in the app). |
+| `CubaCellConnect/Views.swift` | `HomeView` (the root `TabView`), `CategoryListView` (one instance per category, owns that tab's `selectedCode`), `CodeDetailView` (the sheet with the dial/copy logic), and `SettingsView` (appearance picker, how-USSD-works blurbs, about, links). |
 | `CubaCellConnect/codes.json` | Static, bundled dataset: version, carrier, categories, and every service code with its dial string and presentation metadata. |
 | `CubaCellConnect.xcassets/` | `AccentColor` (brand cyan, `#09C`) and `AppIcon`. |
 
@@ -78,7 +82,11 @@ USSDCatalog
 
 ## 4. Navigation Model
 
-There is exactly one navigation surface: `HomeView` is a `NavigationStack` wrapping a grouped `List`, one section per category. Tapping a row sets `selectedCode`, which drives a `.sheet(item:)` presenting `CodeDetailView` at `.medium`/`.large` detents. Dismissing the sheet (by dialing or by swipe) simply clears `selectedCode` — there is no back-stack, no deep linking, and no state that survives relaunch.
+`HomeView` is a bottom `TabView` built by iterating `store.categories` — one tab per catalog category (SF Symbol from `USSDCategory.icon`), plus a fixed final "Settings" tab. Nothing hardcodes the category count or order beyond `codes.json` itself: adding a category there adds a tab automatically.
+
+Each category tab hosts its own `CategoryListView`, a `NavigationStack` wrapping a plain `List` of that category's codes. Tapping a row sets that instance's own `selectedCode`, driving a `.sheet(item:)` that presents `CodeDetailView` at `.medium`/`.large` detents. Because `selectedCode` is local `@State` per `CategoryListView`, each tab's sheet state is independent — switching tabs mid-sheet is not a state collision, SwiftUI just tears down and recreates each tab's own view identity as needed.
+
+`SettingsView` is its own `NavigationStack` with a `Form`, entirely separate from the category tabs — no shared navigation state, no back-stack, no deep linking, and nothing survives relaunch except the one `@AppStorage("darkModePreference")` flag.
 
 ---
 
@@ -96,7 +104,8 @@ There is no prefill/resolver indirection here (unlike apps that inject saved use
 ## 6. Theming
 
 - **Brand palette**: `Color.brandNavy` (`rgb(0,0,102)`) and `Color.brandCyan` (`#09C`) are fixed static properties on `Color`, defined in `Models.swift` — not user-configurable, unlike apps that expose a `ColorPicker` for the accent. `AccentColor` in the asset catalog is set to the same cyan so system controls (nav bar tint, `.tint(.brandCyan)`) match without restating the value.
-- **Adaptive colors**: `Color.appBackground`/`.appForeground` wrap `UIColor.systemBackground`/`.label` so light/dark mode "just works" without any app-level dark-mode toggle or `@AppStorage` preference.
+- **Adaptive colors**: `Color.appBackground`/`.appForeground` wrap `UIColor.systemBackground`/`.label` so light/dark mode "just works" by default.
+- **Dark mode override**: `SettingsView` exposes a "Theme" picker (System Default / Light / Dark) backed by `@AppStorage("darkModePreference")` (`Int`, 0/1/2). `CubaCellConnectApp` reads the same key and applies `.preferredColorScheme(nil/.light/.dark)` to the root `WindowGroup` content — the one piece of state in the app that is both user-configurable and persisted across launches.
 - **Typography**: `AppTheme.codeFont(size:)` is the one shared style — a semibold monospaced font — used everywhere a dial string is displayed, so codes always read as "code" rather than prose.
 - All color usage in views must go through these tokens; no ad-hoc colors.
 
@@ -125,7 +134,7 @@ These shape the UX and are not fixable in code:
 ## 9. Extension Points
 
 - **New code or category** → edit `codes.json` only; UI adapts automatically.
-- **Search** → filter `store.codes` in `HomeView`; no structural change needed.
+- **Search** → filter `store.codes(in:)` inside `CategoryListView`; no structural change needed.
 - **Favorites / recents** → first real persistence; add a small `UserDefaults`-backed store beside `USSDCodeStore`, keep the catalog itself read-only.
 - **Remote catalog updates** → replace `USSDCodeStore.load(from:)` with a cached-remote strategy; the `version` field in the JSON exists for this.
 - **Localization** — UI copy is English; catalog `title`/`details` would move to localized variants keyed by the same `id`.
