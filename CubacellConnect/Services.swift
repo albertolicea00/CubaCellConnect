@@ -226,20 +226,32 @@ final class ContactsService {
         CXCallDirectoryManager.sharedInstance.reloadExtension(withIdentifier: CallerIDStore.extensionBundleID) { _ in }
     }
 
+    /// Leading digit(s) a valid Cuban mobile number starts with, after the country code is
+    /// stripped. Currently "5" or "6" (broad — covers today's ETECSA mobile ranges); narrow
+    /// this to specific prefixes later (e.g. `["60", "61", "64"]` instead of `"6"`) if only
+    /// some ranges under 6 turn out to be mobile — `hasPrefix` matching means any length works.
+    private static let validMobilePrefixes = ["5", "6"]
+
     /// Only Cuban mobile numbers belong in this list — USSD codes are meaningless for anyone
-    /// else. Accepts either the bare 8-digit local form or `+53` plus 8 digits, and strips the
-    /// country code down to those 8 digits (e.g. "+53 5 123 4567" → "51234567"). Anything else
-    /// (a US `+1`, a Mexican `+52`, a malformed number, ...) returns `nil` and the contact — or
-    /// that specific number of theirs — is skipped entirely.
+    /// else. Accepts either the bare 8-digit local form or `+53` plus 8 digits, strips the
+    /// country code down to those 8 digits (e.g. "+53 5 123 4567" → "51234567"), and checks the
+    /// result starts with an allowed prefix (`validMobilePrefixes`). Anything else (a US `+1`,
+    /// a Mexican `+52`, a malformed number, a Cuban landline prefix, ...) returns `nil` and the
+    /// contact — or that specific number of theirs — is skipped entirely.
     private static func normalizeCubanMobile(_ rawNumber: String) -> String? {
         let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
+
+        let localNumber: String
         if digits.count == 8 {
-            return digits
+            localNumber = digits
+        } else if digits.count == 10, digits.hasPrefix("53") {
+            localNumber = String(digits.dropFirst(2))
+        } else {
+            return nil
         }
-        if digits.count == 10, digits.hasPrefix("53") {
-            return String(digits.dropFirst(2))
-        }
-        return nil
+
+        guard validMobilePrefixes.contains(where: localNumber.hasPrefix) else { return nil }
+        return localNumber
     }
 }
 
