@@ -67,6 +67,12 @@ The USSD codes in [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json) mir
 
 A weekly GitHub Action ([`ussd-sync-check`](.github/workflows/ussd-sync-check.yml)) compares the dial strings shipped here against that collection. On drift the run fails and opens a `ussd-sync` issue listing the added/removed codes. **Fix codes upstream in MyUSSDCodes-collection first, then sync this file to match.**
 
+## 🔍 Directory (reverse lookup)
+
+Ajustes › Buscar en Directorio lets you query a phone directory (Truecaller-style dump, not bundled with the app) that the user copies into this app's own files (Finder › your iPhone, or the "Importar Base de Datos" button inside the screen). The app never downloads or bundles that file itself — it only detects and reads it if already present.
+
+**Name search is intentionally disabled for privacy and security.** Only number search is allowed — this avoids turning the app into a reverse people-search-by-name tool.
+
 ## 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).

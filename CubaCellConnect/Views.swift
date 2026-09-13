@@ -958,7 +958,12 @@ struct DirectorySearchView: View {
                     Section {
                         TextField("Número", text: $numberQuery)
                             .keyboardType(.phonePad)
-                        TextField("Nombre", text: $nameQuery)
+
+                        // Name search intentionally disabled for privacy and security — see
+                        // README. `nameQuery` stays "" forever; the rest of the code
+                        // (DirectoryDatabase.search, hasSearchableInput) already supports it
+                        // again just by uncommenting this field.
+                        // TextField("Nombre", text: $nameQuery)
                     }
 
                     Section {
