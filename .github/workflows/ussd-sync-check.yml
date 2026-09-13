@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - "CubacellConnect/Resources/ussd_codes.json"
+      - "CubaCellConnect/codes.json"
       - ".github/scripts/check-ussd-sync.mjs"
       - ".github/workflows/ussd-sync-check.yml"
 

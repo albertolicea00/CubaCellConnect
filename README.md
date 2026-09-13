@@ -20,7 +20,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 💡 **Mnemonics** — e.g. `328 = DAT`, `266 = BON`, `869 = VOZ` — the keypad letters spell the service name.
 - 🌗 **Light and dark mode** support.
 
-*The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubacellConnect/Resources/ussd_codes.json`](CubacellConnect/Resources/ussd_codes.json), keeping the app lightweight and easy to update.* 📁
+*The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
 ## 🛠️ Requirements
 
@@ -53,7 +53,7 @@ CubacellConnect/
 
 ## 🔄 Code source of truth
 
-The USSD codes in [`CubacellConnect/Resources/ussd_codes.json`](CubacellConnect/Resources/ussd_codes.json) mirror the canonical [`cuba-cubacel`](https://github.com/albertolicea00/MyUSSDCodes-collection/blob/main/codes/cuba-cubacel.json) collection in **[MyUSSDCodes-collection](https://github.com/albertolicea00/MyUSSDCodes-collection)** — the single source of truth for USSD codes across all my apps.
+The USSD codes in [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json) mirror the canonical [`cuba-cubacel`](https://github.com/albertolicea00/MyUSSDCodes-collection/blob/main/codes/cuba-cubacel.json) collection in **[MyUSSDCodes-collection](https://github.com/albertolicea00/MyUSSDCodes-collection)** — the single source of truth for USSD codes across all my apps.
 
 A weekly GitHub Action ([`ussd-sync-check`](.github/workflows/ussd-sync-check.yml)) compares the dial strings shipped here against that collection. On drift the run fails and opens a `ussd-sync` issue listing the added/removed codes. **Fix codes upstream in MyUSSDCodes-collection first, then sync this file to match.**
 

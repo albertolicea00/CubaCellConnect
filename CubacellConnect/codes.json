@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "carrier": "ETECSA (Cubacel)",
+  "categories": [
+    { "id": "balance", "name": "Balance & Plans", "icon": "gauge" },
+    { "id": "purchase", "name": "Purchases & Top-Up", "icon": "cart" },
+    { "id": "transfer", "name": "Transfers", "icon": "arrow.left.arrow.right" },
+    { "id": "utilities", "name": "Other Utilities", "icon": "wrench.and.screwdriver" }
+  ],
+  "codes": [
+    {
+      "id": "main-balance",
+      "code": "*222#",
+      "title": "Main Balance",
+      "details": "Main balance, voice, SMS and mobile data resources, plus the phone line validity period.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "data-plan",
+      "code": "*222*328#",
+      "title": "Data Plan",
+      "details": "Remaining balance and validity of the purchased mobile data plan. Does not include bonus data.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": "328 = DAT (datos)"
+    },
+    {
+      "id": "bonus-usd-plans",
+      "code": "*222*266#",
+      "title": "Bonuses & USD Plans",
+      "details": "Everything related to promotional top-up bonuses: minutes (MIN), messages (SMS), credit ($) and data (GB/MB/KB). Also shows extra 4G data (Datos.LTE), national browsing data (Datos.cu) and plans in USD.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": "266 = BON (bono)"
+    },
+    {
+      "id": "voice-plan",
+      "code": "*222*869#",
+      "title": "Voice Plan",
+      "details": "Remaining credit and validity of the purchased voice plan.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": "869 = VOZ (voz)"
+    },
+    {
+      "id": "sms-plan",
+      "code": "*222*767#",
+      "title": "SMS Plan",
+      "details": "Remaining credit and validity of the purchased SMS plan.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": "767 = SMS"
+    },
+    {
+      "id": "friends-plan",
+      "code": "*222*264#",
+      "title": "Friends Plan Status",
+      "details": "Status of the Plan Amigos (Friends Plan), if you have requested it.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": "264 = AMG (amigos)"
+    },
+    {
+      "id": "postpaid-balance",
+      "code": "*111#",
+      "title": "Postpaid Balance",
+      "details": "All-in-one balance query for postpaid and institutional accounts: calls, SMS and internet.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "data-availability",
+      "code": "*222*468#",
+      "title": "Mobile Data Availability",
+      "details": "Check whether your line can connect through mobile data in Cuba.",
+      "category": "balance",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": "468 = INT (internet)"
+    },
+    {
+      "id": "purchase-menu",
+      "code": "*133#",
+      "title": "Purchase Menu",
+      "details": "Interactive menu to buy services: 1) Data, 2) SMS, 3) Voice, 4) Friends Plan, 5) Bundles (Data + Voice + SMS).",
+      "category": "purchase",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "recharge-card",
+      "code": "*662*{input}#",
+      "title": "Recharge with Card",
+      "details": "Manually recharge your balance with a scratch card bought from a Telecommunications Agent or an ETECSA office. Enter the card number.",
+      "category": "purchase",
+      "type": "ussd",
+      "requiresInput": true,
+      "inputPlaceholder": "Card number",
+      "mnemonic": null
+    },
+    {
+      "id": "recharge-call",
+      "code": "*666",
+      "title": "Recharge by Call",
+      "details": "Call this number and follow the voice instructions to recharge your balance.",
+      "category": "purchase",
+      "type": "call",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "transfer-menu",
+      "code": "*234#",
+      "title": "Transfer Menu",
+      "details": "Interactive menu with three options: 1) Balance transfer, 2) Change the transfer PIN, 3) Adelanta Saldo (advance credit) service.",
+      "category": "transfer",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "customer-service",
+      "code": "*2266",
+      "title": "Customer Service",
+      "details": "Call this number for support, questions, or to activate voicemail on your phone.",
+      "category": "utilities",
+      "type": "call",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "collect-call",
+      "code": "*99{input}",
+      "title": "Collect Call",
+      "details": "The person receiving the call pays. Useful when you need to call and have no balance.",
+      "category": "utilities",
+      "type": "call",
+      "requiresInput": true,
+      "inputPlaceholder": "Phone number",
+      "mnemonic": null
+    },
+    {
+      "id": "private-call",
+      "code": "#31#{input}",
+      "title": "Private Call",
+      "details": "Hide your caller ID by prefixing the number you want to call. The other person will not see who is calling.",
+      "category": "utilities",
+      "type": "call",
+      "requiresInput": true,
+      "inputPlaceholder": "Phone number",
+      "mnemonic": null
+    },
+    {
+      "id": "imei",
+      "code": "*#06#",
+      "title": "Show IMEI",
+      "details": "Display the IMEI code of your phone.",
+      "category": "utilities",
+      "type": "ussd",
+      "requiresInput": false,
+      "mnemonic": null
+    },
+    {
+      "id": "voicemail",
+      "code": "*123",
+      "title": "Voicemail",
+      "details": "Call this number to access your voicemail inbox.",
+      "category": "utilities",
+      "type": "call",
+      "requiresInput": false,
+      "mnemonic": null
+    }
+  ]
+}

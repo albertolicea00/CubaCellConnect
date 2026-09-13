@@ -18,7 +18,7 @@ import fs from "node:fs";
 
 const CANONICAL_ID = "cuba-cubacel";
 const CANONICAL_URL = `https://raw.githubusercontent.com/albertolicea00/MyUSSDCodes-collection/main/codes/${CANONICAL_ID}.json`;
-const LOCAL_FILE = "CubacellConnect/Resources/ussd_codes.json";
+const LOCAL_FILE = "CubaCellConnect/codes.json";
 
 /** Repo-specific: pull every dial string out of this repo's own catalog. */
 function extractLocal(json) {
