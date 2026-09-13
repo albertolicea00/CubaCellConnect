@@ -418,71 +418,116 @@ struct CategoryListView: View {
 
 /// Settings tab: appearance, list display, connection warning, how USSD works, about and links.
 struct SettingsView: View {
-    @AppStorage("darkModePreference") private var darkMode: Int = 0
-    @AppStorage("showNetworkStatus") private var showNetworkStatus = false
-
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Apariencia") {
-                    Picker("Tema", selection: $darkMode) {
-                        Text("Predeterminado del sistema").tag(0)
-                        Text("Claro").tag(1)
-                        Text("Oscuro").tag(2)
-                    }
+            List {
+                NavigationLink {
+                    PreferencesSettingsView()
+                } label: {
+                    Label("Preferencias", systemImage: "gearshape.fill")
                 }
 
-                Section {
-                    Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
-                } header: {
-                    Text("General")
-                } footer: {
-                    Text("Muestra un aviso cuando no hay señal celular o es débil. El USSD necesita señal de voz, no datos ni Wi-Fi.")
+                NavigationLink {
+                    HelpSettingsView()
+                } label: {
+                    Label("Ayuda", systemImage: "questionmark.circle.fill")
                 }
 
-                Section("Cómo Funciona el USSD") {
-                    SettingsInfoRow(
-                        title: "¿Qué es el USSD?",
-                        text: "El USSD es un protocolo telefónico que te permite interactuar con tu operadora marcando códigos especiales como *222#. Necesita señal celular, no datos ni Wi-Fi. Toca cualquier código de la lista y el marcador del sistema se abre listo para enviarlo — el propio iOS te pide confirmar antes de que la llamada se realice."
-                    )
-                    SettingsInfoRow(
-                        title: "Códigos que piden un dato",
-                        text: "Algunos códigos, como recargar con tarjeta, necesitan un número adicional (p. ej. *662*{tarjeta}#). Al tocarlos, primero se pide ese dato y luego se marca el código completo."
-                    )
-                }
-
-                Section("Acerca de") {
-                    Text("CubaCell Connect da acceso rápido a los códigos USSD de servicio de ETECSA (Cubacel): saldo, compras, transferencias y otras utilidades, todo desde una app sin conexión y sin dependencias.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-
-                    Label("No está afiliada, avalada ni patrocinada por ETECSA. Los códigos pueden cambiar en cualquier momento a discreción del operador.", systemImage: "exclamationmark.triangle")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Section("Enlaces") {
-                    Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect")!) {
-                        Label("Código fuente en GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
-                    }
-                    Link(destination: URL(string: "https://github.com/albertolicea00/MyUSSDCodes-collection")!) {
-                        Label("Fuente de la verdad de los códigos USSD", systemImage: "checkmark.seal")
-                    }
-                    Link(destination: URL(string: "https://www.linkedin.com/in/albertolicea00")!) {
-                        Label("Alberto Licea (Desarrollador)", systemImage: "person.circle")
-                    }
-                }
-
-                Section {
-                    Text("Versión \(AppVersion) (\(AppBuild))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                NavigationLink {
+                    AboutSettingsView()
+                } label: {
+                    Label("Información", systemImage: "info.circle.fill")
                 }
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+}
+
+/// Ajustes › Preferencias — appearance and general behavior toggles.
+private struct PreferencesSettingsView: View {
+    @AppStorage("darkModePreference") private var darkMode: Int = 0
+    @AppStorage("showNetworkStatus") private var showNetworkStatus = false
+
+    var body: some View {
+        Form {
+            Section("Apariencia") {
+                Picker("Tema", selection: $darkMode) {
+                    Text("Predeterminado del sistema").tag(0)
+                    Text("Claro").tag(1)
+                    Text("Oscuro").tag(2)
+                }
+            }
+
+            Section {
+                Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
+            } header: {
+                Text("General")
+            } footer: {
+                Text("Muestra un aviso cuando no hay señal celular o es débil. El USSD necesita señal de voz, no datos ni Wi-Fi.")
+            }
+        }
+        .navigationTitle("Preferencias")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// Ajustes › Ayuda — how USSD works, in plain language.
+private struct HelpSettingsView: View {
+    var body: some View {
+        Form {
+            Section("Cómo Funciona el USSD") {
+                SettingsInfoRow(
+                    title: "¿Qué es el USSD?",
+                    text: "El USSD es un protocolo telefónico que te permite interactuar con tu operadora marcando códigos especiales como *222#. Necesita señal celular, no datos ni Wi-Fi. Toca cualquier código de la lista y el marcador del sistema se abre listo para enviarlo — el propio iOS te pide confirmar antes de que la llamada se realice."
+                )
+                SettingsInfoRow(
+                    title: "Códigos que piden un dato",
+                    text: "Algunos códigos, como recargar con tarjeta, necesitan un número adicional (p. ej. *662*{tarjeta}#). Al tocarlos, primero se pide ese dato y luego se marca el código completo."
+                )
+            }
+        }
+        .navigationTitle("Ayuda")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// Ajustes › Información — about the app, links, and version.
+private struct AboutSettingsView: View {
+    var body: some View {
+        Form {
+            Section("Acerca de") {
+                Text("CubaCell Connect da acceso rápido a los códigos USSD de servicio de ETECSA (Cubacel): saldo, compras, transferencias y otras utilidades, todo desde una app sin conexión y sin dependencias.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Label("No está afiliada, avalada ni patrocinada por ETECSA. Los códigos pueden cambiar en cualquier momento a discreción del operador.", systemImage: "exclamationmark.triangle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Enlaces") {
+                Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect")!) {
+                    Label("Código fuente en GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                }
+                Link(destination: URL(string: "https://github.com/albertolicea00/MyUSSDCodes-collection")!) {
+                    Label("Fuente de la verdad de los códigos USSD", systemImage: "checkmark.seal")
+                }
+                Link(destination: URL(string: "https://www.linkedin.com/in/albertolicea00")!) {
+                    Label("Alberto Licea (Desarrollador)", systemImage: "person.circle")
+                }
+            }
+
+            Section {
+                Text("Versión \(AppVersion) (\(AppBuild))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+        }
+        .navigationTitle("Información")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
