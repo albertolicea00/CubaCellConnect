@@ -276,13 +276,7 @@ struct HomeQuickActionsView: View {
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .sheet(isPresented: $debugShowSpeedTest) {
-            NavigationStack {
-                SpeedTestView()
-            }
-        }
         .onAppear {
-            debugShowSpeedTest = true
             if pin.isEmpty, let saved = TransferPinStore.load() {
                 isLoadingStoredPin = true
                 pin = saved
@@ -1091,11 +1085,15 @@ struct DirectorySearchView: View {
                 }
 
                 let discovered = DirectoryDatabase.discoverDatabase()
+                // Temporary diagnostic: surface the real sqlite error/table names instead of a
+                // generic message, since a copy that opens fine on a Mac has failed here before
+                // for a reason `discoverDatabase()` alone doesn't report.
+                let diagnosis = discovered == nil ? DirectoryDatabase.diagnose(at: destinationURL) : nil
                 await MainActor.run {
                     databaseFile = discovered
                     isImporting = false
                     if discovered == nil {
-                        importErrorMessage = "El archivo se copió pero no tiene el formato esperado de base de datos de directorio."
+                        importErrorMessage = "El archivo se copió pero no tiene el formato esperado de base de datos de directorio.\n\nDiagnóstico: \(diagnosis ?? "?")"
                     }
                 }
             } catch {
