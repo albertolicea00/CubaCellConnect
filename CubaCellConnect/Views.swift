@@ -1321,11 +1321,36 @@ struct WifiRoomsProvinceListView: View {
 struct WifiRoomsDetailView: View {
     let province: WifiProvince
 
+    @State private var searchText = ""
+
+    private var filteredRooms: [WifiRoom] {
+        guard !searchText.isEmpty else { return province.rooms }
+        return province.rooms.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+                || $0.address.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    /// Municipality name match keeps the whole group; otherwise only its matching spots survive
+    /// — a group with none is dropped entirely so an unmatched municipality doesn't leave an
+    /// empty, pointless `DisclosureGroup` behind.
+    private var filteredHotspotGroups: [WifiHotspotGroup] {
+        guard !searchText.isEmpty else { return province.hotspots }
+        return province.hotspots.compactMap { group in
+            if group.municipality.localizedCaseInsensitiveContains(searchText) {
+                return group
+            }
+            let matches = group.spots.filter { $0.localizedCaseInsensitiveContains(searchText) }
+            guard !matches.isEmpty else { return nil }
+            return WifiHotspotGroup(municipality: group.municipality, spots: matches)
+        }
+    }
+
     var body: some View {
         List {
-            if !province.rooms.isEmpty {
+            if !filteredRooms.isEmpty {
                 Section("Salas de Navegación") {
-                    ForEach(province.rooms) { room in
+                    ForEach(filteredRooms) { room in
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(alignment: .firstTextBaseline) {
                                 Text(room.name)
@@ -1348,9 +1373,9 @@ struct WifiRoomsDetailView: View {
                 }
             }
 
-            if !province.hotspots.isEmpty {
+            if !filteredHotspotGroups.isEmpty {
                 Section("Zonas WiFi Públicas") {
-                    ForEach(province.hotspots) { group in
+                    ForEach(filteredHotspotGroups) { group in
                         DisclosureGroup("\(group.municipality) (\(group.spots.count))") {
                             ForEach(group.spots, id: \.self) { spot in
                                 Text(spot)
@@ -1364,6 +1389,7 @@ struct WifiRoomsDetailView: View {
         .listStyle(.insetGrouped)
         .navigationTitle(province.province)
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar sala o zona wifi")
     }
 }
 
