@@ -416,6 +416,29 @@ enum DialService {
     }
 }
 
+// MARK: - Maps Service
+
+/// Opens the system Maps app as a place *search*, not a pin at known coordinates — ETECSA's
+/// navigation-room/hotspot data only gives names and (sometimes) street addresses, never lat/lng,
+/// so a search query is the only thing that makes sense here.
+enum MapsService {
+    /// Hands a free-text query to Apple Maps. Falls back to a Google Maps search URL if Maps
+    /// itself can't be opened (e.g. no Maps app), since that URL works in any browser too.
+    static func openSearch(for query: String) {
+        var appleComponents = URLComponents(string: "https://maps.apple.com/")!
+        appleComponents.queryItems = [URLQueryItem(name: "q", value: query)]
+        if let appleURL = appleComponents.url, UIApplication.shared.canOpenURL(appleURL) {
+            UIApplication.shared.open(appleURL)
+            return
+        }
+
+        var googleComponents = URLComponents(string: "https://www.google.com/maps/search/")!
+        googleComponents.queryItems = [URLQueryItem(name: "api", value: "1"), URLQueryItem(name: "query", value: query)]
+        guard let googleURL = googleComponents.url else { return }
+        UIApplication.shared.open(googleURL)
+    }
+}
+
 // MARK: - Transfer PIN Store
 
 /// Persists the user's transfer PIN in the device Keychain — encrypted at rest by iOS,

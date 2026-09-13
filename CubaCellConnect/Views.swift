@@ -1333,6 +1333,7 @@ struct WifiRoomsProvinceListView: View {
 struct WifiRoomsDetailView: View {
     let province: WifiProvince
 
+    @Environment(AccentColorStore.self) private var accentColorStore
     @State private var searchText = ""
 
     private var filteredRooms: [WifiRoom] {
@@ -1363,22 +1364,31 @@ struct WifiRoomsDetailView: View {
             if !filteredRooms.isEmpty {
                 Section("Salas de Navegación") {
                     ForEach(filteredRooms) { room in
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(alignment: .firstTextBaseline) {
-                                Text(room.name)
-                                    .font(.body.weight(.medium))
-                                Spacer()
+                        HStack(alignment: .center, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 2) {
                                 if let positions = room.positions {
                                     Text("\(positions) puestos")
                                         .font(.footnote)
                                         .foregroundStyle(.secondary)
                                 }
+                                Text(room.name)
+                                    .font(.body.weight(.medium))
+                                if !room.address.isEmpty {
+                                    Text(room.address)
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
-                            if !room.address.isEmpty {
-                                Text(room.address)
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
+
+                            Spacer()
+
+                            Button {
+                                MapsService.openSearch(for: mapsQuery(name: room.name, address: room.address))
+                            } label: {
+                                Image(systemName: "map")
                             }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(accentColorStore.color)
                         }
                         .padding(.vertical, 2)
                     }
@@ -1388,10 +1398,27 @@ struct WifiRoomsDetailView: View {
             if !filteredHotspotGroups.isEmpty {
                 Section("Zonas WiFi Públicas") {
                     ForEach(filteredHotspotGroups) { group in
-                        DisclosureGroup("\(group.municipality) (\(group.spots.count))") {
+                        DisclosureGroup {
                             ForEach(group.spots, id: \.self) { spot in
-                                Text(spot)
-                                    .font(.subheadline)
+                                HStack {
+                                    Text(spot)
+                                        .font(.subheadline)
+                                    Spacer()
+                                    Button {
+                                        MapsService.openSearch(for: mapsQuery(name: spot, address: group.municipality))
+                                    } label: {
+                                        Image(systemName: "map")
+                                    }
+                                    .buttonStyle(.plain)
+                                    .foregroundStyle(accentColorStore.color)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text(group.municipality)
+                                Spacer()
+                                Text("\(group.spots.count)")
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -1402,6 +1429,14 @@ struct WifiRoomsDetailView: View {
         .navigationTitle(province.province)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar sala o zona wifi")
+    }
+
+    /// "Name, address, Province, Cuba" (address falls back to just the province when ETECSA's
+    /// listing didn't include a street address) — enough context for Maps to geocode a Cuban
+    /// place it has no exact pin for.
+    private func mapsQuery(name: String, address: String) -> String {
+        let locality = address.isEmpty ? province.province : address
+        return "\(name), \(locality), \(province.province), Cuba"
     }
 }
 
@@ -1418,6 +1453,7 @@ struct WifiRoomsDetailView: View {
             ]
         ))
     }
+    .environment(AccentColorStore())
 }
 
 // MARK: - Speed Test
