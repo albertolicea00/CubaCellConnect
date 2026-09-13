@@ -27,6 +27,9 @@ struct USSDCode: Identifiable, Codable, Hashable {
     /// Forces the compact icon-row layout (title only, no description) even with no icon or
     /// price — for actions whose title alone is self-explanatory.
     let compact: Bool?
+    /// Renders as a contact-book row instead: icon, title + the raw number, and a call button.
+    /// Used for phone directories (Teléfonos) where seeing the actual number is the point.
+    let showsNumber: Bool?
     let type: USSDActionType
     let requiresInput: Bool
     let inputPlaceholder: String?

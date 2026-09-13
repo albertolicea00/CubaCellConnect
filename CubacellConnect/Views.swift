@@ -301,6 +301,21 @@ struct CategoryListView: View {
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @State private var pendingInputCode: USSDCode?
     @State private var inputText = ""
+    @State private var searchText = ""
+
+    /// `category.groups`, narrowed to codes whose title or number matches the search text —
+    /// empty groups are dropped so an unmatched group doesn't leave a bare header behind.
+    private var filteredGroups: [USSDCodeGroup] {
+        guard !searchText.isEmpty else { return category.groups }
+        return category.groups.compactMap { group in
+            let matches = group.codes.filter {
+                $0.title.localizedCaseInsensitiveContains(searchText)
+                    || $0.code.localizedCaseInsensitiveContains(searchText)
+            }
+            guard !matches.isEmpty else { return nil }
+            return USSDCodeGroup(name: group.name, codes: matches)
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -310,14 +325,18 @@ struct CategoryListView: View {
                 }
 
                 List {
-                    ForEach(category.groups) { group in
+                    ForEach(filteredGroups) { group in
                         Section {
                             ForEach(group.codes) { code in
                                 // Same compact row for anything with an icon, a price, or the
                                 // explicit `compact` flag — an icon-less code still gets this row
                                 // shape (just without a leading icon), not the old
                                 // title+description+badge row.
-                                if code.icon != nil || code.price != nil || code.compact == true {
+                                if code.showsNumber == true {
+                                    ContactRowView(code: code) { select(code) }
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { select(code) }
+                                } else if code.icon != nil || code.price != nil || code.compact == true {
                                     Button {
                                         select(code)
                                     } label: {
@@ -354,6 +373,7 @@ struct CategoryListView: View {
                 }
                 .listStyle(.insetGrouped)
                 .tint(.brandCyan)
+                .searchable(text: $searchText, prompt: "Buscar")
             }
             .navigationTitle(category.name)
             .navigationBarTitleDisplayMode(.inline)

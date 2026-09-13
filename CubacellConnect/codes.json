@@ -289,52 +289,220 @@
       ]
     },
     {
-      "id": "utilities",
-      "name": "Otras Utilidades",
-      "icon": "wrench.and.screwdriver",
+      "id": "phones",
+      "name": "Teléfonos",
+      "icon": "phone.fill",
       "groups": [
         {
           "name": null,
           "codes": [
             {
-              "id": "customer-service",
-              "code": "*2266",
-              "title": "Atención al Cliente",
-              "details": "Llama a Atención al Cliente de ETECSA.",
-              "type": "call",
-              "requiresInput": false
-            },
-            {
-              "id": "collect-call",
-              "code": "*99{input}",
-              "title": "Llamada por Cobrar",
-              "details": "Llama sin saldo; paga quien recibe.",
-              "type": "call",
-              "requiresInput": true,
-              "inputPlaceholder": "Número de teléfono"
-            },
-            {
-              "id": "private-call",
-              "code": "#31#{input}",
-              "title": "Llamada Privada",
-              "details": "Llama ocultando tu número.",
-              "type": "call",
-              "requiresInput": true,
-              "inputPlaceholder": "Número de teléfono"
-            },
-            {
-              "id": "imei",
-              "code": "*#06#",
-              "title": "Mostrar IMEI",
-              "details": "Muestra el IMEI de tu teléfono.",
-              "type": "ussd",
-              "requiresInput": false
-            },
-            {
               "id": "voicemail",
               "code": "*123",
               "title": "Buzón de Voz",
               "details": "Accede a tu buzón de voz.",
+              "icon": "recordingtape",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "customer-service",
+              "code": "*2266",
+              "title": "Atención al Cliente",
+              "details": "Soporte, dudas, o activar el buzón de voz en tu teléfono.",
+              "icon": "headphones",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Emergencias y Seguridad",
+          "codes": [
+            {
+              "id": "emergency-antidrugs",
+              "code": "103",
+              "title": "Línea Antidrogas",
+              "details": "Apoyo a adicciones.",
+              "icon": "pills.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "emergency-ambulance",
+              "code": "104",
+              "title": "Ambulancia (SIUM)",
+              "details": "Servicio de ambulancias.",
+              "icon": "cross.case.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "emergency-firefighters",
+              "code": "105",
+              "title": "Bomberos",
+              "details": "También para escapes graves de gas.",
+              "icon": "flame.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "emergency-police",
+              "code": "106",
+              "title": "Policía Nacional (PNR)",
+              "details": "Policía Nacional Revolucionaria.",
+              "icon": "shield.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "emergency-coastguard",
+              "code": "107",
+              "title": "Salvamento Marítimo",
+              "details": "Tropas Guardafronteras.",
+              "icon": "sailboat.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Servicios Básicos del Hogar",
+          "codes": [
+            {
+              "id": "home-electricity",
+              "code": "18888",
+              "title": "Averías Eléctricas (UNE)",
+              "details": "Reporte de cortes y averías eléctricas.",
+              "icon": "bolt.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "home-water",
+              "code": "18838",
+              "title": "Averías de Agua",
+              "details": "Salideros y roturas de tuberías (Acueducto).",
+              "icon": "drop.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "home-gas",
+              "code": "7833-3333",
+              "title": "Averías de Gas",
+              "details": "Gas manufacturado — línea directa en La Habana.",
+              "icon": "flame",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Servicios ETECSA y Teléfono",
+          "codes": [
+            {
+              "id": "etecsa-assisted-calls",
+              "code": "112",
+              "title": "Llamadas Asistidas",
+              "details": "Gestión de llamadas asistidas, nacionales e internacionales.",
+              "icon": "phone.arrow.up.right",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "etecsa-directory",
+              "code": "113",
+              "title": "Información y Guía Telefónica",
+              "details": "Para pedir un número.",
+              "icon": "info.circle.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "etecsa-landline-report",
+              "code": "114",
+              "title": "Averías de Teléfono Fijo",
+              "details": "Reporte de interrupciones de telefonía fija.",
+              "icon": "phone.down.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "etecsa-general-info",
+              "code": "115",
+              "title": "Información General ETECSA",
+              "details": "Información general y trámites comerciales.",
+              "icon": "building.2.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "etecsa-time-signal",
+              "code": "116",
+              "title": "Señal Horaria",
+              "details": "La hora exacta.",
+              "icon": "clock.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "etecsa-commercial",
+              "code": "118",
+              "title": "Atención Comercial ETECSA",
+              "details": "Atención comercial unificada.",
+              "icon": "person.2.wave.2.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Quejas y Atención Ciudadana",
+          "codes": [
+            {
+              "id": "complaints-mininit",
+              "code": "18806",
+              "title": "Atención a la Ciudadanía (MININT)",
+              "details": "Denuncias o quejas sobre policías.",
+              "icon": "exclamationmark.bubble.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "complaints-prosecutor",
+              "code": "18860",
+              "title": "Fiscalía General",
+              "details": "Orientación jurídica y quejas de legalidad.",
+              "icon": "building.columns.fill",
+              "showsNumber": true,
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "complaints-mail",
+              "code": "8024-4644",
+              "title": "Correos de Cuba",
+              "details": "Línea única gratuita para bultos y giros.",
+              "icon": "envelope.fill",
+              "showsNumber": true,
               "type": "call",
               "requiresInput": false
             }

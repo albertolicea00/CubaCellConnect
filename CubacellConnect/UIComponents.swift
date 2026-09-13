@@ -97,10 +97,68 @@ struct CodeRowView: View {
         icon: nil,
         price: "$15.00",
         compact: nil,
+        showsNumber: nil,
         type: .ussd,
         requiresInput: false,
         inputPlaceholder: nil
     ))
+    .padding()
+}
+
+// MARK: - Contact Row
+
+/// One row in a phone directory: icon, title + the actual number (unlike `CodeRowView`, which
+/// hides the dial string), and a dedicated call button — tapping the row does the same thing.
+struct ContactRowView: View {
+    let code: USSDCode
+    let onCall: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: code.icon ?? "phone.fill")
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(Color.brandCyan, in: Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(code.title)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.appForeground)
+                Text(code.code)
+                    .font(AppTheme.codeFont(size: 14))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button(action: onCall) {
+                Image(systemName: "phone.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color.brandCyan)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    ContactRowView(
+        code: USSDCode(
+            id: "emergency-police",
+            code: "106",
+            title: "Policía Nacional (PNR)",
+            details: "Policía Nacional Revolucionaria.",
+            icon: "shield.fill",
+            price: nil,
+            compact: nil,
+            showsNumber: true,
+            type: .call,
+            requiresInput: false,
+            inputPlaceholder: nil
+        ),
+        onCall: {}
+    )
     .padding()
 }
 
