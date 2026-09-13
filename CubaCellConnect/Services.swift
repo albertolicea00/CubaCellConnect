@@ -521,6 +521,29 @@ struct DirectoryEntry: Identifiable, Hashable {
 enum DirectoryDatabase {
     private static let transientDestructor = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
+    /// Opens `url` via the `file:...?immutable=1` URI form instead of a plain path. Plain
+    /// `SQLITE_OPEN_READONLY` still has SQLite take a shared lock and probe for a hot journal on
+    /// first real access — inside the iOS sandbox that first access can fail with
+    /// `SQLITE_CANTOPEN` ("unable to open database file") even though the file itself opens and
+    /// reads fine at the raw POSIX level (confirmed: a plain `FileHandle` read of the same file
+    /// succeeds where `sqlite3_prepare_v2` didn't). `immutable=1` tells SQLite the file will never
+    /// change while open, so it skips locking and the journal probe entirely — the standard fix
+    /// for a bundled/copied read-only database on iOS.
+    private static func open(_ url: URL) -> OpaquePointer? {
+        var components = URLComponents()
+        components.scheme = "file"
+        components.path = url.path
+        components.queryItems = [URLQueryItem(name: "immutable", value: "1")]
+        guard let uri = components.url?.absoluteString else { return nil }
+
+        var db: OpaquePointer?
+        guard sqlite3_open_v2(uri, &db, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, nil) == SQLITE_OK else {
+            if let db { sqlite3_close(db) }
+            return nil
+        }
+        return db
+    }
+
     /// Scans Documents for any `.db` file and opens each just long enough to read its table
     /// names, returning the first one that matches a known shape (sorted by filename, for
     /// determinism when more than one is present). `nil` if Documents has no recognizable file.
@@ -544,10 +567,7 @@ enum DirectoryDatabase {
     /// Opens `url` read-only and checks `sqlite_master` for the table names that identify each
     /// schema shape. `nil` if it's neither (not a directory dump, or an unrelated `.db` file).
     private static func detectVersion(at url: URL) -> DirectoryDatabaseVersion? {
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
-            return nil
-        }
+        guard let db = open(url) else { return nil }
         defer { sqlite3_close(db) }
 
         let tables = tableNames(db: db)
@@ -577,19 +597,38 @@ enum DirectoryDatabase {
     /// found, so a report of "wrong format" on a file that opens fine on a Mac can be traced
     /// instead of guessed at. Not on the normal discovery path (that one only needs yes/no).
     static func diagnose(at url: URL) -> String {
-        var db: OpaquePointer?
-        let openResult = sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil)
-        guard openResult == SQLITE_OK, let db else {
-            let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? "unknown error"
-            if let db { sqlite3_close(db) }
-            return "sqlite3_open failed (code \(openResult)): \(message)"
+        var lines: [String] = []
+
+        let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
+        let size = attributes?[.size] as? Int
+        let posixPermissions = attributes?[.posixPermissions] as? Int
+        let protectionType = attributes?[.protectionKey] as? FileProtectionType
+        lines.append("exists=\(FileManager.default.fileExists(atPath: url.path)) size=\(size.map(String.init) ?? "?") posix=\(posixPermissions.map { String($0, radix: 8) } ?? "?") protection=\(protectionType.map(String.init(describing:)) ?? "?")")
+        lines.append("isReadableFile=\(FileManager.default.isReadableFile(atPath: url.path))")
+
+        // Bypass SQLite entirely: read the first 16 bytes at the raw Foundation/POSIX level to
+        // tell "SQLite specifically can't open this" apart from "nothing can read this file
+        // right now" (e.g. Data Protection locked, or the file provider never materialized it).
+        if let handle = FileHandle(forReadingAtPath: url.path) {
+            let header = handle.readData(ofLength: 16)
+            try? handle.close()
+            let headerString = String(data: header, encoding: .ascii) ?? "?"
+            lines.append("raw header read OK, \(header.count) bytes: \"\(headerString)\"")
+        } else {
+            lines.append("raw FileHandle open FAILED (OS-level read denied, not an SQLite-specific issue)")
+        }
+
+        guard let db = open(url) else {
+            lines.append("sqlite3_open (immutable URI) failed")
+            return lines.joined(separator: "\n")
         }
         defer { sqlite3_close(db) }
 
         var statement: OpaquePointer?
         let prepareResult = sqlite3_prepare_v2(db, "SELECT name FROM sqlite_master WHERE type = 'table';", -1, &statement, nil)
         guard prepareResult == SQLITE_OK, let statement else {
-            return "sqlite3_prepare failed (code \(prepareResult)): \(String(cString: sqlite3_errmsg(db)))"
+            lines.append("sqlite3_prepare failed (code \(prepareResult)): \(String(cString: sqlite3_errmsg(db)))")
+            return lines.joined(separator: "\n")
         }
         defer { sqlite3_finalize(statement) }
 
@@ -599,9 +638,12 @@ enum DirectoryDatabase {
                 names.append(String(cString: cString))
             }
         }
-        return names.isEmpty
-            ? "opened fine but sqlite_master has no tables"
-            : "opened fine, tables found: \(names.joined(separator: ", ")) — none match the expected v1/v2 shape"
+        lines.append(
+            names.isEmpty
+                ? "opened fine but sqlite_master has no tables"
+                : "opened fine, tables found: \(names.joined(separator: ", ")) — none match the expected v1/v2 shape"
+        )
+        return lines.joined(separator: "\n")
     }
 
     /// Separate number/name inputs instead of one combined field: a number search is a prefix
