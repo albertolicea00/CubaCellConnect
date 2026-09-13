@@ -289,9 +289,9 @@
       ]
     },
     {
-      "id": "phones",
-      "name": "Teléfonos",
-      "icon": "phone.fill",
+      "id": "helplines",
+      "name": "Líneas de Ayuda",
+      "icon": "flipphone",
       "groups": [
         {
           "name": null,
