@@ -48,7 +48,7 @@
 		0E431AD3BD2CC9FC72A29867 /* CallDirectoryHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDirectoryHandler.swift; sourceTree = "<group>"; };
 		251444BC197B4C25A3B7D314 /* CubaCellConnect.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CubaCellConnect.entitlements; sourceTree = "<group>"; };
 		2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponents.swift; sourceTree = "<group>"; };
-		39C162F860A97892042A87C0 /* CubaCellConnect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		39C162F860A97892042A87C0 /* CubaCellConnect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4720B815C3ABE39F43851DB9 /* CallerIDExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CallerIDExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F632F607ADB7D71EC7B4108 /* wifi_navigation_rooms.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = wifi_navigation_rooms.json; sourceTree = "<group>"; };
 		767C11CEA2E45E76EA941172 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -172,8 +172,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubaCellConnect" */;
 			developmentRegion = en;
@@ -344,6 +342,7 @@
 				CODE_SIGN_ENTITLEMENTS = CubaCellConnect/CubaCellConnect.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7W3D3JL6PV;
 				INFOPLIST_FILE = CubaCellConnect/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -364,6 +363,7 @@
 				CODE_SIGN_ENTITLEMENTS = CubaCellConnect/CubaCellConnect.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7W3D3JL6PV;
 				INFOPLIST_FILE = CubaCellConnect/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

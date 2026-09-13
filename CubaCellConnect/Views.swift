@@ -982,6 +982,8 @@ struct SettingsView: View {
 /// "Importar Base de Datos" picker below; the app never downloads or bundles it itself). Its
 /// schema shape (v1/v2) is auto-detected from the file's own tables — see `DirectoryDatabase`.
 struct DirectorySearchView: View {
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     @State private var databaseFile: DirectoryDatabaseFile?
     @State private var hasSearchedForDatabase = false
     @State private var showingImporter = false
@@ -1025,28 +1027,30 @@ struct DirectorySearchView: View {
                         }
                         .padding(.horizontal, 32)
                     } else {
-                        VStack(spacing: 10) {
-                            Button {
-                                // No hay endpoint de descarga todavía — deshabilitado hasta tenerlo.
-                            } label: {
-                                Label("Descargar Base de Datos", systemImage: "arrow.down.circle.fill")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.brandCyan)
-                            .disabled(true)
+                        // One integrated card (two stacked rows, divider between) instead of two
+                        // separate pill buttons — reads as one grouped action, matching the
+                        // inset-grouped list rows used everywhere else in Ajustes.
+                        VStack(spacing: 0) {
+                            DirectoryActionRow(
+                                title: "Descargar Base de Datos",
+                                systemImage: "arrow.down.circle.fill",
+                                isEnabled: false,
+                                tint: accentColorStore.color
+                            ) {}
 
-                            Button {
+                            Divider().padding(.leading, 52)
+
+                            DirectoryActionRow(
+                                title: "Importar Base de Datos",
+                                systemImage: "square.and.arrow.down.on.square",
+                                isEnabled: true,
+                                tint: accentColorStore.color
+                            ) {
                                 showingImporter = true
-                            } label: {
-                                Label("Importar Base de Datos", systemImage: "square.and.arrow.down.on.square")
-                                    .frame(maxWidth: .infinity)
                             }
-                            .buttonStyle(.bordered)
-                            .tint(.brandCyan)
                         }
-                        .controlSize(.large)
-                        .padding(.horizontal, 32)
+                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .padding(.horizontal, 20)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -1184,6 +1188,37 @@ struct DirectorySearchView: View {
                 }
             }
         }
+    }
+}
+
+/// One row of the "Sin Base de Datos" action card — icon, title, and a chevron, styled like a
+/// native grouped-list row (not a standalone button) so "Descargar"/"Importar" read as one
+/// integrated component instead of two separate pills.
+private struct DirectoryActionRow: View {
+    let title: String
+    let systemImage: String
+    let isEnabled: Bool
+    let tint: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Label(title, systemImage: systemImage)
+                    .foregroundStyle(isEnabled ? tint : .secondary)
+                Spacer()
+                if isEnabled {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(.vertical, 14)
+            .padding(.horizontal, 16)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
     }
 }
 
