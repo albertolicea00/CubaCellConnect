@@ -626,8 +626,12 @@ private struct ContactCallOptionsSheet: View {
                     Button {
                         dialFriendsPlanManage(manageFriendsPlanCode)
                     } label: {
-                        Text("Agregar/Eliminar de mi Plan de Amigos")
-                            .foregroundStyle(accentColorStore.color)
+                        HStack {
+                            Text("Agregar/Eliminar de mi Plan de Amigos")
+                            Spacer()
+                            Image(systemName: "arrow.right")
+                        }
+                        .foregroundStyle(accentColorStore.color)
                     }
                     .disabled(manageFriendsPlanCode.code.isEmpty)
                 }
