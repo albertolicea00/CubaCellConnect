@@ -79,6 +79,22 @@ enum HomeTab: String, CaseIterable, Identifiable {
         .environment(USSDCodeStore())
 }
 
+/// How the Contactos row's call button behaves — configurable in Ajustes › Preferencias.
+enum ContactCallMode: String, CaseIterable, Identifiable {
+    case menu, separateButtons, collectDefault, anonymousDefault
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .menu: return "Menú para elegir"
+        case .separateButtons: return "Dos botones separados"
+        case .collectDefault: return "Llamar con 99 directo"
+        case .anonymousDefault: return "Llamar Anónimo directo"
+        }
+    }
+}
+
 // MARK: - Home Quick Actions
 
 /// The Home tab: one system `List` (same `.insetGrouped` style as every other tab), with
@@ -397,6 +413,9 @@ struct ContactsListView: View {
 private struct ContactCallRowView: View {
     let contact: DeviceContact
 
+    @AppStorage("contactCallMode") private var modeRaw = ContactCallMode.menu.rawValue
+    private var mode: ContactCallMode { ContactCallMode(rawValue: modeRaw) ?? .menu }
+
     var body: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
@@ -410,24 +429,62 @@ private struct ContactCallRowView: View {
 
             Spacer()
 
-            Menu {
-                Button("Llamar Anónimo") {
-                    DialService.dial("#31#\(contact.phoneNumber)")
-                }
+            switch mode {
+            case .menu:
+                Menu {
+                    Button("Llamar Anónimo") {
+                        DialService.dial("#31#\(contact.phoneNumber)")
+                    }
 
-                Button("Llamar con 99") {
-                    DialService.dial("*99\(contact.phoneNumber)")
+                    Button("Llamar con 99") {
+                        DialService.dial("*99\(contact.phoneNumber)")
+                    }
+                } label: {
+                    callButtonIcon
                 }
-            } label: {
-                Image(systemName: "phone.connection")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 32, height: 32)
-                    .background(Color.brandCyan, in: Circle())
+                .accessibilityLabel("Llamar")
+
+            case .separateButtons:
+                Button {
+                    DialService.dial("#31#\(contact.phoneNumber)")
+                } label: {
+                    callButtonIcon
+                }
+                .accessibilityLabel("Llamar Anónimo")
+
+                Button {
+                    DialService.dial("*99\(contact.phoneNumber)")
+                } label: {
+                    callButtonIcon
+                }
+                .accessibilityLabel("Llamar con 99")
+
+            case .collectDefault:
+                Button {
+                    DialService.dial("*99\(contact.phoneNumber)")
+                } label: {
+                    callButtonIcon
+                }
+                .accessibilityLabel("Llamar con 99")
+
+            case .anonymousDefault:
+                Button {
+                    DialService.dial("#31#\(contact.phoneNumber)")
+                } label: {
+                    callButtonIcon
+                }
+                .accessibilityLabel("Llamar Anónimo")
             }
-            .accessibilityLabel("Llamar")
         }
         .padding(.vertical, 2)
+    }
+
+    private var callButtonIcon: some View {
+        Image(systemName: "phone.connection")
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(.white)
+            .frame(width: 32, height: 32)
+            .background(Color.brandCyan, in: Circle())
     }
 }
 
@@ -591,6 +648,7 @@ private struct PreferencesSettingsView: View {
     @AppStorage("darkModePreference") private var darkMode: Int = 0
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
+    @AppStorage("contactCallMode") private var contactCallMode = ContactCallMode.menu.rawValue
 
     var body: some View {
         Form {
@@ -620,6 +678,18 @@ private struct PreferencesSettingsView: View {
                 Text("Inicio")
             } footer: {
                 Text("La pestaña que se muestra al abrir la app.")
+            }
+
+            Section {
+                Picker("Llamada desde Contactos", selection: $contactCallMode) {
+                    ForEach(ContactCallMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode.rawValue)
+                    }
+                }
+            } header: {
+                Text("Contactos")
+            } footer: {
+                Text("Cómo se llama a un contacto: eligiendo cada vez, con los dos botones a la vista, o directo por Anónimo o por 99.")
             }
         }
         .navigationTitle("Preferencias")
