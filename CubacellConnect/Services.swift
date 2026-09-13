@@ -14,8 +14,40 @@ final class USSDCodeStore {
     private(set) var categories: [USSDCategory] = []
     private(set) var carrier: String = ""
 
+    /// Categories shown as their own tab — everything except the `home` category, which the
+    /// Home screen renders itself (a custom layout, not a plain code list).
+    var tabCategories: [USSDCategory] {
+        categories.filter { $0.id != "home" }
+    }
+
     init(bundle: Bundle = .main) {
         load(from: bundle)
+    }
+
+    /// Looks up one code by id anywhere in the catalog, regardless of which category/group holds it.
+    /// Used by the Home screen to pull specific codes (main balance, transfer, recharge) into its
+    /// own custom layout instead of a generic list.
+    func code(withId id: String) -> USSDCode? {
+        for category in categories {
+            for group in category.groups {
+                if let match = group.codes.first(where: { $0.id == id }) {
+                    return match
+                }
+            }
+        }
+        return nil
+    }
+
+    /// Looks up a named group anywhere in the catalog — e.g. Home's "Servicio Adelanta Saldo" —
+    /// so a custom layout can pull its title and codes (price, title, ...) from the catalog
+    /// instead of hardcoding them in the view.
+    func group(named name: String) -> USSDCodeGroup? {
+        for category in categories {
+            if let match = category.groups.first(where: { $0.name == name }) {
+                return match
+            }
+        }
+        return nil
     }
 
     private func load(from bundle: Bundle) {
