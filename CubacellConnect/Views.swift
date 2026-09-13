@@ -2,13 +2,19 @@ import SwiftUI
 
 // MARK: - Home Screen
 
-/// Root screen: one tab per catalog category, plus a Settings/Help tab.
+/// Root screen: a custom Home tab, one tab per remaining catalog category, plus Settings.
 struct HomeView: View {
     @Environment(USSDCodeStore.self) private var store
 
     var body: some View {
         TabView {
-            ForEach(store.categories) { category in
+            HomeQuickActionsView()
+                .tabItem {
+                    Image(systemName: "house.fill")
+                        .accessibilityLabel("Home")
+                }
+
+            ForEach(store.tabCategories) { category in
                 CategoryListView(category: category)
                     .tabItem {
                         Image(systemName: category.icon)
@@ -29,6 +35,254 @@ struct HomeView: View {
 #Preview {
     HomeView()
         .environment(USSDCodeStore())
+}
+
+// MARK: - Home Quick Actions
+
+/// The Home tab: one system `List` (same `.insetGrouped` style as every other tab), with
+/// "Consultar Todo" and the balance shortcuts sharing a single "Saldo y Planes" section,
+/// plus a "Transferir" and a "Recargar" section whose fields are plain rows, not a custom card.
+struct HomeQuickActionsView: View {
+    @Environment(USSDCodeStore.self) private var store
+    @AppStorage("showNetworkStatus") private var showNetworkStatus = false
+
+    @State private var phoneNumber = ""
+    @State private var pin = ""
+    @State private var amount = ""
+    @State private var cardNumber = ""
+    @State private var showingContactPicker = false
+
+    private var isTransferDisabled: Bool {
+        phoneNumber.trimmingCharacters(in: .whitespaces).isEmpty
+            || pin.trimmingCharacters(in: .whitespaces).isEmpty
+            || amount.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    private var isRechargeDisabled: Bool {
+        cardNumber.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                if showNetworkStatus {
+                    ConnectionBannerView()
+                }
+
+                List {
+                    Section("Saldo y Planes") {
+                        Button {
+                            dial(codeId: "main-balance")
+                        } label: {
+                            Label("Consultar Saldo y Planes", systemImage: "list.bullet.rectangle.fill")
+                        }
+
+                        Button {
+                            dial(codeId: "postpaid-balance")
+                        } label: {
+                            Label("Saldo Pospago o Institucional", systemImage: "building.2.fill")
+                        }
+
+                        Button {
+                            dial(codeId: "friends-plan")
+                        } label: {
+                            Label("Estado del Plan Amigos", systemImage: "person.2.fill")
+                        }
+                    }
+
+                    Section {
+                        GeometryReader { geometry in
+                            let tiles = [
+                                ("Saldo", "creditcard.fill", "main-balance"),
+                                ("Bonos", "gift.fill", "bonus-usd-plans"),
+                                ("Datos", "antenna.radiowaves.left.and.right", "data-plan"),
+                                ("Deuda", "creditcard.trianglebadge.exclamationmark", "postpaid-balance"),
+                            ]
+                            let gap: CGFloat = 20
+                            let rawSize = (geometry.size.width - gap * CGFloat(tiles.count - 1)) / CGFloat(tiles.count)
+                            let tileSize = min(max(rawSize, 44), 84)
+
+                            HStack(spacing: gap) {
+                                ForEach(tiles, id: \.2) { title, icon, codeId in
+                                    QuickActionTile(title: title, systemImage: icon, size: tileSize) {
+                                        dial(codeId: codeId)
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .frame(height: 96)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
+                    }
+                    .listSectionSpacing(.compact)
+
+                    Section {
+                        HStack(spacing: 12) {
+                            Button {
+                                showingContactPicker = true
+                            } label: {
+                                Image(systemName: "person.crop.circle")
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            TextField("Número (+53 ...)", text: $phoneNumber)
+                                .keyboardType(.numberPad)
+                        }
+
+                        HStack(spacing: 12) {
+                            TextField("Clave", text: $pin)
+                                .keyboardType(.numberPad)
+                            Divider()
+                            TextField("Monto", text: $amount)
+                                .keyboardType(.numberPad)
+                        }
+
+                        Button {
+                            dialTransfer()
+                        } label: {
+                            HStack(spacing: 6) {
+                                Spacer()
+                                Text("Transferir")
+                                Image(systemName: "arrow.right")
+                            }
+                        }
+                        .disabled(isTransferDisabled)
+                    } header: {
+                        Text("Transferir")
+                    }
+
+                    Section("Recargar") {
+                        Button {
+                            dial(codeId: "recharge-call")
+                        } label: {
+                            Label("Recargar por Llamada", systemImage: "phone.fill")
+                        }
+
+                        HStack(spacing: 12) {
+                            Image(systemName: "camera.fill")
+                                .foregroundStyle(.secondary)
+                                .accessibilityLabel("Escanear (próximamente)")
+
+                            TextField("Código de recarga", text: $cardNumber)
+                                .keyboardType(.numberPad)
+                        }
+
+                        Button {
+                            dialRechargeCard()
+                        } label: {
+                            HStack(spacing: 6) {
+                                Spacer()
+                                Text("Recargar con Tarjeta")
+                                Image(systemName: "arrow.right")
+                            }
+                        }
+                        .disabled(isRechargeDisabled)
+                    }
+
+                    if let advanceBalanceGroup = store.group(named: "Servicio Adelanta Saldo") {
+                        Section(advanceBalanceGroup.name ?? "") {
+                            HStack(spacing: 12) {
+                                ForEach(advanceBalanceGroup.codes) { code in
+                                    Button {
+                                        DialService.dial(code.code)
+                                    } label: {
+                                        Text(code.price ?? code.title)
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    .buttonStyle(OutlineButtonStyle())
+                                }
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .tint(.brandCyan)
+                .sheet(isPresented: $showingContactPicker) {
+                    ContactPickerView { number in
+                        phoneNumber = number
+                    }
+                    .ignoresSafeArea()
+                }
+            }
+            .navigationTitle("Home")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private func dial(codeId: String) {
+        if let code = store.code(withId: codeId) {
+            DialService.dial(code.code)
+        }
+    }
+
+    /// Composes `transfer-direct`'s `{phoneNumber}`/`{pin}`/`{amount}` placeholders. Assumed dial
+    /// pattern `*234*1*{phoneNumber}*{pin}*{amount}#` — verify against the real ETECSA menu before
+    /// relying on it; this app has no way to confirm it against a live line.
+    private func dialTransfer() {
+        guard let code = store.code(withId: "transfer-direct") else { return }
+        let resolved = code.resolvedCode(with: ["phoneNumber": phoneNumber, "pin": pin, "amount": amount])
+        DialService.dial(resolved)
+    }
+
+    private func dialRechargeCard() {
+        guard let code = store.code(withId: "recharge-card") else { return }
+        DialService.dial(code.resolvedCode(input: cardNumber))
+    }
+}
+
+#Preview {
+    HomeQuickActionsView()
+        .environment(USSDCodeStore())
+}
+
+/// A secondary/outline look: border and text in the tint color, no filled background —
+/// unlike `.bordered`, which fills with a light tint. Used for the Adelanta Saldo amount buttons.
+private struct OutlineButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .padding(.vertical, 6)
+            .foregroundStyle(Color.brandCyan)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.brandCyan, lineWidth: 1.5)
+            )
+            .opacity(configuration.isPressed ? 0.6 : 1)
+    }
+}
+
+/// One square icon + label button in the Home quick-action grid.
+private struct QuickActionTile: View {
+    let title: String
+    let systemImage: String
+    /// Explicit width computed by the parent from the available screen width, so the tile
+    /// actually grows on a bigger screen instead of collapsing to the icon's intrinsic size.
+    let size: CGFloat
+    let action: () -> Void
+
+    /// Shorter than `size` so the tile reads as a rounded rectangle, not a square.
+    private var height: CGFloat { size * 0.72 }
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.system(size: size * 0.26))
+                    .foregroundStyle(.white)
+                    .frame(width: size, height: height)
+                    .background(Color.brandCyan, in: RoundedRectangle(cornerRadius: size * 0.24))
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.appForeground)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 // MARK: - Category Screen
@@ -54,25 +308,50 @@ struct CategoryListView: View {
                     ForEach(category.groups) { group in
                         Section {
                             ForEach(group.codes) { code in
-                                CodeRowView(code: code)
-                                    .contentShape(Rectangle())
-                                    .onTapGesture { select(code) }
+                                // Same compact row for anything with an icon, a price, or the
+                                // explicit `compact` flag — an icon-less code still gets this row
+                                // shape (just without a leading icon), not the old
+                                // title+description+badge row.
+                                if code.icon != nil || code.price != nil || code.compact == true {
+                                    Button {
+                                        select(code)
+                                    } label: {
+                                        HStack {
+                                            if let icon = code.icon {
+                                                Label(code.title, systemImage: icon)
+                                            } else {
+                                                Text(code.title)
+                                            }
+                                            if let price = code.price {
+                                                Spacer()
+                                                Text(price)
+                                                    .font(.subheadline.weight(.semibold))
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    CodeRowView(code: code)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { select(code) }
+                                }
                             }
                         } header: {
                             if let name = group.name {
                                 Text(name)
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(Color.brandCyan)
+                            } else {
+                                // A little breathing room in place of a missing header, so an
+                                // unnamed first section doesn't sit flush against the nav bar.
+                                Color.clear.frame(height: 8)
                             }
                         }
                     }
                 }
                 .listStyle(.insetGrouped)
+                .tint(.brandCyan)
             }
             .navigationTitle(category.name)
-            .toolbarBackground(Color.brandNavy, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationBarTitleDisplayMode(.inline)
             .alert(
                 pendingInputCode?.title ?? "",
                 isPresented: Binding(
@@ -177,9 +456,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Ajustes")
-            .toolbarBackground(Color.brandNavy, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
