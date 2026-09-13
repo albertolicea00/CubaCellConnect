@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - Home Screen
 
@@ -882,6 +883,8 @@ struct SettingsView: View {
 struct DirectorySearchView: View {
     @State private var databaseFile: DirectoryDatabaseFile?
     @State private var hasSearchedForDatabase = false
+    @State private var showingImporter = false
+    @State private var importErrorMessage: String?
 
     @State private var query = ""
     @State private var results: [DirectoryEntry] = []
@@ -900,14 +903,53 @@ struct DirectorySearchView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if databaseFile == nil {
-                // Never names v1/v2 here — whoever copies the file in may not know which shape
-                // it is either; the app detects that on its own from the file's own tables.
-                ContentUnavailableView(
-                    "Sin Base de Datos",
-                    systemImage: "externaldrive.badge.questionmark",
-                    description: Text("Copia un archivo de directorio (.db) a los archivos de esta app desde Finder (tu iPhone › CubaCell Connect) para poder buscar.")
-                )
+                VStack(spacing: 20) {
+                    // Never names v1/v2 here — whoever copies the file in may not know which
+                    // shape it is either; the app detects that on its own from its tables.
+                    ContentUnavailableView(
+                        "Sin Base de Datos",
+                        systemImage: "externaldrive.badge.questionmark",
+                        description: Text("Descarga la base de datos o impórtala si ya la tienes en este dispositivo.")
+                    )
+
+                    VStack(spacing: 10) {
+                        Button {
+                            // No hay endpoint de descarga todavía — deshabilitado hasta tenerlo.
+                        } label: {
+                            Label("Descargar Base de Datos", systemImage: "arrow.down.circle.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.brandCyan)
+                        .disabled(true)
+
+                        Button {
+                            showingImporter = true
+                        } label: {
+                            Label("Importar Base de Datos", systemImage: "square.and.arrow.down.on.square")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.brandCyan)
+                    }
+                    .controlSize(.large)
+                    .padding(.horizontal, 32)
+                }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.item]) { result in
+                    importDatabase(from: result)
+                }
+                .alert(
+                    "No se Pudo Importar",
+                    isPresented: Binding(
+                        get: { importErrorMessage != nil },
+                        set: { if !$0 { importErrorMessage = nil } }
+                    )
+                ) {
+                    Button("Entendido", role: .cancel) {}
+                } message: {
+                    Text(importErrorMessage ?? "")
+                }
             } else {
                 List {
                     ForEach(results) { entry in
@@ -956,6 +998,36 @@ struct DirectorySearchView: View {
             guard !Task.isCancelled else { return }
             results = found
             isSearching = false
+        }
+    }
+
+    /// Copies a file the user picked (Files app, iCloud Drive, "On My iPhone", …) into this app's
+    /// Documents folder, then re-runs discovery — `DirectoryDatabase` doesn't care about the
+    /// filename, only what tables the copy actually has, so an unrecognized file just leaves
+    /// `databaseFile` nil instead of throwing here.
+    private func importDatabase(from result: Result<URL, Error>) {
+        guard case let .success(sourceURL) = result else { return }
+
+        let didAccess = sourceURL.startAccessingSecurityScopedResource()
+        defer { if didAccess { sourceURL.stopAccessingSecurityScopedResource() } }
+
+        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            importErrorMessage = "No se pudo acceder a los archivos de la app."
+            return
+        }
+        let destinationURL = documents.appendingPathComponent(sourceURL.lastPathComponent)
+
+        do {
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+            databaseFile = DirectoryDatabase.discoverDatabase()
+            if databaseFile == nil {
+                importErrorMessage = "El archivo se copió pero no tiene el formato esperado de base de datos de directorio."
+            }
+        } catch {
+            importErrorMessage = "No se pudo copiar el archivo: \(error.localizedDescription)"
         }
     }
 }
