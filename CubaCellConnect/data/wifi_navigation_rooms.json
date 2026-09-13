@@ -1,0 +1,3552 @@
+[
+  {
+    "province": "Pinar del Río",
+    "rooms": [
+      {
+        "name": "Multiservice Center Hermanos Cruz",
+        "address": "Calle 5ta e/ A y B",
+        "positions": 3
+      },
+      {
+        "name": "Post Office Pinar del Río 1",
+        "address": "Calle Martí No. 49 esq. a Recreo",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Alameda",
+        "address": "Calle Alameda e/13 de marzo y 6ta",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Martí",
+        "address": "",
+        "positions": 8
+      },
+      {
+        "name": "Post Sale Workshop Pinar del Río",
+        "address": "Calle 6ª e/ A y B Rpto. Hermanos Cruz",
+        "positions": 1
+      },
+      {
+        "name": "Telepunto Pinar del Río",
+        "address": "Gerardo Medina esq. a Juan Gualberto Gómez",
+        "positions": 8
+      },
+      {
+        "name": "Youth Club Palacio de Computación",
+        "address": "Calle Martí No. 124 esq. Cuarteles",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Consolación del Sur II",
+        "address": "Calle 9 e/ 5ta y 5ta A, Pueblo Nuevo",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Consolación del Sur",
+        "address": "Calle 64 e/ 53 y 55",
+        "positions": 5
+      },
+      {
+        "name": "Minipunto Herradura",
+        "address": "Calle 29 e/ 28 y 30 Nº 28068",
+        "positions": 1
+      },
+      {
+        "name": "Commercial Office Guane",
+        "address": "Calle Coronel Barrios e/. Isabel Rubio y Policarpo Fajardo",
+        "positions": 4
+      },
+      {
+        "name": "Minipunto Isabel Rubio",
+        "address": "",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Guane I",
+        "address": "Domingo Urquiola No. 21 E Interior",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office La Palma",
+        "address": "Calle Comandante Cruz e/ Céspedes y M. Gómez",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club La Palma I",
+        "address": "Calle 5ta No. 8",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Los Palacios",
+        "address": "Calle 21 No. 2811 e/ 28 y 30",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Los Palacios",
+        "address": "Calle 21 e/ 22 y 24",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Mantua",
+        "address": "Calle A, Maceo",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Mantua I",
+        "address": "Calle Carlos M. de Céspedes No. 234",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Minas de Matahambre",
+        "address": "Calle Paseo Ruiz Señor No. 4",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto Sales Office Santa Lucía",
+        "address": "Calle Celso Maragoto",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Minas I",
+        "address": "Calle 1ª No. 125",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club San Juan I",
+        "address": "Calle Isidro de Armas No. 1 Rpto Alturas",
+        "positions": 3
+      },
+      {
+        "name": "Commercial Office San Juan y Martínez",
+        "address": "Martí esq. a Luis Calderón, San Juan y Martínez",
+        "positions": 3
+      },
+      {
+        "name": "Commercial Office San Luis",
+        "address": "Calle J. Romero No. 89",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club San Luis",
+        "address": "Rpto Conrado Benítez",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Sandino I",
+        "address": "Calle 5ta No. 8",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Sandino",
+        "address": "Zona G, Sandino",
+        "positions": 10
+      },
+      {
+        "name": "Youth Club Viñales I",
+        "address": "Calle Ceferino Fernández",
+        "positions": 2
+      },
+      {
+        "name": "Post Office de Viñales",
+        "address": "Ceferino Fernández No. 14",
+        "positions": 1
+      },
+      {
+        "name": "Multiservice Center",
+        "address": "C. Fernández No. 3 e/ S. Cisneros y R. Trejo, Viñales",
+        "positions": 8
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Pinar del Río",
+        "spots": [
+          "El Renacer. Hermanos Cruz",
+          "ParK: Las Ovas",
+          "Recreation Center: Super Gol",
+          "Park: La Conchita",
+          "Park: 10 de octubre ARTEX",
+          "Park Ferrocarriles",
+          "Park Gabinete 9 plantas",
+          "Park Vocacional",
+          "Luces de ciudad",
+          "Park La ESPA",
+          "Park Pedro Téllez",
+          "Park interior Abel Santamaría",
+          "Park Valle Ancón",
+          "Guanajera Park",
+          "La Coloma Park",
+          "ParK: Independencia",
+          "ParK: Colón",
+          "ParK: Montequín",
+          "Restaurant Cabaret: Rumayor",
+          "Plaza Hermanos Cruz",
+          "Park: Capitán San Luis",
+          "Park Celso Maragoto",
+          "Park Km 4 Luis Lazo",
+          "Park El Mudo Guiteras",
+          "Park 12 plantas Maceo",
+          "Parque Lázaro Acosta",
+          "Park Cuchillo Galeano",
+          "Park las Taironas",
+          "Backyard UNEAC",
+          "El Vizcaino Park",
+          "ParK: Roberto Amarán",
+          "Sales office: CIMEX La Cristal",
+          "Park José Martí",
+          "Park: Hospital Pediátrico",
+          "Park: IPE Alameda",
+          "Park: Capó",
+          "Park 9 plantas Hermanos Cruz",
+          "Park San Vicente",
+          "Park Monumento Hermanos Saíz",
+          "Park 30 de noviembre, El cartucho",
+          "Bar 12 plantas Maceo",
+          "Park Coloma 1",
+          "Park Politécnico del tabaco",
+          "Commercial Center: Alameda",
+          "El Mudo Guiteras Park",
+          "Park: Commercial Center Hermanos Cruz",
+          "ParK: La Coloma",
+          "Promenade: Martí",
+          "Park: Briones Montoto",
+          "Park: de la Audiencia",
+          "Park Pedagógico",
+          "Park Hospital Abel Santamaría",
+          "Park Entronque Ovas",
+          "Telepinar",
+          "Park Cuba libre",
+          "Park Km 4 La Coloma",
+          "Park de los mártires",
+          "Park Km 21 La Coloma",
+          "Park: Capó",
+          "Park 9 Floors Hermanos Cruz 2"
+        ]
+      },
+      {
+        "municipality": "Consolación del Sur",
+        "spots": [
+          "Park Pilotos",
+          "Park Antonio Maceo, Consolación del Sur",
+          "Park Alonso Rojas",
+          "Park Entronque Herradura",
+          "Park Puerta de Golpe",
+          "Park Herradura",
+          "Park Pueblo Nuevo"
+        ]
+      },
+      {
+        "municipality": "Guane",
+        "spots": [
+          "Park Combate Tenería",
+          "Park Punta de la Sierra",
+          "Park Sábalo",
+          "Park Arena Silice",
+          "Park 26 de julio, Guane",
+          "Park Surí",
+          "Park Güira, Guane",
+          "Park Isabel Rubio",
+          "Park Guane 2",
+          "Los Portales"
+        ]
+      },
+      {
+        "municipality": "La Palma",
+        "spots": [
+          "Park San Andrés",
+          "Park Sanguily",
+          "Park La Mulata",
+          "Restaurant and park La Palma"
+        ]
+      },
+      {
+        "municipality": "Los Palacios",
+        "spots": [
+          "Park Los Palacios",
+          "Pizzería 23-24 and Park Los Palacios",
+          "Park Paso quemado",
+          "Park San Diego de los baños",
+          "Park Paso San Diego",
+          "Park La Güira",
+          "Square La amistad"
+        ]
+      },
+      {
+        "municipality": "Mantua",
+        "spots": [
+          "Park Montezuelo Mantua",
+          "Park Dimas",
+          "Cafeteria and park CIMEX-Mantua",
+          "Park Pino Gordo",
+          "Park Arroyo de Mantua",
+          "Park Macurije"
+        ]
+      },
+      {
+        "municipality": "Minas de Matahambre",
+        "spots": [
+          "Park Santa Lucía",
+          "Park Cabeza",
+          "Park Sumidero",
+          "Park Río del medio, Minas",
+          "Park viejo, Santa Lucía",
+          "Emincar, Santa Lucía",
+          "Restaurant and area El Cobre, Minas de Matahambre",
+          "Park Pons"
+        ]
+      },
+      {
+        "municipality": "San Juan y Martínez",
+        "spots": [
+          "Park Hermanos Saíz",
+          "Cafeteria and park La esquinita Martín Herrera, San Juan",
+          "Farm Quemado del Rubí",
+          "Park Río Seco",
+          "San Juan Park",
+          "Park Calderón",
+          "The Cafetal"
+        ]
+      },
+      {
+        "municipality": "San Luis",
+        "spots": [
+          "Park Río Feo",
+          "Park Cooperativa Hermanos Venas",
+          "Park San Luis",
+          "Park Santa María",
+          "Park El Corojo"
+        ]
+      },
+      {
+        "municipality": "Sandino",
+        "spots": [
+          "Park Las Martinas",
+          "Park Las Tumbas",
+          "Park Commercial Center, Sandino",
+          "Park Villa Bolívar",
+          "Park Bolívar",
+          "Park Manuel Lazo, Sandino",
+          "Park La Fe",
+          "Park Martí",
+          "Recreation Center Cortés",
+          "Laguna Grande Sandino"
+        ]
+      },
+      {
+        "municipality": "Viñales",
+        "spots": [
+          "Park Puerto Esperanza",
+          "Camping Dos Hermanas, Viñales",
+          "Park Mural de la Prehistoria",
+          "El Palenque, Viñales",
+          "El Moncada",
+          "Park Don Tomás",
+          "Park Viñales",
+          "Bar de tapas, Viñales",
+          "Park República de Chile",
+          "Cafeteria Las Cubanitas, Viñales",
+          "Restaurant Las Brisas, Viñales",
+          "Park San Cayetano"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Artemisa",
+    "rooms": [
+      {
+        "name": "Multiservice Center Alquízar",
+        "address": "Av. 86 No. 8702 e/ 87 y 89",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Alquízar II",
+        "address": "Calle No. 82 e/ 79 y PNR",
+        "positions": 1
+      },
+      {
+        "name": "Post Office Artemisa",
+        "address": "Calle 33 e/ 40 y 42",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Artemisa",
+        "address": "Calle 50 e/ 27 y 29",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Artemisa IV",
+        "address": "Calle No. 14 e/1 y 3, Las Cañas",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Bahía Honda I",
+        "address": "Calle 30 No. 2519 e/ 25 y 27 B",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto ELAM",
+        "address": "Carretera Panamericana Km. 31/2, Santa Fé",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto BMTE Baracoa",
+        "address": "Carretera Panamericana UM 4895",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Bauta III",
+        "address": "Calle 150 e/ 3ra A y 3ra B, Playa Baracoa",
+        "positions": null
+      },
+      {
+        "name": "Multiservice Center Bauta",
+        "address": "Calle 148 No. 24909 e/ 249 y 251",
+        "positions": 3
+      },
+      {
+        "name": "Minipunto Escuela Cadetes Antonio Maceo",
+        "address": "Escuela Interarmas Antonio Maceo de las FAR, Ceiba del Agua",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Caimito II",
+        "address": "Calle 36 No. 4306",
+        "positions": 1
+      },
+      {
+        "name": "Multiservice Center Caimito",
+        "address": "Av. 41 esq. 36",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Candelaria",
+        "address": "Av. 38 e/ Av. 31 y Ave. 33",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Candelaria II",
+        "address": "Calle 34, Godinez",
+        "positions": null
+      },
+      {
+        "name": "Multiservice Center Guanajay",
+        "address": "Calle 80 No. 6106 e/ 61 y 63",
+        "positions": 1
+      },
+      {
+        "name": "Commercial Office Guanajay",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Guanajay II",
+        "address": "Av. 71 e/ 78 y 80",
+        "positions": null
+      },
+      {
+        "name": "Multiservice Center Güira de Melena",
+        "address": "Calle 86 No. 8910 e/ 89 y 91",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Güira II",
+        "address": "Calle 86 No. 8108 e/ 81 y 83",
+        "positions": 1
+      },
+      {
+        "name": "Multiservice Center Centro de Negocios Mariel",
+        "address": "Centro de Negocios Mariel esq. Quiebra Hacha-Angosta Zona No. 5 ZDEM",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Mariel",
+        "address": "Calle 128 no. 6527 e/ 65 y 67",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Cabañas",
+        "address": "Calle 24 No. 2305 e/ 43 y 45",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto San Antonio de los Baños",
+        "address": "Av. 39 No. 4402 e/ 44 y 46",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club San Antonio III",
+        "address": "Av. 41 No. 3802 e/ 38 y 40",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center San Antonio de los Baños",
+        "address": "Av. 41 No. 6610 e/ 66 y 68",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center San Cristóbal",
+        "address": "Antonio Maceo No.108",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club San Cristóbal I",
+        "address": "Calle Camilo Cienfuegos No. 9 e/ Céspedes y Conrado Benitez",
+        "positions": null
+      },
+      {
+        "name": "Post Office San Cristobal",
+        "address": "Calle Maceo e/ Capitán Reyes y Guillermo",
+        "positions": 3
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Artemisa",
+        "spots": [
+          "Baseball Stadium",
+          "Cuban Communist Party Municipal Park",
+          "Park Libertad (Iglesia)",
+          "Park Los Caballitos",
+          "El Corojal",
+          "Boulevard",
+          "JC Las cañas",
+          "Park Las Cañas",
+          "Neighborhood Toledos"
+        ]
+      },
+      {
+        "municipality": "Bahía Honda",
+        "spots": [
+          "Luis Carrasco",
+          "CT Silvio Caro",
+          "Pablo de la Torriente Brau",
+          "Pizzería"
+        ]
+      },
+      {
+        "municipality": "Bauta",
+        "spots": [
+          "Restaurant El Cochinito",
+          "Park Baracoa beach",
+          "BMTE Baracoa",
+          "Key La Rosa"
+        ]
+      },
+      {
+        "municipality": "Caimito",
+        "spots": [
+          "Cadet Academy",
+          "Vereda",
+          "CT Pueblo Nuevo",
+          "Julio Antonio Mella International Camp"
+        ]
+      },
+      {
+        "municipality": "Candelaria",
+        "spots": [
+          "Park Central"
+        ]
+      },
+      {
+        "municipality": "Guanajay",
+        "spots": [
+          "CT Guanajay",
+          "Park Central"
+        ]
+      },
+      {
+        "municipality": "Güira de Melena",
+        "spots": [
+          "CT Gabriel",
+          "Boulevard Artemisa",
+          "ANAP school"
+        ]
+      },
+      {
+        "municipality": "Mariel",
+        "spots": [
+          "Park Central",
+          "Park Cabañas",
+          "Boca de Mariel",
+          "Intermodal ZEDM",
+          "Quiebra Hacha"
+        ]
+      },
+      {
+        "municipality": "San Antonio de los Baños",
+        "spots": [
+          "Park Camilo Cienfuegos",
+          "Park La Placita"
+        ]
+      },
+      {
+        "municipality": "San Cristóbal",
+        "spots": [
+          "CT López Peña",
+          "Medic Sciences SC",
+          "Santa Cruz de los Pinos",
+          "Fachada CTLP",
+          "Fierro",
+          "Batey Martí"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "La Habana",
+    "rooms": [
+      {
+        "name": "Commercial office Aldabó",
+        "address": "Nacional e/ Alday y Lililoy",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Boyeros III",
+        "address": "Calle 4 e/ Parque Oeste, Embil",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Palacio Central",
+        "address": "Calle Reina esq. Amistad",
+        "positions": 8
+      },
+      {
+        "name": "Youth Club Centro Habana I",
+        "address": "Calle Zanja No. 605 e/ Oquendo y Soledad",
+        "positions": 4
+      },
+      {
+        "name": "Post Office Zanja-San Francisco",
+        "address": "Calle Zanja y San Francisco",
+        "positions": 20
+      },
+      {
+        "name": "Multiservice Center Casino Deportivo",
+        "address": "Calle Entrada e/ Av. de Los Ocujes y Final, Rpto. Antonio Maceo",
+        "positions": 5
+      },
+      {
+        "name": "Youth Club Cerro II",
+        "address": "Calle Esperanza y Suzarte",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Marianao II",
+        "address": "Calle 31 B y102",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Cotorro II",
+        "address": "Calle 58 No. 9902 e/ Av. 99 y 99ª",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club 10 de Octubre IV",
+        "address": "Calle D No. 367 e/ 12 y 13, Lawton",
+        "positions": 4
+      },
+      {
+        "name": "Post Office Habana 5",
+        "address": "Ave. Santa Catalina no. 465 entre Juan Delgado y Destrampes.",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Guanabacoa",
+        "address": "Calle Cadena No. 9 e/ Pepe Antonio y División",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Guanabacoa III",
+        "address": "Calle Quintín Banderas e/ Máximo Gómez y Martí, Villa I",
+        "positions": 4
+      },
+      {
+        "name": "Post Office Habana 11",
+        "address": "Calle División No. 309 e/ Máximo Gómez y Cadenas",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Tarará",
+        "address": "Ave. 13 no. 33806 e/ 6ta. y 6ta. A, Tarará.",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Habana del Este II",
+        "address": "Calle 180 No. 1003 e/ 1era D y 1era C. Zona 17",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Alamar",
+        "address": "Calle 162 D e/ 5ta C y 5ta D, Zona 6",
+        "positions": 10
+      },
+      {
+        "name": "Post Office Habana 25",
+        "address": "Calle 62D e/ 5ta Zona 6 Alamar.",
+        "positions": 3
+      },
+      {
+        "name": "Navigation Room Guanabo",
+        "address": "Calle 5ta C e/ 490 A y 492, Guanabo",
+        "positions": 6
+      },
+      {
+        "name": "Multiservice Center Guanabo",
+        "address": "Calle no. 468 e/7ma y 9na no.718, Guanabo.",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Center Villa Panamericana",
+        "address": "Calle 5ta C e/ 76 y 78, edif. 40 A (bajos)",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Habana and Desamparados",
+        "address": "Habana y Desamparados",
+        "positions": 5
+      },
+      {
+        "name": "Post Office O´Reilly",
+        "address": "Calle O´Reilly No. 522 e/ Bernaza y Villega",
+        "positions": 7
+      },
+      {
+        "name": "Post Office Obispo",
+        "address": "Calle Obispo No. 518 e/ Bernaza y Villega",
+        "positions": 2
+      },
+      {
+        "name": "Telepunto Obispo and Habana",
+        "address": "Calle Obispo No. 351 e/ Habana y Compostela",
+        "positions": 12
+      },
+      {
+        "name": "Commercial Office La Lisa",
+        "address": "Calle 190 esq. a 39",
+        "positions": 3
+      },
+      {
+        "name": "Post Office Habana 14",
+        "address": "Calle 33 e/ 82 y 84",
+        "positions": 4
+      },
+      {
+        "name": "Navigation Room Marianao",
+        "address": "Av. 51 y 106",
+        "positions": 11
+      },
+      {
+        "name": "Multiservice Center Miramar",
+        "address": "Av. 5ta y 76, edif. Barcelona bajos",
+        "positions": 49
+      },
+      {
+        "name": "Multiservice Center La Copa",
+        "address": "Calle 42 y Av. 1ra, Miramar",
+        "positions": 9
+      },
+      {
+        "name": "Youth Club Jaimanitas VI",
+        "address": "Calle 234 y 3ra A",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Vedado",
+        "address": "Calle 17 e/ B y C",
+        "positions": 8
+      },
+      {
+        "name": "Navigation Room 17 y A",
+        "address": "Calle 17 y A",
+        "positions": 20
+      },
+      {
+        "name": "Youth Club Plaza I",
+        "address": "Calle N e/ 21 y 23",
+        "positions": 4
+      },
+      {
+        "name": "Telepunto FOCSA",
+        "address": "Calle 17 y M edif. Focsa",
+        "positions": 9
+      },
+      {
+        "name": "Post Office Habana 4",
+        "address": "Línea e/ 2 y Paseo",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Regla",
+        "address": "Calle Rotaria e/ Ciruela y Enlace",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Cumbre",
+        "address": "Calzada de Güines Km 10 ½ y Final. Rpto. La Cumbre.",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club San Miguel del Padrón IV",
+        "address": "Calle 2da No. 48 e/ Av. 1era y Calzada de Güines",
+        "positions": 4
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Arroyo Naranjo",
+        "spots": [
+          "Park Isabel Sofía, Párraga",
+          "EXPOCUBA Pabellón Central y 14",
+          "Park Arístides Viera, Rpto. Eléctrico",
+          "Park Santa Amalia",
+          "Park de Lourdes y San Gregorio (Víbora Park)",
+          "Park de Caballero y Pizarro",
+          "National Botanic Garden - Japanese Garden"
+        ]
+      },
+      {
+        "municipality": "Boyeros",
+        "spots": [
+          "Park Wajay",
+          "Recreation Center - Recreatur Fontanar",
+          "Park Lugardita",
+          "Park Altahabana",
+          "Park José Martí, Santiago de las Vegas",
+          "Park de la Iglesia, Managua",
+          "Park Lenin",
+          "Park de Calabazar",
+          "Park Río Cristal",
+          "Park Río Verde"
+        ]
+      },
+      {
+        "municipality": "Centro Habana",
+        "spots": [
+          "Malecón Drive (Hotel Deauville outdoor area)",
+          "Boulevard San Rafael",
+          "Chinatown",
+          "Malecón drive (Castro Poll, outdoor restauran)",
+          "Park Ángeles y Estrella",
+          "Park Infanta y Salud",
+          "Park La Pera",
+          "Park Trillo",
+          "Park Karl Marx",
+          "Park de los Mártires"
+        ]
+      },
+      {
+        "municipality": "Cerro",
+        "spots": [
+          "Park Latin American Stadium",
+          "Park Palatino",
+          "Park Manila",
+          "Boulevard, Martí Neighborhood"
+        ]
+      },
+      {
+        "municipality": "Cotorro",
+        "spots": [
+          "Park 9 de abril",
+          "Park de Santa María del Rosario",
+          "Park de Cuatro Caminos"
+        ]
+      },
+      {
+        "municipality": "Diez de Octubre",
+        "spots": [
+          "Park Asunción",
+          "Park Lawton. Calle B y 8, Diez de octubre",
+          "Park Mónaco",
+          "Park de Concepción y 21, Lawton",
+          "Park Cordóba",
+          "Park Camilo Cienfuegos (Dolores)"
+        ]
+      },
+      {
+        "municipality": "Guanabacoa",
+        "spots": [
+          "Park de los Mártires de la Jata",
+          "Children park D&#039;beche",
+          "Park La Gallega Neighborhood",
+          "Park Chibás Neighborhood",
+          "Park Néstor Aranguren (El Machaco)",
+          "Park Mañana Neighborhood",
+          "Park Viondi",
+          "Children park Santa Fe"
+        ]
+      },
+      {
+        "municipality": "La Habana del Este",
+        "spots": [
+          "Park de Campo Florido",
+          "Park La Guayabera",
+          "Hotel Colinas de Villarreal Militar",
+          "Park de Guanabo",
+          "Park diversiones &quot;José Martí&quot;",
+          "Guanabito",
+          "Promenade Villa Panamericana",
+          "Park Commercial Center Camilo Cienfuegos",
+          "Park Ernest Hemingway",
+          "Morro Cabañas Complex",
+          "Park Hanoi, Alamar",
+          "Park del Rpto. Guiteras",
+          "Traffic Circle Guanabo"
+        ]
+      },
+      {
+        "municipality": "La Habana Vieja",
+        "spots": [
+          "Park Cuatro Caminos",
+          "Plaza Cristo"
+        ]
+      },
+      {
+        "municipality": "La Lisa",
+        "spots": [
+          "Park Punta Brava",
+          "Park Arroyo Arenas",
+          "Park Cano",
+          "Park Verde",
+          "Park 51 (Ampliación de La Lisa)",
+          "Park Valle Grande",
+          "Commercial Center 31 y 240, San Agustín",
+          "Park 51 y 278",
+          "Park Elena"
+        ]
+      },
+      {
+        "municipality": "Marianao",
+        "spots": [
+          "Park 126 y 51",
+          "Park 140 y 37",
+          "Park 118 Marianao Amphitheater",
+          "Park 98 y 39",
+          "Park 51 y 76",
+          "Park Camilo Cienfuegos (Baldomero Acosta)",
+          "Park 104 y 41",
+          "Park 114 y 81"
+        ]
+      },
+      {
+        "municipality": "Playa",
+        "spots": [
+          "Park Coyula 19 y 30",
+          "Park Juan Manuel Márquez",
+          "Park Jaimanitas",
+          "University Resort, 1ra. y 42",
+          "Monte Barreto",
+          "Park 13 y 76",
+          "Park Náutico",
+          "Park Japonés",
+          "Theater Karl Marx",
+          "Promenade Marítimo 1ra. y 70",
+          "Park Flores",
+          "Park Rincón Martiano",
+          "Park Tropicana",
+          "Laboratory KCHO",
+          "La Corbata Park",
+          "Park Genética",
+          "Park Lázaro Cárdenas (Kolhy)",
+          "Park Barbosa",
+          "El Sauce"
+        ]
+      },
+      {
+        "municipality": "Plaza de la Revolución",
+        "spots": [
+          "La Rampa (from the Malecón drive to Yara Movie Center)",
+          "Park Línea y L",
+          "Malecón drive (Hispanoamericano Center Outdoor)",
+          "Pabellón Cuba",
+          "EGREM Cultural Center",
+          "Malecón y Paseo",
+          "Park Wifredo Lam",
+          "Malecón drive. Zona Abadía",
+          "Park Clandestinidad",
+          "Park Forestal",
+          "La Piragua",
+          "Technological Center ¡Hola, Ola!",
+          "Park Coopelia",
+          "Park 3ra. y B",
+          "Park La Alegria El Fanguito",
+          "El Castillito",
+          "G y Malecón",
+          "Park Línea y H",
+          "Park Tulipán y Loma"
+        ]
+      },
+      {
+        "municipality": "Regla",
+        "spots": [
+          "Park Las Madres",
+          "Park Arcoiris",
+          "Morro Cabañas Historic Military Museum",
+          "Park Casablanca"
+        ]
+      },
+      {
+        "municipality": "San Miguel del Padrón",
+        "spots": [
+          "Park Los Chivos (Manuel Ascunce)",
+          "Park Dolores",
+          "Park José Martí",
+          "Park Monterrey"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Isla de la Juventud",
+    "rooms": [
+      {
+        "name": "Youth Club Isla III",
+        "address": "Calle 8 esq. 5, La Demajagua",
+        "positions": 4
+      },
+      {
+        "name": "Telepunto Sales Office Isla de la Juventud (Gerona)",
+        "address": "Calle 41 No. 2804 e/ 28 y 30",
+        "positions": 6
+      },
+      {
+        "name": "Post Office Isla de la Juventud",
+        "address": "Calle Jose Martí e/18 y 20, Nueva Gerona",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center La Fe",
+        "address": "Calle 20 e/ 9 y 18",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto La Fe",
+        "address": "",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Isla VI",
+        "address": "Calle 24 E/ 13 y 15 Panel II, Santa Fe",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Cubacel Isla",
+        "address": "",
+        "positions": 2
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Isla de la Juventud",
+        "spots": [
+          "Park La Fe",
+          "Park La Victoria",
+          "Square Marina, Cayo Largo del Sur",
+          "Market Micro 70",
+          "Panel II La Fe",
+          "Museum El Abra",
+          "La Pista Panel 1 La Fe",
+          "Park El Lucero, La Demajagua",
+          "Park Delio Chacón",
+          "Park Argelia",
+          "Market Abel Santamaría",
+          "Park El Avión",
+          "Recreation Complex El Abra",
+          "Boulevard Nueva Gerona",
+          "Park Caribe Movie Center",
+          "Baseball Stadium Cristóbal Labra",
+          "Park Cocodrilo",
+          "Market Patria",
+          "WiFi Ciro Redondo Neighborhood",
+          "Park Estudiantes / Cotorras",
+          "Park Ahao",
+          "Park Recreation and Technological Center",
+          "Park Reforma",
+          "Town Cayo Largo del Sur",
+          "Centro Cultural Atanagildo"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Mayabeque",
+    "rooms": [
+      {
+        "name": "Commercial Office Güines",
+        "address": "Calle 94 No. 7501 e/ 75 y 77",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Batabanó",
+        "address": "Av. 71 No. 6415 e/ 64 y 66",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Bejucal II",
+        "address": "Calle 2 e/ 9 y 11",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Jaruco",
+        "address": "Calle 18 No. 2302 e/ 23 y 25",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Madruga",
+        "address": "Av. 27 No. 3612 e/ 36 y 38",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Melena del Sur",
+        "address": "Calle 22 e/ 39 y 41",
+        "positions": 1
+      },
+      {
+        "name": "Commercial Office Quivicán",
+        "address": "Av. 21 No. 3201 e/ 32 y 34",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center San José de las Lajas",
+        "address": "Av. 47 e/ 54 y 64",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club San José",
+        "address": "Av. 59 No. 5406 e/ 54 y 64",
+        "positions": 1
+      },
+      {
+        "name": "Commercial Office San Nicolás de Bari",
+        "address": "Av. 21 No. 3201 e/ 32 y 34",
+        "positions": 3
+      },
+      {
+        "name": "Commercial Office Santa Cruz del Norte",
+        "address": "Av. 11 edif. 3201, Zona de Desarrollo",
+        "positions": 4
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Güines",
+        "spots": [
+          "Park de Güines",
+          "Square Cangre",
+          "Park Catalina de Güines",
+          "El Congo Catalina",
+          "Park Micro de Güines"
+        ]
+      },
+      {
+        "municipality": "Batabanó",
+        "spots": [
+          "Park Batabanó",
+          "BB Surgidero"
+        ]
+      },
+      {
+        "municipality": "Bejucal",
+        "spots": [
+          "Park Bejucal"
+        ]
+      },
+      {
+        "municipality": "Jaruco",
+        "spots": [
+          "Plaza Jaruco",
+          "Park San Antonio Río Blanco",
+          "Promenade Bainoa",
+          "Park Jaruco",
+          "Park Caraballo"
+        ]
+      },
+      {
+        "municipality": "Madruga",
+        "spots": [
+          "Youth Club, Aguacate",
+          "Park de Madruga",
+          "Park Aguacate",
+          "Park Pipian"
+        ]
+      },
+      {
+        "municipality": "Melena del Sur",
+        "spots": [
+          "Park Cuatro Esquinas"
+        ]
+      },
+      {
+        "municipality": "Nueva Paz",
+        "spots": [
+          "CT Nueva Paz",
+          "Conejito Mayabeque",
+          "Park Nueva Paz"
+        ]
+      },
+      {
+        "municipality": "Quivicán",
+        "spots": [
+          "Park La Salud",
+          "Park Quivicán"
+        ]
+      },
+      {
+        "municipality": "San José de las Lajas",
+        "spots": [
+          "Las Ruinas",
+          "Park San Antonio Las Vegas",
+          "Square Micro 2",
+          "Park Camilo San José",
+          "Youth Club and Technological Park Micro",
+          "Shop El Samurai",
+          "Cultural Square San José",
+          "Boulevard San José de las Lajas",
+          "Park Tapaste",
+          "Neighborhood Jamaica"
+        ]
+      },
+      {
+        "municipality": "Santa Cruz del Norte",
+        "spots": [
+          "Parador Peñon del Fraile",
+          "Malecón Drive Boca de Jaruco",
+          "4 Esquinas Camilo Cienfuegos",
+          "Park Malecón de Santa Cruz del Norte"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Matanzas",
+    "rooms": [
+      {
+        "name": "Commercial Office Calimete",
+        "address": "Independencia No. 9 e/ Colón y Calle 6",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Hotel Melia Las Américas",
+        "address": "Carretera Las Américas, Hotel Meliá América, Varadero",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Hotel Sandals",
+        "address": "Hotel Sandals, Varadero",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Varadero I",
+        "address": "Independencia e/ Callejón de La Conchita y Cuchillo",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Plaza América",
+        "address": "Carretera Las Morlas, Centro Comercial Plaza América, Varadero",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Complejo Hicacos",
+        "address": "Av. 1ra. y 44, Centro Comercial Hicacos, Varadero",
+        "positions": 3
+      },
+      {
+        "name": "Post Office Varadero",
+        "address": "Calle 36 y 1ra Av.",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Aeropuerto Internacional",
+        "address": "Carretera a Regalito Km 5 1/2 Aeropuerto Juan Gualberto Gómez",
+        "positions": 1
+      },
+      {
+        "name": "Multiservice Center Hotel Sol Palmeras",
+        "address": "Carretera Las Américas, Hotel Sol Palmeras, Varadero",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Cárdenas",
+        "address": "Céspedes esq. a Coronel Verdugo",
+        "positions": 14
+      },
+      {
+        "name": "Multiservice Center Calle 30",
+        "address": "Calle 30 esq. a 1ra. Varadero",
+        "positions": 6
+      },
+      {
+        "name": "Multiservice Center Hotel Meliá Las Antillas",
+        "address": "Carretera Las Morlas, Hotel Meliá Antillas, Varadero",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Cárdenas I",
+        "address": "Céspedes 712 e/ Cristina y Minerva Pueblo Nuevo",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Ciénaga de Zapata",
+        "address": "",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Zapata Municipality",
+        "address": "Carretera Buenaventura, Entronque Playa Larga",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Colón III",
+        "address": "Calle Concha e/ Martorell y Víctor Torres",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Colón",
+        "address": "Martí No. 119 e/ M. Gómez y Colón",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Jagüey I",
+        "address": "Calle 58 e/ 11 y 13",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Jagüey Grande",
+        "address": "Calle 56 No. 1106 e/ 11 y 13",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Jovellanos I",
+        "address": "Av. 12 No. 912 e/ 9A y 9B",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Limonar II",
+        "address": "C/ E. Limonar",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Los Arabos",
+        "address": "Martí No. 47",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Martí II",
+        "address": "Maceo Final No. 252",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Martí",
+        "address": "Maceo No. 385",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Matanzas V",
+        "address": "Monserrat e/ Calzada de Esteban y Línea",
+        "positions": 4
+      },
+      {
+        "name": "Matanzas 1",
+        "address": "Medio No. 64 e/ Ayuntamiento y Santa Teresa",
+        "positions": 6
+      },
+      {
+        "name": "Telepunto Matanzas",
+        "address": "Jovellanos esq. a Milanés",
+        "positions": 12
+      },
+      {
+        "name": "Youth Club Matanzas I",
+        "address": "Calle Contreras esq. Buenavista",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Pedro Betancourt",
+        "address": "Calle 27 e/ 18 y 20",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Betancourt II",
+        "address": "Calle 29 No. 1604 e/ 16 y 18",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Perico II",
+        "address": "Martí e/ Jovellanos y Valentín Castro, Máximo Gómez",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Unión II",
+        "address": "Bartolomé Masó No. 15 e/ Juan Ávila y General Lacret",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Unión de Reyes",
+        "address": "Antonio Maceo No. 32 e/ Camilo Cienfuegos y José Martí",
+        "positions": 3
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Cárdenas",
+        "spots": [
+          "Conventions Center Plaza América, Varadero",
+          "Artex Center, Varadero",
+          "Hotel Meliá Las Américas, Varadero",
+          "Calle 30, Varadero",
+          "Square Las Morlas, Varadero",
+          "Hotel Sol Palmeras, Varadero",
+          "Park Martí",
+          "WiFi Park Los Mártires",
+          "Park José Antonio Echeverría",
+          "Commercial Center Plaza Hicacos, Varadero",
+          "Music Center, Varadero",
+          "ACAA Cárdenas",
+          "Feria Tur Boulevar",
+          "All in one Center, Varadero",
+          "Park Boca Camarioca, Varadero",
+          "Park Santa Marta, Varadero",
+          "Park Antonio Maceo"
+        ]
+      },
+      {
+        "municipality": "Ciénaga de Zapata",
+        "spots": [
+          "Beach Bar, Playa Girón",
+          "Giron Museum"
+        ]
+      },
+      {
+        "municipality": "Colón",
+        "spots": [
+          "Park La Libertad",
+          "Boulevard"
+        ]
+      },
+      {
+        "municipality": "Jagüey Grande",
+        "spots": [
+          "Park Jagüey Grande"
+        ]
+      },
+      {
+        "municipality": "Jovellanos",
+        "spots": [
+          "Park Jovellanos"
+        ]
+      },
+      {
+        "municipality": "Los Arabos",
+        "spots": [
+          "Park Los Árabos"
+        ]
+      },
+      {
+        "municipality": "Martí",
+        "spots": [
+          "Park Martí"
+        ]
+      },
+      {
+        "municipality": "Matanzas",
+        "spots": [
+          "Park René Fraga",
+          "Park La Catedral",
+          "Park Guanima",
+          "Tourism Room Faustino Pérez Hospital",
+          "Cafe Atenas",
+          "Market Artesanos",
+          "Craftsmen Cultural Association Artesanos",
+          "Technological Center Narvaez",
+          "Park La Estrella",
+          "University of Medical Sciences",
+          "Techonological Center and Promenade Narvaez",
+          "Agramonte Park",
+          "Park La Libertad",
+          "Restaurant Bar Cafeteria Center, Plaza La Vigia",
+          "Recreation Park Monserrate",
+          "Park Naranjal",
+          "Park La Jarcia. Pueblo Nuevo",
+          "Park Itabo Martí",
+          "Park Peñas Altas",
+          "Performing Arts Center",
+          "Promenade Martí",
+          "Technological Center Universidad Camilo Cienfuegos",
+          "Art School, Promenade Narvaez",
+          "Park Los Pinitos"
+        ]
+      },
+      {
+        "municipality": "Pedro Betancourt",
+        "spots": [
+          "Park Pedro Betancourt"
+        ]
+      },
+      {
+        "municipality": "Perico",
+        "spots": [
+          "Park Perico"
+        ]
+      },
+      {
+        "municipality": "Unión de Reyes",
+        "spots": [
+          "Park Juan Gualberto Gómez"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Cienfuegos",
+    "rooms": [
+      {
+        "name": "Youth Club Abreus II",
+        "address": "Calle HE e/ Alegría e Ignacio Agramonte",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Aguada de Pasajeros",
+        "address": "Maceo No. 66 e/ Agüero y Panchito Pérez",
+        "positions": 5
+      },
+      {
+        "name": "Minipunto La CEN",
+        "address": "Ciudad Nuclear",
+        "positions": 2
+      },
+      {
+        "name": "Commercial office Palmira",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Cienfuegos III",
+        "address": "Av. 5 de septiembre y Calle 57",
+        "positions": 4
+      },
+      {
+        "name": "Telepunto Cienfuegos",
+        "address": "Calle 31 e/ 54 y 56",
+        "positions": 12
+      },
+      {
+        "name": "Youth Club Cienfuegos V (Dorticós)",
+        "address": "Av. 48 No. 4103",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Boulevard",
+        "address": "Av. 54 e/ 35 y 37",
+        "positions": 13
+      },
+      {
+        "name": "Pastorita (Cienfuegos 4)",
+        "address": "Calle 35 Rpto. Pastorita",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Cruces",
+        "address": "Esquerra No. 707 e/ Padre las Casas y Pepe Alemán",
+        "positions": 5
+      },
+      {
+        "name": "Commercial Office Cumanayagua",
+        "address": "Cienfuegos e/ Orlando Gómez y Paraíso",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Palmira",
+        "address": "Villuenda 34 C e/ Recreo y Máximo Gómez",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Palmira I",
+        "address": "Camilo Cienfuegos No. 120",
+        "positions": 4
+      },
+      {
+        "name": "Commercial office Rodas",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Lajas I",
+        "address": "Calle Nueva No. 5",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Rodas I",
+        "address": "Calle Céspedes No. 72-6",
+        "positions": 4
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Abreus",
+        "spots": [
+          "Horquita",
+          "CT-Yaguaramas-Abreu"
+        ]
+      },
+      {
+        "municipality": "Cienfuegos",
+        "spots": [
+          "Park Villuendas",
+          "Post Office Rpto-Pastorita",
+          "TRD Shop Guaos",
+          "Círculo Social Caunao",
+          "Park Imago",
+          "Park de la Circunvalación",
+          "Junco Sur",
+          "La Barrera",
+          "La Bolera",
+          "RCM Malecón",
+          "12 Plantas Pueblo Griffo",
+          "Video Room Real Campiña",
+          "Park La Aduana",
+          "University of Cienfuegos",
+          "5 de septiembre",
+          "Hospital CEA"
+        ]
+      },
+      {
+        "municipality": "Cruces",
+        "spots": [
+          "Pak Potrerillo"
+        ]
+      },
+      {
+        "municipality": "Cumanayagua",
+        "spots": [
+          "Boulevard",
+          "Barajagua",
+          "Crucesitas",
+          "La Sierrita Park"
+        ]
+      },
+      {
+        "municipality": "Palmira",
+        "spots": [
+          "Espartaco",
+          "Prado San Fdo Camarones",
+          "Social Club Ciego Montero"
+        ]
+      },
+      {
+        "municipality": "Rodas",
+        "spots": [
+          "Park 14 de julio",
+          "Park Cartagena",
+          "Park Congoja"
+        ]
+      },
+      {
+        "municipality": "Moa",
+        "spots": [
+          "Fast Food Center Punta Gorda"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Villa Clara",
+    "rooms": [
+      {
+        "name": "Minipunto Cayo Santa María",
+        "address": "",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Caibarién",
+        "address": "",
+        "positions": 5
+      },
+      {
+        "name": "Vueltas I",
+        "address": "Ramón Hernández Cuvilla interior.",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Camajuaní",
+        "address": "",
+        "positions": 5
+      },
+      {
+        "name": "Cifuentes I",
+        "address": "Juan B. Zayas No. 34 e/ Camagüey y Oriente",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Cifuentes I",
+        "address": "Juan B. Zayas No. 34 e/ Camagüey y Oriente",
+        "positions": 4
+      },
+      {
+        "name": "Commercial office Corralillo",
+        "address": "",
+        "positions": null
+      },
+      {
+        "name": "Multiservice Center Encrucijada",
+        "address": "",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Manicaragua I",
+        "address": "Juan B. Zayas No. 66 Norte",
+        "positions": 4
+      },
+      {
+        "name": "Manicaragua I",
+        "address": "Juan B. Zayas No. 66 Norte",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Placetas",
+        "address": "",
+        "positions": 6
+      },
+      {
+        "name": "Youth Club Placetas II",
+        "address": "1ra del Sur No. 62 e/ 3ra y 4ta del Oeste",
+        "positions": 4
+      },
+      {
+        "name": "Quemado de Güines I",
+        "address": "Av. Sur No. 74 e/ 8va y 10ma",
+        "positions": 4
+      },
+      {
+        "name": "Ranchuelo I",
+        "address": "Juan B. Contreras No. 4 e/ Calixto García y Ramiro Lavandero",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Ranchuelo I",
+        "address": "Juan B. Contreras No. 4 e/ Calixto García y Ramiro Lavandero",
+        "positions": 4
+      },
+      {
+        "name": "Remedios",
+        "address": "1ra del Sur No. 62 e/ 3ra y 4ta del Oeste",
+        "positions": 4
+      },
+      {
+        "name": "Sagua la Grande IV",
+        "address": "Av. 7ma e/ Independencia y Bartolomé Masó",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Sagua la Grande",
+        "address": "",
+        "positions": 7
+      },
+      {
+        "name": "Sagua la Grande I",
+        "address": "Martí No. 60 e/ Carmen Rivalta y Céspedes",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Santa Clara XII (Centro)",
+        "address": "Calle 1ra e/ Perimetral y San Cristóbal",
+        "positions": 4
+      },
+      {
+        "name": "Santa Clara University minipunto",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Santa Clara I (Central)",
+        "address": "Carretera Central No. 289 e/ Libertadores y Rojas",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center La Salud",
+        "address": "",
+        "positions": 6
+      },
+      {
+        "name": "Zona 1",
+        "address": "Colón No. 10 entre Parque y Candelaria",
+        "positions": 5
+      },
+      {
+        "name": "Multiservice Center Taller Posventa",
+        "address": "",
+        "positions": 3
+      },
+      {
+        "name": "Santa Clara I (Central)",
+        "address": "Carretera Central No. 289. e/ Libertadores y Rojas.",
+        "positions": 2
+      },
+      {
+        "name": "Telepunto Santa Clara",
+        "address": "",
+        "positions": 16
+      },
+      {
+        "name": "Minipunto José Martí",
+        "address": "",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Santo Domingo",
+        "address": "",
+        "positions": 3
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Caibarién",
+        "spots": [
+          "Park Nguyen Van Troi",
+          "Joven Club Caibarién 1",
+          "Beach Caibarién",
+          "Park La Libertad"
+        ]
+      },
+      {
+        "municipality": "Camajuaní",
+        "spots": [
+          "Park Vega Alta",
+          "CAI Batalla de Santa Clara",
+          "Paseo José María Pérez",
+          "Boulevard Camajuaní",
+          "La Quinta",
+          "Leoncio Vidal Park",
+          "Parque Central Vueltas",
+          "Boulevard Taguayabón",
+          "José Maria Pérez Park"
+        ]
+      },
+      {
+        "municipality": "Cifuentes",
+        "spots": [
+          "WIFI Unidad Proletaria",
+          "Park Cifuentes",
+          "Park San Diego"
+        ]
+      },
+      {
+        "municipality": "Corralillo",
+        "spots": [
+          "Rancho Veloz",
+          "Quintin Banderas Park",
+          "La Panchita",
+          "Park Sierra Morena"
+        ]
+      },
+      {
+        "municipality": "Encrucijada",
+        "spots": [
+          "Park El Santo",
+          "Park Emilio Córdova",
+          "Park Encrucijada",
+          "Park Calabazar de Sagua"
+        ]
+      },
+      {
+        "municipality": "Manicaragua",
+        "spots": [
+          "Park Manicaragua",
+          "Town Mataguá"
+        ]
+      },
+      {
+        "municipality": "Placetas",
+        "spots": [
+          "Park Casallas",
+          "Park Báez",
+          "CAI Benito Juarez",
+          "Youth Club Placetas 2",
+          "Park Carbó Serviá"
+        ]
+      },
+      {
+        "municipality": "Quemado de Güines",
+        "spots": [
+          "Riquelme Park",
+          "Polyclinic Area Quemado de Güines"
+        ]
+      },
+      {
+        "municipality": "Ranchuelo",
+        "spots": [
+          "Park La Esperanza",
+          "Park San Juan de los Yeras",
+          "Social Club Jicotea",
+          "Park Ranchuelo"
+        ]
+      },
+      {
+        "municipality": "Remedios",
+        "spots": [
+          "Park de Remedios",
+          "Park Buena Vista",
+          "Promenade Carrillo"
+        ]
+      },
+      {
+        "municipality": "Sagua la Grande",
+        "spots": [
+          "Neighborhood Finlay",
+          "Park Sagua",
+          "Youth Club Sagua 1",
+          "Park Isabela de Sagua",
+          "Sitiecito"
+        ]
+      },
+      {
+        "municipality": "Santa Clara",
+        "spots": [
+          "Multiservices Center Salud",
+          "Restaurant Center Vista Hermosa",
+          "Provincial Library José Martí",
+          "Park Maceo",
+          "Kindergarten Somos Jóvenes",
+          "Park Pastorita",
+          "Legal Services",
+          "Recreation Center La Minerva",
+          "Casa Gobernador Restaurant",
+          "Park y Áreas del Baseboll Stadium Sandino",
+          "Park Temático Sandino",
+          "Cultural Center ARTEX Patio del Bar",
+          "Fast Food Center 8 de Marzo",
+          "Center La Taberna",
+          "Park Infantil Camacho",
+          "Medical Science School",
+          "12 Plantas Riviera",
+          "WIFI EIDE",
+          "Park de los Mártires",
+          "Zoo Garden Camilo",
+          "Recreation Center Los Pinos",
+          "Park Base Áerea",
+          "Park El Carmen",
+          "Park Bosque",
+          "Park La Pastora",
+          "Hospital Arnaldo Milián Castro",
+          "Los Almendros Park",
+          "Park Leoncio Vidal",
+          "Scultural Work Memorial Ernesto Che Guevara",
+          "Park Audiencia",
+          "Park de los Columpios",
+          "Boulevard Santa Clara",
+          "Park Maceo Rotonda",
+          "Park Los Beatles",
+          "Cultural Center Cubo de Luz"
+        ]
+      },
+      {
+        "municipality": "Santo Domingo",
+        "spots": [
+          "Park Manacas",
+          "Mordazo Santo Domingo",
+          "Park Santo Domingo"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Sancti Spíritus",
+    "rooms": [
+      {
+        "name": "Multiservice Center Cabaiguán",
+        "address": "Camilo Cienfuegos No. 190 e/ República y Libertad",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Cabaiguán III",
+        "address": "Luis Seijás e/ Manolo González y Sergio Espinosa",
+        "positions": 1
+      },
+      {
+        "name": "Post Office Cabaiguán",
+        "address": "Camilo Cienfuegos No. 250 e/ Beremundo Paz y Alfredo López Brito",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Fomento",
+        "address": "Céspedes No. 159 e/ M. Gómez y José del Carmen Hdez",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Fomento II",
+        "address": "José del Carmen Hernández",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Jatibonico III (Arroyo Blanco)",
+        "address": "Independencia e/ Primito Sánchez e Isidro Piñero Arroy Blanco",
+        "positions": 1
+      },
+      {
+        "name": "Multiservice Center Jatibonico",
+        "address": "Maceo No. 148 e/ J. Blas Hernández y Céspedes",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Jatibonico I",
+        "address": "Calle José Miguel Gómez No. 68 A e/ Calle Céspedes y Juan Blas Hernández",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office La Sierpe",
+        "address": "Carretera del Jíbaro",
+        "positions": 3
+      },
+      {
+        "name": "Minipunto Small Sales Office Ciencias Médicas SS",
+        "address": "Facultad Ciencias Médicas, Circunvalación, Olivos III",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Sancti Spíritus IV",
+        "address": "Calle 5ta e/ 1ra y Av. 26 de Julio, Colón",
+        "positions": 1
+      },
+      {
+        "name": "Telepunto Sales Office Sancti Spiritus",
+        "address": "Independencia Sur No. 10 e/ Cervantes y Honorato del Castillo",
+        "positions": 5
+      },
+      {
+        "name": "Post Office Zona 1",
+        "address": "Bartolomé Masó Sur e/ Mirto y Coronel José Legón",
+        "positions": 4
+      },
+      {
+        "name": "Minipunto Small Sales Office Terminal de Ómnibus Sancti Spíritus",
+        "address": "Carretera Central y Circunvalación",
+        "positions": 5
+      },
+      {
+        "name": "Post Office Zona 2",
+        "address": "Independencia No. 8 e/ Ernesto Valdés Muñoz y Av. de los Mártires",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Taguasco I",
+        "address": "José Antonio Echevarría No. 40 altos",
+        "positions": 2
+      },
+      {
+        "name": "Telepunto Sales Office Trinidad",
+        "address": "Lino Pérez No. 274 e/ J. Martí y Miguel Calzada",
+        "positions": 14
+      },
+      {
+        "name": "Youth Club Trinidad I",
+        "address": "Concordia Rpto. Plaza Trinidad",
+        "positions": 1
+      },
+      {
+        "name": "Post Office Trinidad",
+        "address": "Antonio Maceo No. 418 e/ Francisco Javier Zerguera y Colón",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Yaguajay",
+        "address": "Panchito Gómez No. 96 e/ Maceo y General González",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Yaguajay I",
+        "address": "Joven Club Camajuaní II (Vueltas)",
+        "positions": 2
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Cabaiguán",
+        "spots": [
+          "Promenade Cabaiguán",
+          "Park José Martí de Guayos",
+          "Park Cabaigúan"
+        ]
+      },
+      {
+        "municipality": "Fomento",
+        "spots": [
+          "Cultural Center El Pedrero",
+          "Cultural Square Fomento"
+        ]
+      },
+      {
+        "municipality": "Jatibonico",
+        "spots": [
+          "Promenade Jatibonico",
+          "Park Arroyo Blanco",
+          "Park Terminal Jatibonico"
+        ]
+      },
+      {
+        "municipality": "La Sierpe",
+        "spots": [
+          "Cultural Center Algarrobo Jíbaro"
+        ]
+      },
+      {
+        "municipality": "Sancti Spíritus",
+        "spots": [
+          "Park Serafín Sánchez",
+          "Gastronomic Complex Pío Lindo",
+          "Park Banao",
+          "Cultural Square Yayabo",
+          "House Guayabera",
+          "Promenade Colón",
+          "Promenade Norte I y II",
+          "Grastronomic Complex Mar y Cielo",
+          "Promenade Coppelia"
+        ]
+      },
+      {
+        "municipality": "Taguasco",
+        "spots": [
+          "TUINUCU",
+          "Park Taguasco",
+          "Park José Martí de Zaza del Medio"
+        ]
+      },
+      {
+        "municipality": "Trinidad",
+        "spots": [
+          "Park Céspedes",
+          "Square Santa Ana"
+        ]
+      },
+      {
+        "municipality": "Yaguajay",
+        "spots": [
+          "Park Yaguajay",
+          "Park Meneses"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Ciego de Ávila",
+    "rooms": [
+      {
+        "name": "Youth Club Ciro 2",
+        "address": "Av. Los Patriotas Intercepción Pionia",
+        "positions": 4
+      },
+      {
+        "name": "Post Office Chambas",
+        "address": "Agramonte esq. Las Palmas",
+        "positions": 4
+      },
+      {
+        "name": "Telepunto Sales Office Ciego de Ávila",
+        "address": "Joaquín de Agüero e/ Honorato del Castillo y Maceo",
+        "positions": 11
+      },
+      {
+        "name": "Youth Club Ciego 1",
+        "address": "Micro C",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Ciego 6",
+        "address": "Calle 1 e/ Libertad y Independencia",
+        "positions": 4
+      },
+      {
+        "name": "Sales Office Majagua",
+        "address": "Antonio Maceo No. 66 e/ Paseo Martí y Justo Sánchez",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Majagua 1",
+        "address": "Paseo Martí No. 26",
+        "positions": 4
+      },
+      {
+        "name": "Sales Office Cayo Coco",
+        "address": "Rotonda Los Almacinos, Cayo Coco",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Morón 1",
+        "address": "Calle Sergio Antuña No.138 esq. Martí",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Morón",
+        "address": "Carlos M. de Céspedes No. 5",
+        "positions": 6
+      },
+      {
+        "name": "Minipunto Small Sales Office Villa Cojímar",
+        "address": "Cayo Guillermo",
+        "positions": 1
+      },
+      {
+        "name": "Sales Office Venezuela",
+        "address": "Carretera a Venezuela",
+        "positions": 1
+      },
+      {
+        "name": "Sales Office Gaspar",
+        "address": "Calle 2da e/ A y B",
+        "positions": 1
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Ciro Redondo",
+        "spots": [
+          "Paseo Ceballo"
+        ]
+      },
+      {
+        "municipality": "Baraguá",
+        "spots": [
+          "Park Baraguá",
+          "Promenade Gaspar"
+        ]
+      },
+      {
+        "municipality": "Bolivia",
+        "spots": [
+          "Park de Los Mártires",
+          "Plazoleta Miraflores"
+        ]
+      },
+      {
+        "municipality": "Chambas",
+        "spots": [
+          "Paseo de Chambas",
+          "Ranchuelo Chambas Park",
+          "Promenade Varona",
+          "Park Punta Alegre",
+          "Park Máximo Gómez"
+        ]
+      },
+      {
+        "municipality": "Ciego de Ávila",
+        "spots": [
+          "Paseo Calle D",
+          "Micro Ortiz",
+          "Park de la Ciudad",
+          "Promenade Jicotea",
+          "Promenade Calle K",
+          "BAseboll Stadium José Ramón Cepero",
+          "Park GTecnológico-Ciego",
+          "Park Edad de Oro",
+          "Park Los Enamorados"
+        ]
+      },
+      {
+        "municipality": "Florencia",
+        "spots": [
+          "Park Tamarindo"
+        ]
+      },
+      {
+        "municipality": "Majagua",
+        "spots": [
+          "Park Martí",
+          "Park Guayacanes"
+        ]
+      },
+      {
+        "municipality": "Morón",
+        "spots": [
+          "Fast Food Center Turiguanó",
+          "Park Bautista",
+          "Park Morón",
+          "Park Agramonte",
+          "Park de Las Madres"
+        ]
+      },
+      {
+        "municipality": "Primero de Enero",
+        "spots": [
+          "Promenade Velazco"
+        ]
+      },
+      {
+        "municipality": "Venezuela",
+        "spots": [
+          "Cultural Center Auraca"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Camagüey",
+    "rooms": [
+      {
+        "name": "Telepunto Sales Office Camagüey",
+        "address": "República e/ San José y San Martín",
+        "positions": 12
+      },
+      {
+        "name": "Multiservice Center La Estrella",
+        "address": "Carretera Central Oeste esq. a Calle Cuba",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Camagüey",
+        "address": "Ignacio Agramonte No. 442 e/ López Recio y Plaza de los Trabajadores",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Camagüey 2",
+        "address": "Camino La Matanza e/ 25 de Julio y Perucho Figueredo",
+        "positions": 2
+      },
+      {
+        "name": "Minipunto Small Sales Office Finlay",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto Small Sales Office Agramonte",
+        "address": "Palomino e/ 1ra y J",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Camagüey 9",
+        "address": "Calle 6ta e/ calle B y Av. 1ra Paralela, Rpto. Julio A. Mella",
+        "positions": 2
+      },
+      {
+        "name": "Minipunto Small Sales Office Hospital Provincial",
+        "address": "",
+        "positions": 2
+      },
+      {
+        "name": "Minipunto Small Sales Office Mella",
+        "address": "Av. Mónaco Sur, Rpto. Julio A. Mella",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Céspedes",
+        "address": "Calle 14 e/ 21 e Y",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Esmeralda",
+        "address": "Fernández Bello e/ Martí y Miguel Coyula",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Florida",
+        "address": "Carretera Central esq. a P. Gómez",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Florida 3",
+        "address": "Avellaneda No. 414 e/ Av. 6ta y Calle F, Argentina",
+        "positions": 2
+      },
+      {
+        "name": "Post Office Florida",
+        "address": "Presidente Gómez No.302 e/ Estrada Palma y Julio Sanguily",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Guáimaro",
+        "address": "Eudaldo Ávila No. 78 e/ Martí y Constitución",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Guáimaro 1",
+        "address": "Carretera Central No. 98",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Minas",
+        "address": "Cisneros No. 160 e/ Inglesito y Aralio Hernández",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Nuevitas",
+        "address": "Maceo No. 40 e/ A. Arango y Agramonte",
+        "positions": 3
+      },
+      {
+        "name": "Minipunto Small Sales Office Camalote",
+        "address": "Álvaro Reinoso",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Nuevitas 1",
+        "address": "Av. Micro-distrito 2 Rpto. 1ro de Mayo",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Santa Lucía",
+        "address": "Av. Turística Residencial",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Santa Cruz",
+        "address": "Calle Carretera No. 141 e/ D y E",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Santa Cruz 1",
+        "address": "Calle Central No. 130 e/ E y F",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Sibanicú",
+        "address": "Castañeda No. 32 e/ Carretera Central y Francisco Rosales",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Sibanicú 1",
+        "address": "Carretera Central No. 158",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Sola",
+        "address": "Ignacio Agramonte No. 82 e/ Ave Mario Herrero y Funcia",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Cubitas 2",
+        "address": "Calle Mario Herrero Toscano e/ Ingnacio Agramonte y Martí",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Vertientes",
+        "address": "Calle 4ta e/ Línea y A Vertientes",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Vertientes 4",
+        "address": "Carretera Camagüey e/ la Juventud y 4, La Siria",
+        "positions": 2
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Camagüey",
+        "spots": [
+          "Terminal de Ómnibus Nacionales",
+          "Park Agramonte"
+        ]
+      },
+      {
+        "municipality": "Nuevitas",
+        "spots": [
+          "Park Maceo"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Las Tunas",
+    "rooms": [
+      {
+        "name": "Sales Office Amancio",
+        "address": "Av. Sergio Reinó No. 25, El Batey",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Colombia",
+        "address": "Av. Cándido González No. 175, Rpto. Progreso",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Menéndez",
+        "address": "Calle 4ta, Rpto. Batey",
+        "positions": 3
+      },
+      {
+        "name": "Sales Office Jobabo",
+        "address": "Av. Martí No. 22 e/ Frank País y E. R. Chivás",
+        "positions": 3
+      },
+      {
+        "name": "Post Office Las Tunas 2",
+        "address": "Av. Camilo Cienfuegos esq. Calle 13",
+        "positions": 8
+      },
+      {
+        "name": "Telepunto Sales Office Las Tunas",
+        "address": "Francisco Vega No. 237 e/ Lucas Ortiz y Vicente García",
+        "positions": 18
+      },
+      {
+        "name": "Multiservice Center Boulevar",
+        "address": "Francisco Varona y Vicente García.",
+        "positions": 15
+      },
+      {
+        "name": "Commercial Office Calixto",
+        "address": "",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Majibacoa 2",
+        "address": "Calle 1ra No. 43",
+        "positions": 4
+      },
+      {
+        "name": "Sales Office Manatí",
+        "address": "Julio A. Mella No. 74 esq. a Guiteras",
+        "positions": 3
+      },
+      {
+        "name": "Multiservice Center Puerto Padre",
+        "address": "Av. Libertad No. 144 e/ B. Masó y Flor Crombet",
+        "positions": 7
+      },
+      {
+        "name": "Minipunto Small Sales Office Vázquez Puerto Padre",
+        "address": "Calle 66 e/ Carretera Tunas-Puerto Padre y Calle 39",
+        "positions": 2
+      },
+      {
+        "name": "Minipunto Small Sales Guiteras",
+        "address": "",
+        "positions": 2
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Amancio Rodríguez",
+        "spots": [
+          "KM 14 Park"
+        ]
+      },
+      {
+        "municipality": "Jesús Menéndez",
+        "spots": [
+          "Park de Jesús Menéndez",
+          "Park El Palín"
+        ]
+      },
+      {
+        "municipality": "Jobabo",
+        "spots": [
+          "SIRVEN",
+          "Mejias",
+          "Park José Martí"
+        ]
+      },
+      {
+        "municipality": "Las Tunas",
+        "spots": [
+          "Park Antonio Maceo",
+          "Zona Edificio 12 Plantas",
+          "Market Telégrafo",
+          "University Lenin Headquarters 1",
+          "Square Cale",
+          "Baseball Stadium Julio Antonio Mella",
+          "Motel Los Pinos",
+          "Telepunto Las Tunas",
+          "Las Antillas Complex",
+          "Terminal Ómnibus Nacional",
+          "Parque Bartle",
+          "Park Calle 7",
+          "Park Becerra",
+          "Park Melanio Ortiz",
+          "AIT",
+          "Square Martiana",
+          "Casa Piedra",
+          "Park Temático",
+          "Municipal UJC",
+          "Park Casa Insólita",
+          "Ranchón La Arboleda",
+          "Sala Turismo Hospital Guevara",
+          "Tanque de Buena Vista",
+          "Parador El Cornito",
+          "Boulevard Buena Vista",
+          "Plaza Mercado Río",
+          "Complex La Cubana",
+          "Boulevard Mercado Mambí",
+          "Park Rubi y Villalón"
+        ]
+      },
+      {
+        "municipality": "Majibacoa",
+        "spots": [
+          "Park Las Parras",
+          "Park Omaja",
+          "Park Plaza Vivienda",
+          "Park Vicente García",
+          "Park Gastón"
+        ]
+      },
+      {
+        "municipality": "Manatí",
+        "spots": [
+          "Park Manatí",
+          "Park Puerto Manatí"
+        ]
+      },
+      {
+        "municipality": "Puerto Padre",
+        "spots": [
+          "Park Antonio Guiteras",
+          "BPA Puerto Padre",
+          "Park Vázquez",
+          "WiFi La Llanita",
+          "Park Emiliano Salvador",
+          "Park Maniabón",
+          "Park José Martí",
+          "Park San Manuel",
+          "Círculo Social Naranjo"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Granma",
+    "rooms": [
+      {
+        "name": "Sales Office Bartolomé Masó",
+        "address": "Antonio Guiteras No. 10",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center El Triángulo",
+        "address": "Augusto Márquez No. 27 e/ Zenea y C. Central Bayamo",
+        "positions": 2
+      },
+      {
+        "name": "Minipunto Small Sales Office Polígono",
+        "address": "Miguel Cabañas, Rpto. Granma",
+        "positions": 1
+      },
+      {
+        "name": "Minipunto Small Sales Office Bayamo (CUPET)",
+        "address": "C.Central vía Santiago",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Bayamo I",
+        "address": "Calle General García No. 11 e/ Canducha Figueredo y Maceo",
+        "positions": 4
+      },
+      {
+        "name": "Minipunto Small Sales Office Jesús Menéndez",
+        "address": "Antonio Maceo e/ Av. Granma y 2da.",
+        "positions": 3
+      },
+      {
+        "name": "Post Office Bayamo I",
+        "address": "Calle Libertad No.2 Altos e/ C. Figueredo Y A. Maceo",
+        "positions": 10
+      },
+      {
+        "name": "Telepunto Sales Office Bayamo",
+        "address": "General García No. 109 e/ Saco y Figueredo",
+        "positions": 15
+      },
+      {
+        "name": "Minipunto Small Sales Office Vallejo",
+        "address": "Calle 21 e/ 10 y 12, Rpto. El Valle",
+        "positions": 4
+      },
+      {
+        "name": "Sales Office Buey Arriba",
+        "address": "Coronel Lien No. 151e/ Cristino Naranjo y Luis Ramírez Lopez",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Campechuela",
+        "address": "Calle R, Rpto. Batey Central",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Guisa I",
+        "address": "Calle Céspedes e/ General García y Milanés",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Guisa",
+        "address": "B. Ramírez e/ Florentín Bárzaga y Martí",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Jiguaní II",
+        "address": "Calle General Rabí e/ Ángel Guardia y Céspedes",
+        "positions": 4
+      },
+      {
+        "name": "Multiservice Center Manzanillo",
+        "address": "Calle Dr. Codina No. 84 e/ José Miguel Gómez y Martí",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Manzanillo I",
+        "address": "Calle Villuenda No. 102 e/ Batería y Concepción",
+        "positions": 4
+      },
+      {
+        "name": "Post Office Manzanillo",
+        "address": "Calle José Martí No. 265 e/ Francisco Codina Polanco y José",
+        "positions": 5
+      },
+      {
+        "name": "Sales Office Media Luna",
+        "address": "Raúl Podio No. 38",
+        "positions": 1
+      },
+      {
+        "name": "Sales Office Niquero",
+        "address": "B. Masó No. 36 e/ J. Martí y A. Maceo.",
+        "positions": 1
+      },
+      {
+        "name": "Post Office Niquero",
+        "address": "Calle José Martí No.101 e/ Patricio Lumumba y Bartolomé Masó",
+        "positions": 3
+      },
+      {
+        "name": "Sales Office Pilón",
+        "address": "Jesús Menéndez No. 40",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Yara II",
+        "address": "Calle 10 de octubre No. 100 A e/ Av. Martí y Quintín Bandera",
+        "positions": 1
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Bartolomé Masó",
+        "spots": [
+          "Las Mercedes",
+          "Parque Bartolomé Masó",
+          "Providencia",
+          "Park Caney de las Mercedes",
+          "Park Zarzal",
+          "Camping La Sierrita"
+        ]
+      },
+      {
+        "municipality": "Bayamo",
+        "spots": [
+          "Park del Amor",
+          "Park Camilo Cienfuegos",
+          "Parque El Horno",
+          "Cabaret Bayam",
+          "Park Francisco Vicente Aguilera",
+          "Terminal Ómnibus Nacionales",
+          "Social Club Pompita",
+          "Park Siboney",
+          "Medical Science Faculty",
+          "University Campus 2",
+          "Youth Club VI Jesús Menéndez",
+          "Plaza de la Patria",
+          "Park Ciro Redondo",
+          "Park Latinoamericano",
+          "Park Juan Clemente Zenea",
+          "TRD Shop La Defensa",
+          "Funeraria Home",
+          "Las Torres",
+          "Bar Don Juan",
+          "Restaurant la Filarmónica",
+          "La Calesa",
+          "Youth Club VII Antonio Guiteras",
+          "Complex Las Novedades",
+          "Pedro Pompa",
+          "Rpto. Antonio Guiteras",
+          "Park Rosa la Bayamesa",
+          "Cultural Center Mi Tumbao",
+          "Boulevard Mabay",
+          "Park Infantil Los Caballitos",
+          "El Palmar Siboney",
+          "Entronque de Bueycito",
+          "Park: Barranca de la Lisiana",
+          "Neighborhood: El Datil",
+          "Park Céspedes",
+          "Neighborhood El Valle",
+          "Retablo de los Héroes",
+          "Las Caobas",
+          "Restaurant La Cubana",
+          "Café Serrano",
+          "Cultural Center La Trova",
+          "Park Julia",
+          "BAseball Stadium Mártires de Barbados",
+          "Universidad ISCAB",
+          "Room: Carlos M. Céspedes Hospital",
+          "Cabaret"
+        ]
+      },
+      {
+        "municipality": "Buey Arriba",
+        "spots": [
+          "La Estrella",
+          "Park: Ignacio Agramonte",
+          "Square: San Pablo Yao",
+          "Park: Bueycito"
+        ]
+      },
+      {
+        "municipality": "Campechuela",
+        "spots": [
+          "Park Ceiba Hueca",
+          "Ecológic Center",
+          "Park: 24 de febrero",
+          "Park San Ramón"
+        ]
+      },
+      {
+        "municipality": "Cauto Cristo",
+        "spots": [
+          "Boulevard"
+        ]
+      },
+      {
+        "municipality": "Guisa",
+        "spots": [
+          "Park Calixto García",
+          "Botanic GArden Cupaynicú",
+          "Recreation Center El Mesón"
+        ]
+      },
+      {
+        "municipality": "Jiguaní",
+        "spots": [
+          "Parque Cautillo",
+          "Parque de Jiguaní",
+          "Charco Redondo",
+          "Parque Santa Rita",
+          "Park 13 de Marzo",
+          "Parque WiFi Jiguaní",
+          "Bus Terminal"
+        ]
+      },
+      {
+        "municipality": "Manzanillo",
+        "spots": [
+          "Malecón Drive Manzanillo",
+          "San Francisco",
+          "Park Vuelta del Caño",
+          "Park Caymari",
+          "Park ICP",
+          "Troya",
+          "Hospital Celia Sánchez",
+          "Park Bertot",
+          "Cruise Terminals",
+          "La Pesquera",
+          "Pedagógic Institute Manzanillo",
+          "Park Bertho Manzanillo",
+          "Park Céspedes",
+          "Calicito",
+          "Historic Site La Demajagua",
+          "Medical Science Faculty"
+        ]
+      },
+      {
+        "municipality": "Media Luna",
+        "spots": [
+          "Park de los Mártires",
+          "Calle Nuevo Media Luna"
+        ]
+      },
+      {
+        "municipality": "Niquero",
+        "spots": [
+          "Park Ricardo de Céspedes",
+          "Cabo Cruz",
+          "Neighborhhod Belic",
+          "Bus Terminal",
+          "Youth Club Cabo Cruz"
+        ]
+      },
+      {
+        "municipality": "Pilón",
+        "spots": [
+          "Sevilla",
+          "Neighborhood Caridad de Mota",
+          "Park José Martí",
+          "Malecón Drive",
+          "Plaza Marea del Portillo"
+        ]
+      },
+      {
+        "municipality": "Río Cauto",
+        "spots": [
+          "Park Grito de Yara",
+          "Park Promenade Cauto Embarcadero",
+          "Park Vado del Yeso",
+          "Boulevard Río Cauto"
+        ]
+      },
+      {
+        "municipality": "Yara",
+        "spots": [
+          "Park Carlos Manuel de Céspedes",
+          "Park Veguitas",
+          "Youth Club Veguitas"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Holguín",
+    "rooms": [
+      {
+        "name": "Commercial Office Báguanos",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Banes III",
+        "address": "Calle 4 No. 3, Guardalavaca",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Cacocum",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Cacocúm II",
+        "address": "Calle Rubén Bravo No. 42 e/ Gilberto Gonzalez y Gloria Anzardo",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Calixto García",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Gibara III",
+        "address": "Calle 26 No. 4312A, Velasco",
+        "positions": 2
+      },
+      {
+        "name": "Navigation Room Holguín",
+        "address": "Calle Martí No. 122 e/ Mártires y M. Gómez",
+        "positions": 14
+      },
+      {
+        "name": "Youth Club Holguín I",
+        "address": "Calle Maceo No. 86 e/ Agramonte y Garayalde",
+        "positions": 4
+      },
+      {
+        "name": "Post Office Filatelia",
+        "address": "Calle Libertad e/ Martí y Frexes",
+        "positions": 4
+      },
+      {
+        "name": "Sales Office Mayarí",
+        "address": "Calle Delfín Aguilera No.39 e/ A. Guiteras y Mastrapa",
+        "positions": 3
+      },
+      {
+        "name": "Sales Office Moa",
+        "address": "Av. 1ro. de Mayo",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Rafael Freyre II",
+        "address": "Av. 6 No.80 /15 y 17, Santa Lucía",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Sagua de Tánamo",
+        "address": "",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Urbano Noris II",
+        "address": "Calle 3ra e/ 16 y 1ra, El Canal",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office Urbano Noris",
+        "address": "",
+        "positions": 1
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Moa",
+        "spots": [
+          "Fast Food Center Punta Gorda",
+          "Park:Universidad Moa",
+          "Pedro Soto",
+          "Shopping Center CIMEX Moa",
+          "Park Las Auroras"
+        ]
+      },
+      {
+        "municipality": "Báguanos",
+        "spots": [
+          "Industrial Market Tacajó",
+          "Avenida Báguanos"
+        ]
+      },
+      {
+        "municipality": "Banes",
+        "spots": [
+          "Park Cárdenas",
+          "Boulevard Los artesanos",
+          "Retrete",
+          "Boulevard Guardalavaca",
+          "Park El Bosque",
+          "Neigborhood Nicaragua",
+          "Los Pinos",
+          "Deleyte",
+          "Commercial Center Los Flamboyanes"
+        ]
+      },
+      {
+        "municipality": "Cacocum",
+        "spots": [
+          "Parque Cacocum",
+          "Parque Cristino Naranjo"
+        ]
+      },
+      {
+        "municipality": "Calixto García",
+        "spots": [
+          "Boulevard Buenaventura",
+          "Plaza Calixto Garcia",
+          "MIR",
+          "San Agustín de Aguaras"
+        ]
+      },
+      {
+        "municipality": "Cueto",
+        "spots": [
+          "CT Marcané",
+          "Guamuta",
+          "CT Birán",
+          "Alto Cedro"
+        ]
+      },
+      {
+        "municipality": "Gibara",
+        "spots": [
+          "Parque Uñas",
+          "Park Floro Pérez",
+          "Beach Caletones",
+          "Post Offcie Velasco",
+          "Square Cultura Gibara",
+          "El Promenade Bocas"
+        ]
+      },
+      {
+        "municipality": "Holguín",
+        "spots": [
+          "Park Calixto García",
+          "Loma de la Cruz",
+          "Park San José",
+          "Barbecue Mayabe",
+          "Park: 1ro de Enero",
+          "Polyclinic Alcides Pino",
+          "Studen Housing: Medical Science Faculty HLG",
+          "Hermanos Aguilera",
+          "ETECSA&#039;s WiFi Nuevo Llano",
+          "Square Los Chinos",
+          "Playground Bolera",
+          "BAseball Stadium Calixto García",
+          "Club Bariay",
+          "Neighborhood: Villanueva",
+          "Park: Manuel Angulo Clinic",
+          "Square: La Central",
+          "National Airport: Frank Pais",
+          "Square: La Marqueta",
+          "Las Torres",
+          "WiFi Neighborhood Piedra Blanca",
+          "Neighborhood Caribe MOA",
+          "Boulevard Holguín",
+          "Park Julio de Peralta",
+          "Town: Emilio Bárcenas",
+          "Patana Mayabe",
+          "Expo Holguín",
+          "Market: Hermano Aguilera",
+          "Hospital: Lenin",
+          "DTHO",
+          "Park Las Ferromozas",
+          "ETECSA&#039;s WiFi Villa Nueva 2",
+          "Pavilion Armando Mestre",
+          "Park Infantil Rubén Bravo",
+          "Park: el Quijote",
+          "Castillito Mayabe",
+          "Terminal: Viazul",
+          "Square Baraguá",
+          "Parque de Diversiones Valle Mayabe",
+          "San Andrés",
+          "ETECSA&#039;s WiFi Arboleda Hotel",
+          "Youth Club La Aduana",
+          "Park Maceo"
+        ]
+      },
+      {
+        "municipality": "Mayarí",
+        "spots": [
+          "Park Guatemala",
+          "Park: Felton",
+          "Youth Club Mayarí",
+          "Arroyo Seco",
+          "Alto Cedro",
+          "Bitiri Motel",
+          "Square Guaro",
+          "Shop El Minero Levisa",
+          "Park Mayarí",
+          "Hotel: 90 Habitaciones",
+          "Park Mayarí I"
+        ]
+      },
+      {
+        "municipality": "Rafael Freyre",
+        "spots": [
+          "Fray Benito",
+          "Boulevard: Holguín",
+          "Square Pesquero",
+          "Aguada La Piedra"
+        ]
+      },
+      {
+        "municipality": "Sagua de Tánamo",
+        "spots": [
+          "Sitio Sagua de Tánamo",
+          "Calabaza de Sagua de Tánamo",
+          "Naranjo Agrio"
+        ]
+      },
+      {
+        "municipality": "Urbano Noris",
+        "spots": [
+          "Boulevard San Germán"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Santiago de Cuba",
+    "rooms": [
+      {
+        "name": "Post Office Contramaestre",
+        "address": "Calle 7 e/ 6 y Av. Camilo Cienfuegos, Reparto Frank País",
+        "positions": 4
+      },
+      {
+        "name": "Sales Office Contramaestre",
+        "address": "Calle 7 e/ Camilo Cienfuegos y Av. 6, Frank País",
+        "positions": 3
+      },
+      {
+        "name": "Youth Club Contramaestre III",
+        "address": "19 e/ 2 y 4, Lumumba",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Los Negros Contramaestre V",
+        "address": "Carretera Maffo, Los Negros",
+        "positions": 1
+      },
+      {
+        "name": "Sales Office Guamá",
+        "address": "Calle E Cine, Chivirico",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Guamá II",
+        "address": "9 No. 29 e/ E y F, Los Mangos",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Mella I",
+        "address": "Carretera Central e/ Ingenio y Cazona",
+        "positions": 2
+      },
+      {
+        "name": "Multiservice Center Palma Soriano",
+        "address": "Calle Martí Alta No.160 e/ Céspedes y Callamo",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Palma Soriano II",
+        "address": "2da., N.Ortega",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club San Luis III",
+        "address": "Martí e/ Av. Los Maceos y Cebreco, Enma Rosa Chuig",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office San Luis",
+        "address": "Calle Martí",
+        "positions": 2
+      },
+      {
+        "name": "Multiservices Center Versalles",
+        "address": "Calle 6 e/ 3era y 5ta. RFeparto Versalles",
+        "positions": 4
+      },
+      {
+        "name": "Telepunto Sales Office Santiago de Cuba",
+        "address": "Calle San Félix esq. Callejón del Carmen",
+        "positions": 14
+      },
+      {
+        "name": "Minipunto El Cobre",
+        "address": "Calle Aurelio Fernández e/ Omar Sofía y Los Maceos",
+        "positions": 1
+      },
+      {
+        "name": "Youth Ferreiro Centro Tecnológico Recreativo",
+        "address": "Carretera Siboney (frente al Parque Ferreiro)",
+        "positions": 10
+      },
+      {
+        "name": "Post Office-Santiago 1",
+        "address": "Calle Camilo Cienfuegos e/ 7 y 9, Frank País",
+        "positions": 10
+      },
+      {
+        "name": "Youth Club Santiago de Cuba I",
+        "address": "Calle M.Corona No.154 e/ José Antonio Saco y Jagüey",
+        "positions": 41
+      },
+      {
+        "name": "Youth Club Joven Club II Frente",
+        "address": "Ave. C.Campesino, II Frente Oriental",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club Songo la Maya II",
+        "address": "Los Maceos e/ R. Rizo",
+        "positions": 4
+      },
+      {
+        "name": "Youth Club III Frente",
+        "address": "12, III Frente Oriental",
+        "positions": 4
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Contramaestre",
+        "spots": [
+          "Park Central Baire",
+          "Park Central Contramaestre",
+          "Park Maffo",
+          "Los Negros"
+        ]
+      },
+      {
+        "municipality": "Guamá",
+        "spots": [
+          "Park Chivirico"
+        ]
+      },
+      {
+        "municipality": "Julio Antonio Mella",
+        "spots": [
+          "Radio Station Titán, Mella",
+          "Plaza Mella"
+        ]
+      },
+      {
+        "municipality": "Palma Soriano",
+        "spots": [
+          "Park José Martí, Palma Soriano",
+          "Park Juvenil Palma Soriano",
+          "Park Infantil Dos Rios"
+        ]
+      },
+      {
+        "municipality": "San Luis",
+        "spots": [
+          "Park San Luis"
+        ]
+      },
+      {
+        "municipality": "Santiago de Cuba",
+        "spots": [
+          "Multifuncional Area Altamira",
+          "Cafeteria NP El Caney",
+          "Park Cobre",
+          "La Alameda",
+          "Placita Santo Tomás",
+          "Movie Center Rialto",
+          "Multiservices Center Jose Marti District",
+          "Tienda Los Ríos",
+          "Park Ferreiro",
+          "Salón de los Vitrales",
+          "Supermarket Areas Versalles",
+          "Micro 3",
+          "Movie Center El Caney",
+          "Movie Center El Cobre",
+          "Train Terminal",
+          "Enramadas I",
+          "La Claqueta",
+          "Micro 9",
+          "Movie Center Capitolio",
+          "Vista Alegre Multiservice Center",
+          "Galery René Valdés Cedeño (Caguayo)",
+          "Cafeteria ON",
+          "Urban Center Abel Santa María Micro 1B",
+          "School Inter Armas de Santiago de Cuba",
+          "Popular Neighborhood Cristo",
+          "Hotel Enramadas",
+          "Multiservices Center and Park Céspedes",
+          "Amphitheater",
+          "Martí y San Rafael",
+          "Park de los Sueños",
+          "Restaurant Mariachi",
+          "Pastorita",
+          "Park Boniato",
+          "El Cayo",
+          "Movie Center El Cristo",
+          "Ferro Caribe",
+          "Square Marte",
+          "Commercial Center José Martí District",
+          "Complejo Gran Piedra",
+          "Restaurant Siboney",
+          "Theater Heredia",
+          "Recreation Center Algarrobos"
+        ]
+      },
+      {
+        "municipality": "Segundo Frente",
+        "spots": [
+          "Library Areas Enma Rosa Chuy (II Frente)"
+        ]
+      },
+      {
+        "municipality": "Songo la Maya",
+        "spots": [
+          "Park La Maya",
+          "Park Songo"
+        ]
+      },
+      {
+        "municipality": "Tercer Frente",
+        "spots": [
+          "Park Matías"
+        ]
+      }
+    ]
+  },
+  {
+    "province": "Guantánamo",
+    "rooms": [
+      {
+        "name": "Post Office Baracoa",
+        "address": "Calle Maceo No. 136 esq. Frank País.",
+        "positions": 5
+      },
+      {
+        "name": "Multiservice Center Baracoa",
+        "address": "Calle Maceo esq. a Rafael Trejo",
+        "positions": 9
+      },
+      {
+        "name": "Minipunto Cabacú",
+        "address": "Dos Caminos Cabacú",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Baracoa I",
+        "address": "Calle Martí No. 207 e/ Coronel Galano y Céspedes",
+        "positions": 4
+      },
+      {
+        "name": "Commercial Office Caimanera",
+        "address": "Calle Martí S/N e/ Carril y Primera",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Caimanera I",
+        "address": "Calle Carretera e/ Correo y Martí",
+        "positions": 2
+      },
+      {
+        "name": "Minipunto Limonar",
+        "address": "Limonar",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club El Salvador",
+        "address": "Calle 23. El Batey",
+        "positions": 2
+      },
+      {
+        "name": "Commercial Office El Salvador",
+        "address": "Calle 23",
+        "positions": 1
+      },
+      {
+        "name": "Post Office Guantánamo",
+        "address": "Calle P.A. Pérez e/ Aguilera y Crombet.",
+        "positions": 10
+      },
+      {
+        "name": "Telepunto Guantánamo",
+        "address": "Calle Los Maceo esq. a Aguilera",
+        "positions": 6
+      },
+      {
+        "name": "Multiservice Center Caribe",
+        "address": "Calle Ahogado esq. 11 Norte",
+        "positions": 9
+      },
+      {
+        "name": "Youth Club Guantánamo VI",
+        "address": "Calle 9 Sur e/ 4 y 5 Oeste",
+        "positions": 2
+      },
+      {
+        "name": "Post Office Guantánamo",
+        "address": "Pedro A. Pérez e/ F.V. Aguilera y Flor Crombet",
+        "positions": 10
+      },
+      {
+        "name": "Commercial Office Imías",
+        "address": "Calle B No. 172",
+        "positions": 1
+      },
+      {
+        "name": "Campismo Yacabo",
+        "address": "Yacabo abajo",
+        "positions": 1
+      },
+      {
+        "name": "Commercial Office Maisí",
+        "address": "La Máquina",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Maisí I",
+        "address": "Carretera Central No. 204. La Máquina",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club Manuel Tames III",
+        "address": "Calle Bartolomé Massó No. 361 e/ José Faisán y Silvio García",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office Niceto Pérez",
+        "address": "Calle 9 e/ 2 y 8, La Yaya",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Niceto Pérez I",
+        "address": "Calle 6 esq. Calle 9. La Yaya",
+        "positions": 2
+      },
+      {
+        "name": "Sales Office San Antonio del Sur",
+        "address": "Calle 22 S/N, San Antonio del Sur",
+        "positions": 2
+      },
+      {
+        "name": "Youth Club San Antonio del Sur I",
+        "address": "Calle 21 No. 136 e/ 22 y 23. Reparto Cultura",
+        "positions": 1
+      },
+      {
+        "name": "Youth Club Yateras I",
+        "address": "Calle 6 No. 18, Palenque",
+        "positions": 2
+      }
+    ],
+    "hotspots": [
+      {
+        "municipality": "Baracoa",
+        "spots": [
+          "CT Cabacú",
+          "Park Central Baracoa",
+          "Hospital Baracoa",
+          "Park El Jamal",
+          "Malecón Drive Baracoa"
+        ]
+      },
+      {
+        "municipality": "Caimanera",
+        "spots": [
+          "Area Boquerón",
+          "Park Central Caimanera"
+        ]
+      },
+      {
+        "municipality": "El Salvador",
+        "spots": [
+          "Park Costa Rica",
+          "CT Carrera Larga",
+          "Park Comercio Bayate",
+          "Park Municipio El Salvador"
+        ]
+      },
+      {
+        "municipality": "Guantánamo",
+        "spots": [
+          "Square Pedro A. Pérez",
+          "Park La Majagua",
+          "Provincial Health Directorate",
+          "WiFi International Room, General Agostino Neto Hospital",
+          "Park Elmo Catalán",
+          "Ave. Camilo Cienfuegos",
+          "Park Faustino Pérez",
+          "Park San Rafael",
+          "JCCE Caribe",
+          "Youth Club Reparto Obrero",
+          "Park Máximo Gómez / Commercial Center Caribe",
+          "Park Sur Isleta",
+          "Sta Maria",
+          "Paraguay",
+          "Neighborhood Commercial Complex Obrero",
+          "Square 28 de Septiembre",
+          "OBE San Justo",
+          "Bus Terminal",
+          "Train Terminals, Guantánamo"
+        ]
+      },
+      {
+        "municipality": "Imías",
+        "spots": [
+          "JCCE Jesús Lores",
+          "Yacabo",
+          "Park Imías",
+          "Square Jesús Lores"
+        ]
+      },
+      {
+        "municipality": "Maisí",
+        "spots": [
+          "Park La Máquina"
+        ]
+      },
+      {
+        "municipality": "Manuel Tames",
+        "spots": [
+          "Park Jamaica",
+          "Park Manuel Tames Municipality"
+        ]
+      },
+      {
+        "municipality": "Niceto Pérez",
+        "spots": [
+          "Park Niceto Pérez Municipality"
+        ]
+      },
+      {
+        "municipality": "San Antonio del Sur",
+        "spots": [
+          "Park San Antonio del Sur"
+        ]
+      },
+      {
+        "municipality": "Yateras",
+        "spots": [
+          "Park Yateras (Palenque) Municipality",
+          "CT Felicidad"
+        ]
+      }
+    ]
+  }
+]
