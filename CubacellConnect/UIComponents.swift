@@ -1,9 +1,57 @@
+import ContactsUI
 import SwiftUI
+
+// MARK: - Contact Picker
+
+/// Wraps the system contact picker so picking a contact with several phone numbers drills down
+/// to a single number automatically. Runs out-of-process — unlike reading `Contacts` directly,
+/// this needs no `NSContactsUsageDescription` entry and never prompts for permission.
+struct ContactPickerView: UIViewControllerRepresentable {
+    var onPick: (String) -> Void
+
+    func makeUIViewController(context: Context) -> CNContactPickerViewController {
+        let picker = CNContactPickerViewController()
+        picker.delegate = context.coordinator
+        picker.displayedPropertyKeys = [CNContactPhoneNumbersKey]
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: CNContactPickerViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onPick: onPick)
+    }
+
+    final class Coordinator: NSObject, CNContactPickerDelegate {
+        let onPick: (String) -> Void
+
+        init(onPick: @escaping (String) -> Void) {
+            self.onPick = onPick
+        }
+
+        func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
+            guard let phoneNumber = contactProperty.value as? CNPhoneNumber else { return }
+            onPick(Self.normalize(phoneNumber.stringValue))
+        }
+
+        /// USSD prompts take bare digits. Strips formatting and the Cuban country code so a
+        /// stored "+53 5 123 4567" becomes the 8-digit "51234567" the transfer menu expects.
+        private static func normalize(_ rawNumber: String) -> String {
+            let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
+            if digits.count == 10, digits.hasPrefix("53") {
+                return String(digits.dropFirst(2))
+            }
+            return digits
+        }
+    }
+}
 
 // MARK: - Code Row
 
-/// One row in the code list: title and description only — no raw dial code shown, since
-/// iOS itself asks for confirmation before the call goes through when the row is tapped.
+/// One row in the code list: title, plus a trailing price when the code has one. A priced code's
+/// title already says what it is (e.g. "Plan de 20 SMS"), so the description is skipped for it —
+/// unpriced codes still show their description. No raw dial code shown either way, since iOS
+/// itself asks for confirmation before the call goes through.
 struct CodeRowView: View {
     let code: USSDCode
 
@@ -14,13 +62,21 @@ struct CodeRowView: View {
                     .font(.body.weight(.medium))
                     .foregroundStyle(Color.appForeground)
 
-                Text(code.details)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                if code.price == nil {
+                    Text(code.details)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
 
             Spacer()
+
+            if let price = code.price {
+                Text(price)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color.brandNavy)
+            }
 
             Image(systemName: code.type == .call ? "phone.fill" : "number")
                 .font(.callout)
@@ -34,10 +90,13 @@ struct CodeRowView: View {
 
 #Preview(traits: .sizeThatFitsLayout) {
     CodeRowView(code: USSDCode(
-        id: "main-balance",
-        code: "*222#",
-        title: "Saldo Principal",
-        details: "Consulta tu saldo, minutos, SMS y datos.",
+        id: "sms-bundle-20",
+        code: "*133*2*1#",
+        title: "Plan de 20 SMS",
+        details: "20 SMS.",
+        icon: nil,
+        price: "$15.00",
+        compact: nil,
         type: .ussd,
         requiresInput: false,
         inputPlaceholder: nil
