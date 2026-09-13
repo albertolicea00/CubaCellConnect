@@ -962,7 +962,11 @@ struct SettingsView: View {
                             Button {
                                 dial(code)
                             } label: {
-                                Text(code.title)
+                                HStack(spacing: 6) {
+                                    Text(code.title)
+                                    Spacer()
+                                    Image(systemName: "arrow.right")
+                                }
                             }
                         }
 
