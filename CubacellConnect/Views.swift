@@ -783,6 +783,17 @@ private struct HelpSettingsView: View {
                     text: "Algunos códigos, como recargar con tarjeta, necesitan un número adicional (p. ej. *662*{tarjeta}#). Al tocarlos, primero se pide ese dato y luego se marca el código completo."
                 )
             }
+
+            Section("Identificar Llamadas por Cobrar (*99)") {
+                SettingsInfoRow(
+                    title: "¿Por qué me llaman con un número raro?",
+                    text: "El servicio *99 de ETECSA no oculta el número de quien llama — lo envuelve, y por eso el teléfono muestra una cadena larga en vez del contacto real."
+                )
+                SettingsInfoRow(
+                    title: "Cómo activarlo",
+                    text: "Ve a Ajustes del sistema › Teléfono › Bloqueo e Identificación de Llamadas y activa \"CallerID\". Es un paso manual de iOS — la app no puede activarlo sola. Solo identifica a quienes ya tienes en Contactos; una llamada anónima (#31#) nunca se puede identificar, porque el número real nunca llega al teléfono."
+                )
+            }
         }
         .navigationTitle("Ayuda")
         .navigationBarTitleDisplayMode(.inline)

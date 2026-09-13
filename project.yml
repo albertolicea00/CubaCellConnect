@@ -11,6 +11,7 @@ targets:
     platform: iOS
     sources:
       - CubaCellConnect
+      - Shared
     info:
       path: CubaCellConnect/Info.plist
       properties:
@@ -31,3 +32,40 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1"
+    entitlements:
+      path: CubaCellConnect/CubaCellConnect.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.cubacellconnect.shared
+    dependencies:
+      - target: CallerIDExtension
+        embed: true
+
+  CallerIDExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - CallerIDExtension
+      - Shared
+    info:
+      path: CallerIDExtension/Info.plist
+      properties:
+        CFBundleDisplayName: CallerID
+        CFBundleShortVersionString: 1.0.0
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.callkit.call-directory
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).CallDirectoryHandler
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cubacellconnect.app.CallerIDExtension
+        MARKETING_VERSION: 1.0.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: NO
+    entitlements:
+      path: CallerIDExtension/CallerIDExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.cubacellconnect.shared

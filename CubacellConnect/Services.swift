@@ -1,3 +1,4 @@
+import CallKit
 import Contacts
 import CoreTelephony
 import Foundation
@@ -195,10 +196,24 @@ final class ContactsService {
                 ))
             }
             let sorted = results.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            Self.syncCallerIDExtension(with: sorted)
             DispatchQueue.main.async { [weak self] in
                 self?.contacts = sorted
             }
         }
+    }
+
+    /// Rebuilds the `*99` collect-call caller-ID list (see `CallerIDStore`) from the freshly
+    /// fetched contacts and asks CallKit to reload `CallerIDExtension` with it. No-op if the
+    /// user has never enabled the extension in Ajustes del sistema — `reloadExtension` still
+    /// completes, CallKit just has nothing enabled to feed.
+    private static func syncCallerIDExtension(with contacts: [DeviceContact]) {
+        let entries = contacts.compactMap { contact -> CallerIDEntry? in
+            guard let wrapped = CallerIDStore.wrappedNumber(forLocalNumber: contact.phoneNumber) else { return nil }
+            return CallerIDEntry(wrappedNumber: wrapped, name: contact.name)
+        }
+        CallerIDStore.write(entries)
+        CXCallDirectoryManager.sharedInstance.reloadExtension(withIdentifier: CallerIDStore.extensionBundleID) { _ in }
     }
 
     /// USSD prompts take bare digits. Strips formatting and the Cuban country code so a

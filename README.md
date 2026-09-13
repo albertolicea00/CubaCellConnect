@@ -19,6 +19,8 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 📎 **Copy to clipboard** for any code.
 - 💡 **Mnemonics** — e.g. `328 = DAT`, `266 = BON`, `869 = VOZ` — the keypad letters spell the service name.
 - 🌗 **Light and dark mode** support.
+- 👤 **Contactos tab** — reads the device's real address book (with photos) so you can call, transfer balance to, or dial a collect/hidden call for any contact without leaving the app.
+- 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
 
 *The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
@@ -39,16 +41,24 @@ open CubaCellConnect.xcodeproj
 
 Build and run on a device. **USSD dialing requires a physical iPhone with a Cubacel SIM** 📲 — the simulator cannot place calls.
 
+To get Caller ID working for `*99` collect calls, after installing the app go to **Ajustes (Settings) › Teléfono › Bloqueo e Identificación de Llamadas** on the device and enable **CallerID**. This is a one-time, manual iOS setting — no app can enable it automatically. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for why.
+
 ## 🗂️ Project Structure
 
 ```
 CubaCellConnect/
 ├── CubaCellConnectApp.swift  # App entry point
 ├── Models.swift              # USSDCode, USSDCategory, catalog decoding, brand palette
-├── Services.swift            # JSON catalog store, system dialer bridge
+├── Services.swift            # JSON catalog store, Contacts, system dialer bridge
 ├── UIComponents.swift        # Reusable presentational views (code row)
-├── Views.swift               # Home list and detail sheet screens
+├── Views.swift               # Home, Contactos, category, and settings screens
 └── codes.json                # Bundled USSD code catalog
+
+CallerIDExtension/             # CallKit Call Directory Extension (labels *99 collect calls)
+└── CallDirectoryHandler.swift
+
+Shared/                        # Code shared by the app and CallerIDExtension
+└── CallerIDStore.swift        # App Group–backed caller-ID list (read/write)
 ```
 
 ## 🔄 Code source of truth
