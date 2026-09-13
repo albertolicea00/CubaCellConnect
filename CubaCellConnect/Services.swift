@@ -665,19 +665,25 @@ enum DirectoryDatabase {
         return lines.joined(separator: "\n")
     }
 
+    /// Minimum digits before a number search runs — a product-level floor (not a perf one, the
+    /// index makes even a 1-digit prefix cheap), just to avoid a "results" list for a near-empty
+    /// query.
+    static let minimumNumberQueryLength = 3
+    /// Minimum characters before a name search runs — this one IS a perf floor: `name` isn't
+    /// indexed, so a name search is a genuine full-table scan and a shorter query is an
+    /// unbounded scan for almost no signal.
+    static let minimumNameQueryLength = 5
+
     /// Separate number/name inputs instead of one combined field: a number search is a prefix
-    /// match that rides `number`'s index (cheap even for a 1-digit prefix, since `LIMIT` stops
-    /// the index range scan early); a name search is `LIKE '%x%'`, which can't use any index and
-    /// is a genuine full-table scan. Filling both ANDs them — SQLite narrows via the number index
+    /// match that rides `number`'s index (cheap at any length — `LIMIT` stops the index range
+    /// scan early), while a name search is `LIKE '%x%'`, which can't use any index and is a
+    /// genuine full-table scan. Filling both ANDs them — SQLite narrows via the number index
     /// first and only checks `name` against that already-small result set, so it stays cheap.
-    /// A name-only search below 3 characters is refused (an unbounded scan for near-zero signal);
-    /// a number-only search has no minimum since the index bounds its cost regardless of length.
     /// Synchronous and potentially slow (see type-level note) — call from a background task.
     static func search(numberQuery: String, nameQuery: String, in file: DirectoryDatabaseFile, limit: Int32 = 100) -> [DirectoryEntry] {
         let number = numberQuery.trimmingCharacters(in: .whitespaces)
         let name = nameQuery.trimmingCharacters(in: .whitespaces)
-        guard !number.isEmpty || !name.isEmpty else { return [] }
-        guard !number.isEmpty || name.count >= 3 else { return [] }
+        guard number.count >= minimumNumberQueryLength || name.count >= minimumNameQueryLength else { return [] }
 
         guard let db = open(file.url) else { return [] }
         defer { sqlite3_close(db) }

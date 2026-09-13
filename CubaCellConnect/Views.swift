@@ -904,13 +904,11 @@ struct DirectorySearchView: View {
     @State private var results: [DirectoryEntry] = []
     @State private var isSearching = false
 
-    /// A number search rides `number`'s index (cheap at any length — `LIMIT` bounds it), but a
-    /// name search alone is an unbounded full-table scan; `DirectoryDatabase.search` refuses a
-    /// name-only query under 3 characters, and this mirrors that so the empty-state message
-    /// doesn't flash "sin resultados" while the user is still typing a short name.
+    /// Mirrors `DirectoryDatabase`'s own minimums so the empty-state message doesn't flash "sin
+    /// resultados" while the user is still short of the threshold that would actually search.
     private var hasSearchableInput: Bool {
-        !numberQuery.trimmingCharacters(in: .whitespaces).isEmpty
-            || nameQuery.trimmingCharacters(in: .whitespaces).count >= 3
+        numberQuery.trimmingCharacters(in: .whitespaces).count >= DirectoryDatabase.minimumNumberQueryLength
+            || nameQuery.trimmingCharacters(in: .whitespaces).count >= DirectoryDatabase.minimumNameQueryLength
     }
 
     var body: some View {
@@ -980,14 +978,24 @@ struct DirectorySearchView: View {
             } else {
                 List {
                     Section {
-                        TextField("Número", text: $numberQuery)
-                            .keyboardType(.phonePad)
+                        VStack(alignment: .leading, spacing: 2) {
+                            TextField("Número", text: $numberQuery)
+                                .keyboardType(.phonePad)
+                            Text("Mínimo \(DirectoryDatabase.minimumNumberQueryLength) dígitos")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
 
                         // Name search intentionally disabled for privacy and security — see
                         // README. `nameQuery` stays "" forever; the rest of the code
                         // (DirectoryDatabase.search, hasSearchableInput) already supports it
                         // again just by uncommenting this field.
-                        // TextField("Nombre", text: $nameQuery)
+                        // VStack(alignment: .leading, spacing: 2) {
+                        //     TextField("Nombre", text: $nameQuery)
+                        //     Text("Mínimo \(DirectoryDatabase.minimumNameQueryLength) caracteres")
+                        //         .font(.caption)
+                        //         .foregroundStyle(.secondary)
+                        // }
                     }
 
                     Section {
