@@ -880,23 +880,12 @@ struct SettingsView: View {
 /// file sharing; the app never downloads or bundles either one itself). Defaults to v1; the
 /// segmented picker to switch to v2 only shows once more than one version is actually present.
 struct DirectorySearchView: View {
-    @AppStorage("directoryDatabaseVersion") private var versionRaw = DirectoryDatabaseVersion.v1.rawValue
+    @State private var databaseFile: DirectoryDatabaseFile?
+    @State private var hasSearchedForDatabase = false
 
     @State private var query = ""
     @State private var results: [DirectoryEntry] = []
     @State private var isSearching = false
-
-    private var version: DirectoryDatabaseVersion {
-        DirectoryDatabaseVersion(rawValue: versionRaw) ?? .v1
-    }
-
-    private var availableVersions: [DirectoryDatabaseVersion] {
-        DirectoryDatabaseVersion.allCases.filter { DirectoryDatabase.isAvailable($0) }
-    }
-
-    private var isDatabaseAvailable: Bool {
-        DirectoryDatabase.isAvailable(version)
-    }
 
     /// Below this length a name search would be an unbounded full-table scan over millions of
     /// rows for almost no signal — `DirectoryDatabase.search` refuses it too; this just keeps the
@@ -906,26 +895,21 @@ struct DirectorySearchView: View {
     }
 
     var body: some View {
-        List {
-            if availableVersions.count > 1 {
-                Section {
-                    Picker("Base de Datos", selection: $versionRaw) {
-                        ForEach(availableVersions) { version in
-                            Text(version.displayName).tag(version.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-            }
-
-            if !isDatabaseAvailable {
+        Group {
+            if !hasSearchedForDatabase {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if databaseFile == nil {
+                // Never names v1/v2 here — whoever copies the file in may not know which shape
+                // it is either; the app detects that on its own from the file's own tables.
                 ContentUnavailableView(
                     "Sin Base de Datos",
                     systemImage: "externaldrive.badge.questionmark",
-                    description: Text("Copia \(version.filename) a los archivos de esta app desde Finder (tu iPhone › CubaCell Connect) para poder buscar.")
+                    description: Text("Copia un archivo de directorio (.db) a los archivos de esta app desde Finder (tu iPhone › CubaCell Connect) para poder buscar.")
                 )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Section {
+                List {
                     ForEach(results) { entry in
                         DirectoryEntryRowView(entry: entry)
                     }
@@ -941,14 +925,19 @@ struct DirectorySearchView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                .listStyle(.insetGrouped)
+                .searchable(text: $query, prompt: "Nombre o número")
             }
         }
-        .listStyle(.insetGrouped)
-        .searchable(text: $query, prompt: "Nombre o número")
         .navigationTitle("Buscar en Directorio")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            guard !hasSearchedForDatabase else { return }
+            databaseFile = DirectoryDatabase.discoverDatabase()
+            hasSearchedForDatabase = true
+        }
         .task(id: query) {
-            guard isDatabaseAvailable, queryIsLongEnough else {
+            guard let file = databaseFile, queryIsLongEnough else {
                 isSearching = false
                 results = []
                 return
@@ -960,9 +949,8 @@ struct DirectorySearchView: View {
             guard !Task.isCancelled else { return }
 
             let searchQuery = query
-            let searchVersion = version
             let found = await Task.detached(priority: .userInitiated) {
-                DirectoryDatabase.search(searchQuery, version: searchVersion)
+                DirectoryDatabase.search(searchQuery, in: file)
             }.value
 
             guard !Task.isCancelled else { return }

@@ -331,30 +331,19 @@ enum TransferPinStore {
 
 // MARK: - Directory Database
 
-/// The two schema shapes the on-device Truecaller-style dump can come in. The app never bundles
-/// or downloads either file itself — the user copies one (or both) into this app's Documents
-/// folder via Finder's "On My iPhone" file sharing (`UIFileSharingEnabled`) and the app just reads
-/// whatever it finds there. v1 is the default; v2 is picked explicitly once present.
-enum DirectoryDatabaseVersion: String, CaseIterable, Identifiable {
+/// The two schema shapes the on-device Truecaller-style dump can come in — detected from the
+/// file's own tables (see `DirectoryDatabase.discoverDatabase`), never from its filename or a
+/// user choice: whoever copies the file in via Finder names it whatever they want, and may not
+/// know themselves which shape it is.
+enum DirectoryDatabaseVersion {
     case v1
     case v2
+}
 
-    var id: String { rawValue }
-
-    /// Exact filename expected in Documents.
-    var filename: String {
-        switch self {
-        case .v1: return "database.v1.db"
-        case .v2: return "database.v2.db"
-        }
-    }
-
-    var displayName: String {
-        switch self {
-        case .v1: return "v1"
-        case .v2: return "v2"
-        }
-    }
+/// A `.db` file found in the app's Documents folder with its schema already identified.
+struct DirectoryDatabaseFile {
+    let url: URL
+    let version: DirectoryDatabaseVersion
 }
 
 /// One directory match: a number and the name it resolves to (blank for a few `fix` rows that
@@ -365,35 +354,78 @@ struct DirectoryEntry: Identifiable, Hashable {
     let name: String
 }
 
-/// Reverse number/name lookup over whichever database version is present in Documents.
-/// v1 is a single `contacts(number, name, is_mobile)` table; v2 splits landline and mobile into
-/// separate `fix(number, name)` / `movil(number, name)` tables with no `is_mobile` column — v2's
-/// search merges both. Both databases are 400+MB with millions of rows and only `name` is
-/// indexed, so a name search is a full table scan: callers must run this off the main thread and
-/// keep queries short (`search` refuses under 3 characters) to bound how bad that scan gets.
+/// Reverse number/name lookup over a Truecaller-style dump the user drops into this app's
+/// Documents folder via Finder file sharing (`UIFileSharingEnabled`) — the app never bundles or
+/// downloads it, and doesn't assume a filename or ask which schema it is. v1 is a single
+/// `contacts(number, name, is_mobile)` table; v2 splits landline and mobile into separate
+/// `fix(number, name)` / `movil(number, name)` tables — `discoverDatabase` tells them apart by
+/// querying `sqlite_master` for the table names each shape actually has. Both dumps are 400+MB
+/// with millions of rows and only `name` is indexed, so a name search is a full table scan:
+/// callers must run `search` off the main thread and keep queries short (it refuses under 3
+/// characters) to bound how bad that scan gets.
 enum DirectoryDatabase {
     private static let transientDestructor = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
-    static func fileURL(for version: DirectoryDatabaseVersion) -> URL? {
-        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    /// Scans Documents for any `.db` file and opens each just long enough to read its table
+    /// names, returning the first one that matches a known shape (sorted by filename, for
+    /// determinism when more than one is present). `nil` if Documents has no recognizable file.
+    static func discoverDatabase() -> DirectoryDatabaseFile? {
+        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+              let candidates = try? FileManager.default.contentsOfDirectory(at: documents, includingPropertiesForKeys: nil)
         else { return nil }
-        let url = documents.appendingPathComponent(version.filename)
-        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+
+        let dbFiles = candidates
+            .filter { $0.pathExtension.lowercased() == "db" }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+
+        for url in dbFiles {
+            if let version = detectVersion(at: url) {
+                return DirectoryDatabaseFile(url: url, version: version)
+            }
+        }
+        return nil
     }
 
-    static func isAvailable(_ version: DirectoryDatabaseVersion) -> Bool {
-        fileURL(for: version) != nil
+    /// Opens `url` read-only and checks `sqlite_master` for the table names that identify each
+    /// schema shape. `nil` if it's neither (not a directory dump, or an unrelated `.db` file).
+    private static func detectVersion(at url: URL) -> DirectoryDatabaseVersion? {
+        var db: OpaquePointer?
+        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
+            return nil
+        }
+        defer { sqlite3_close(db) }
+
+        let tables = tableNames(db: db)
+        if tables.contains("contacts") { return .v1 }
+        if tables.contains("movil") || tables.contains("fix") { return .v2 }
+        return nil
+    }
+
+    private static func tableNames(db: OpaquePointer) -> Set<String> {
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, "SELECT name FROM sqlite_master WHERE type = 'table';", -1, &statement, nil) == SQLITE_OK,
+              let statement
+        else { return [] }
+        defer { sqlite3_finalize(statement) }
+
+        var names: Set<String> = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            if let cString = sqlite3_column_text(statement, 0) {
+                names.insert(String(cString: cString))
+            }
+        }
+        return names
     }
 
     /// Case-insensitive substring match on name, or prefix match on number — capped at `limit`
-    /// results. Returns `[]` for a query under 3 characters or when the file isn't present.
+    /// results. Returns `[]` for a query under 3 characters.
     /// Synchronous and potentially slow (see type-level note) — call from a background task.
-    static func search(_ query: String, version: DirectoryDatabaseVersion, limit: Int32 = 100) -> [DirectoryEntry] {
+    static func search(_ query: String, in file: DirectoryDatabaseFile, limit: Int32 = 100) -> [DirectoryEntry] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
-        guard trimmed.count >= 3, let url = fileURL(for: version) else { return [] }
+        guard trimmed.count >= 3 else { return [] }
 
         var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
+        guard sqlite3_open_v2(file.url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
             return []
         }
         defer { sqlite3_close(db) }
@@ -401,7 +433,7 @@ enum DirectoryDatabase {
         let namePattern = "%\(trimmed)%"
         let numberPattern = "\(trimmed)%"
 
-        switch version {
+        switch file.version {
         case .v1:
             return rows(
                 db: db,
