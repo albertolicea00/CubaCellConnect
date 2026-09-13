@@ -133,6 +133,7 @@ struct DeviceContact: Identifiable, Hashable {
     let id: String
     let name: String
     let phoneNumber: String
+    let thumbnailImageData: Data?
 }
 
 /// Reads the full address book so the Contactos tab can render its own alphabetical list
@@ -176,6 +177,7 @@ final class ContactsService {
         let keys: [CNKeyDescriptor] = [
             CNContactFormatter.descriptorForRequiredKeys(for: .fullName),
             CNContactPhoneNumbersKey as CNKeyDescriptor,
+            CNContactThumbnailImageDataKey as CNKeyDescriptor,
         ]
         let request = CNContactFetchRequest(keysToFetch: keys)
         request.sortOrder = .givenName
@@ -188,7 +190,8 @@ final class ContactsService {
                 results.append(DeviceContact(
                     id: contact.identifier,
                     name: name,
-                    phoneNumber: Self.normalize(firstNumber)
+                    phoneNumber: Self.normalize(firstNumber),
+                    thumbnailImageData: contact.thumbnailImageData
                 ))
             }
             let sorted = results.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }

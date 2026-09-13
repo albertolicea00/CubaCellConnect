@@ -404,7 +404,9 @@ private struct ContactCallRowView: View {
     @State private var showingCallOptions = false
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
+            ContactAvatarView(contact: contact)
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(contact.name)
                     .font(.body.weight(.medium))
@@ -443,6 +445,38 @@ private struct ContactCallRowView: View {
     }
 }
 
+/// Round contact photo pulled from the device address book, falling back to the contact's
+/// initials on a tinted circle when there's no photo.
+private struct ContactAvatarView: View {
+    let contact: DeviceContact
+    var size: CGFloat = 40
+
+    private var initials: String {
+        let words = contact.name.split(separator: " ")
+        let letters = words.prefix(2).compactMap { $0.first }
+        return letters.isEmpty ? "?" : String(letters).uppercased()
+    }
+
+    var body: some View {
+        Group {
+            if let data = contact.thumbnailImageData, let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                ZStack {
+                    Color.brandCyan.opacity(0.2)
+                    Text(initials)
+                        .font(.system(size: size * 0.4, weight: .semibold))
+                        .foregroundStyle(Color.brandCyan)
+                }
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+    }
+}
+
 /// Bottom sheet shown when a contact row is tapped: call the contact (collect via `*99` or
 /// hidden caller ID via `#31#`), or transfer balance to it — same Clave/Monto form as Home's
 /// Transferir, just with the number already filled in from the contact.
@@ -463,12 +497,16 @@ private struct ContactCallOptionsSheet: View {
     var body: some View {
         Form {
             Section {
-                VStack(spacing: 4) {
-                    Text(contact.name)
-                        .font(.title2.weight(.semibold))
-                    Text(contact.phoneNumber)
-                        .font(AppTheme.codeFont(size: 18))
-                        .foregroundStyle(.secondary)
+                VStack(spacing: 8) {
+                    ContactAvatarView(contact: contact, size: 64)
+
+                    VStack(spacing: 4) {
+                        Text(contact.name)
+                            .font(.title2.weight(.semibold))
+                        Text(contact.phoneNumber)
+                            .font(AppTheme.codeFont(size: 18))
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .listRowBackground(Color.clear)
