@@ -70,25 +70,8 @@ struct HomeQuickActionsView: View {
                 }
 
                 List {
-                    Section("Saldo y Planes") {
-                        Button {
-                            dial(codeId: "main-balance")
-                        } label: {
-                            Label("Consultar Saldo y Planes", systemImage: "list.bullet.rectangle.fill")
-                        }
-
-                        Button {
-                            dial(codeId: "postpaid-balance")
-                        } label: {
-                            Label("Saldo Pospago o Institucional", systemImage: "building.2.fill")
-                        }
-
-                        Button {
-                            dial(codeId: "friends-plan")
-                        } label: {
-                            Label("Estado del Plan Amigos", systemImage: "person.2.fill")
-                        }
-                    }
+                    Section("Saldo y Planes") {}
+                    .listSectionSpacing(6)
 
                     Section {
                         GeometryReader { geometry in
@@ -116,7 +99,25 @@ struct HomeQuickActionsView: View {
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12))
                     }
-                    .listSectionSpacing(.compact)
+                    .listSectionSpacing(6)
+
+                    Section {
+                        Button {
+                            dial(codeId: "postpaid-balance")
+                        } label: {
+                            Label("Saldo Pospago o Institucional", systemImage: "building.2.fill")
+                        }
+                    }
+                    .listSectionSpacing(6)
+
+                    Section {
+                        Button {
+                            dial(codeId: "friends-plan")
+                        } label: {
+                            Label("Estado del Plan Amigos", systemImage: "person.2.fill")
+                        }
+                    }
+                    .listSectionSpacing(6)
 
                     Section {
                         HStack(spacing: 12) {
