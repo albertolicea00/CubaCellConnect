@@ -882,14 +882,15 @@ struct SettingsView: View {
     }
 }
 
-/// Ajustes › Buscar en Directorio — reverse number/name lookup over whichever
-/// `DirectoryDatabaseVersion` file the user has copied into this app's Documents folder (Finder
-/// file sharing; the app never downloads or bundles either one itself). Defaults to v1; the
-/// segmented picker to switch to v2 only shows once more than one version is actually present.
+/// Ajustes › Buscar en Directorio — reverse number/name lookup over whichever directory database
+/// file the user has copied into this app's Documents folder (Finder file sharing, or the
+/// "Importar Base de Datos" picker below; the app never downloads or bundles it itself). Its
+/// schema shape (v1/v2) is auto-detected from the file's own tables — see `DirectoryDatabase`.
 struct DirectorySearchView: View {
     @State private var databaseFile: DirectoryDatabaseFile?
     @State private var hasSearchedForDatabase = false
     @State private var showingImporter = false
+    @State private var isImporting = false
     @State private var importErrorMessage: String?
 
     @State private var numberQuery = ""
@@ -921,28 +922,39 @@ struct DirectorySearchView: View {
                         description: Text("Descarga la base de datos o impórtala si ya la tienes en este dispositivo.")
                     )
 
-                    VStack(spacing: 10) {
-                        Button {
-                            // No hay endpoint de descarga todavía — deshabilitado hasta tenerlo.
-                        } label: {
-                            Label("Descargar Base de Datos", systemImage: "arrow.down.circle.fill")
-                                .frame(maxWidth: .infinity)
+                    if isImporting {
+                        VStack(spacing: 10) {
+                            ProgressView()
+                            Text("Importando… puede tardar varios minutos, no cierres la app.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.brandCyan)
-                        .disabled(true)
+                        .padding(.horizontal, 32)
+                    } else {
+                        VStack(spacing: 10) {
+                            Button {
+                                // No hay endpoint de descarga todavía — deshabilitado hasta tenerlo.
+                            } label: {
+                                Label("Descargar Base de Datos", systemImage: "arrow.down.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.brandCyan)
+                            .disabled(true)
 
-                        Button {
-                            showingImporter = true
-                        } label: {
-                            Label("Importar Base de Datos", systemImage: "square.and.arrow.down.on.square")
-                                .frame(maxWidth: .infinity)
+                            Button {
+                                showingImporter = true
+                            } label: {
+                                Label("Importar Base de Datos", systemImage: "square.and.arrow.down.on.square")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.brandCyan)
                         }
-                        .buttonStyle(.bordered)
-                        .tint(.brandCyan)
+                        .controlSize(.large)
+                        .padding(.horizontal, 32)
                     }
-                    .controlSize(.large)
-                    .padding(.horizontal, 32)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.item]) { result in
@@ -1027,29 +1039,56 @@ struct DirectorySearchView: View {
     /// Documents folder, then re-runs discovery — `DirectoryDatabase` doesn't care about the
     /// filename, only what tables the copy actually has, so an unrecognized file just leaves
     /// `databaseFile` nil instead of throwing here.
+    /// These dumps are 400+MB — copying on the calling thread would block the UI for however
+    /// long that takes (and risk the app being killed or force-quit mid-copy, leaving a truncated
+    /// file `sqlite3` can't read). So the actual `copyItem` runs on a detached background task,
+    /// and its result is checked against the source's byte size before trusting it — a size
+    /// mismatch means an interrupted copy, not a bad file, so it's reported as that distinctly.
     private func importDatabase(from result: Result<URL, Error>) {
         guard case let .success(sourceURL) = result else { return }
-
-        let didAccess = sourceURL.startAccessingSecurityScopedResource()
-        defer { if didAccess { sourceURL.stopAccessingSecurityScopedResource() } }
-
         guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             importErrorMessage = "No se pudo acceder a los archivos de la app."
             return
         }
         let destinationURL = documents.appendingPathComponent(sourceURL.lastPathComponent)
 
-        do {
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: destinationURL)
+        isImporting = true
+        Task.detached(priority: .userInitiated) {
+            let didAccess = sourceURL.startAccessingSecurityScopedResource()
+            defer { if didAccess { sourceURL.stopAccessingSecurityScopedResource() } }
+
+            do {
+                let sourceSize = try FileManager.default.attributesOfItem(atPath: sourceURL.path)[.size] as? Int
+
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.removeItem(at: destinationURL)
+                }
+                try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+
+                let destinationSize = try FileManager.default.attributesOfItem(atPath: destinationURL.path)[.size] as? Int
+                if let sourceSize, let destinationSize, sourceSize != destinationSize {
+                    try? FileManager.default.removeItem(at: destinationURL)
+                    await MainActor.run {
+                        isImporting = false
+                        importErrorMessage = "La copia no terminó (\(destinationSize) de \(sourceSize) bytes) — inténtalo de nuevo."
+                    }
+                    return
+                }
+
+                let discovered = DirectoryDatabase.discoverDatabase()
+                await MainActor.run {
+                    databaseFile = discovered
+                    isImporting = false
+                    if discovered == nil {
+                        importErrorMessage = "El archivo se copió pero no tiene el formato esperado de base de datos de directorio."
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    isImporting = false
+                    importErrorMessage = "No se pudo copiar el archivo: \(error.localizedDescription)"
+                }
             }
-            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
-            databaseFile = DirectoryDatabase.discoverDatabase()
-            if databaseFile == nil {
-                importErrorMessage = "El archivo se copió pero no tiene el formato esperado de base de datos de directorio."
-            }
-        } catch {
-            importErrorMessage = "No se pudo copiar el archivo: \(error.localizedDescription)"
         }
     }
 }
