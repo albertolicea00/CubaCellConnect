@@ -91,6 +91,8 @@ struct PinRevealField: View {
 struct CodeRowView: View {
     let code: USSDCode
 
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
@@ -118,7 +120,7 @@ struct CodeRowView: View {
                 .font(.callout)
                 .foregroundStyle(.white)
                 .frame(width: 32, height: 32)
-                .background(Color.brandCyan, in: Circle())
+                .background(accentColorStore.color, in: Circle())
         }
         .padding(.vertical, 8)
     }
@@ -139,6 +141,7 @@ struct CodeRowView: View {
         inputPlaceholder: nil
     ))
     .padding()
+    .environment(AccentColorStore())
 }
 
 // MARK: - Contact Row
@@ -149,12 +152,14 @@ struct ContactRowView: View {
     let code: USSDCode
     let onCall: () -> Void
 
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: code.icon ?? "phone.fill")
                 .foregroundStyle(.white)
                 .frame(width: 36, height: 36)
-                .background(Color.brandCyan, in: Circle())
+                .background(accentColorStore.color, in: Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(code.title)
@@ -170,7 +175,7 @@ struct ContactRowView: View {
             Button(action: onCall) {
                 Image(systemName: "phone.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(Color.brandCyan)
+                    .foregroundStyle(accentColorStore.color)
             }
             .buttonStyle(.plain)
         }
@@ -196,6 +201,7 @@ struct ContactRowView: View {
         onCall: {}
     )
     .padding()
+    .environment(AccentColorStore())
 }
 
 // MARK: - Connection Status Banner
@@ -204,6 +210,7 @@ struct ContactRowView: View {
 /// reachability and will silently fail to send without it.
 struct ConnectionBannerView: View {
     @State private var monitor = CellularMonitor.shared
+    @Environment(AccentColorStore.self) private var accentColorStore
 
     private var statusText: String {
         guard monitor.hasService else { return "Sin señal — el USSD no funcionará" }
@@ -219,7 +226,7 @@ struct ConnectionBannerView: View {
         guard monitor.hasService else { return .red }
         switch monitor.signalQuality {
         case 3: return .green
-        case 2: return Color.brandCyan
+        case 2: return accentColorStore.color
         case 1: return .orange
         default: return .gray
         }
@@ -246,4 +253,5 @@ struct ConnectionBannerView: View {
 
 #Preview {
     ConnectionBannerView()
+        .environment(AccentColorStore())
 }

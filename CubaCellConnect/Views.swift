@@ -7,6 +7,7 @@ import SwiftUI
 /// other: Líneas de Ayuda, Contactos, Home, Compras, Ajustes.
 struct HomeView: View {
     @Environment(USSDCodeStore.self) private var store
+    @Environment(AccentColorStore.self) private var accentColorStore
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
     @State private var selectedTab = HomeTab.home.rawValue
 
@@ -51,7 +52,7 @@ struct HomeView: View {
                 }
                 .tag(HomeTab.settings.rawValue)
         }
-        .tint(.brandCyan)
+        .tint(accentColorStore.color)
         .onAppear { selectedTab = defaultTab }
     }
 }
@@ -77,6 +78,7 @@ enum HomeTab: String, CaseIterable, Identifiable {
 #Preview {
     HomeView()
         .environment(USSDCodeStore())
+        .environment(AccentColorStore())
 }
 
 // MARK: - Home Quick Actions
@@ -86,6 +88,7 @@ enum HomeTab: String, CaseIterable, Identifiable {
 /// plus a "Transferir" and a "Recargar" section whose fields are plain rows, not a custom card.
 struct HomeQuickActionsView: View {
     @Environment(USSDCodeStore.self) private var store
+    @Environment(AccentColorStore.self) private var accentColorStore
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
 
     @State private var phoneNumber = ""
@@ -254,7 +257,7 @@ struct HomeQuickActionsView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .tint(.brandCyan)
+                .tint(accentColorStore.color)
                 .sheet(isPresented: $showingContactPicker) {
                     ContactPickerView { number, isValidCubanNumber in
                         phoneNumber = number
@@ -311,19 +314,22 @@ struct HomeQuickActionsView: View {
 #Preview {
     HomeQuickActionsView()
         .environment(USSDCodeStore())
+        .environment(AccentColorStore())
 }
 
 /// A secondary/outline look: border and text in the tint color, no filled background —
 /// unlike `.bordered`, which fills with a light tint. Used for the Adelanta Saldo amount buttons.
 private struct OutlineButtonStyle: ButtonStyle {
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
             .padding(.vertical, 6)
-            .foregroundStyle(Color.brandCyan)
+            .foregroundStyle(accentColorStore.color)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.brandCyan, lineWidth: 1.5)
+                    .stroke(accentColorStore.color, lineWidth: 1.5)
             )
             .opacity(configuration.isPressed ? 0.6 : 1)
     }
@@ -338,6 +344,8 @@ private struct QuickActionTile: View {
     let size: CGFloat
     let action: () -> Void
 
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     /// Shorter than `size` so the tile reads as a rounded rectangle, not a square.
     private var height: CGFloat { size * 0.72 }
 
@@ -348,7 +356,7 @@ private struct QuickActionTile: View {
                     .font(.system(size: size * 0.26))
                     .foregroundStyle(.white)
                     .frame(width: size, height: height)
-                    .background(Color.brandCyan, in: RoundedRectangle(cornerRadius: size * 0.24))
+                    .background(accentColorStore.color, in: RoundedRectangle(cornerRadius: size * 0.24))
                 Text(title)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.appForeground)
@@ -434,6 +442,7 @@ struct ContactsListView: View {
 private struct ContactCallRowView: View {
     let contact: DeviceContact
 
+    @Environment(AccentColorStore.self) private var accentColorStore
     @State private var showingCallOptions = false
 
     var body: some View {
@@ -462,14 +471,14 @@ private struct ContactCallRowView: View {
             } label: {
                 Label("Llamar 99", systemImage: "phone.fill")
             }
-            .tint(.brandCyan)
+            .tint(accentColorStore.color)
 
             Button {
                 DialService.dial("#31#\(contact.phoneNumber)")
             } label: {
                 Label("Anónimo", systemImage: "shield.lefthalf.filled")
             }
-            .tint(.brandCyan.opacity(0.6))
+            .tint(accentColorStore.color.opacity(0.6))
         }
         .sheet(isPresented: $showingCallOptions) {
             ContactCallOptionsSheet(contact: contact)
@@ -482,6 +491,8 @@ private struct ContactCallRowView: View {
 private struct ContactAvatarView: View {
     let contact: DeviceContact
     var size: CGFloat = 40
+
+    @Environment(AccentColorStore.self) private var accentColorStore
 
     private var initials: String {
         let words = contact.name.split(separator: " ")
@@ -497,10 +508,10 @@ private struct ContactAvatarView: View {
                     .scaledToFill()
             } else {
                 ZStack {
-                    Color.brandCyan.opacity(0.2)
+                    accentColorStore.color.opacity(0.2)
                     Text(initials)
                         .font(.system(size: size * 0.4, weight: .semibold))
-                        .foregroundStyle(Color.brandCyan)
+                        .foregroundStyle(accentColorStore.color)
                 }
             }
         }
@@ -517,6 +528,7 @@ private struct ContactCallOptionsSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(USSDCodeStore.self) private var store
+    @Environment(AccentColorStore.self) private var accentColorStore
 
     @State private var pin = ""
     @State private var amount = ""
@@ -557,7 +569,7 @@ private struct ContactCallOptionsSheet: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.brandCyan)
+                    .tint(accentColorStore.color)
 
                     Button {
                         DialService.dial("#31#\(contact.phoneNumber)")
@@ -568,7 +580,7 @@ private struct ContactCallOptionsSheet: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
-                    .tint(.brandCyan)
+                    .tint(accentColorStore.color)
                 }
                 .controlSize(.large)
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
@@ -633,6 +645,7 @@ private struct ContactCallOptionsSheet: View {
 struct CategoryListView: View {
     let category: USSDCategory
 
+    @Environment(AccentColorStore.self) private var accentColorStore
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @State private var pendingInputCode: USSDCode?
     @State private var inputText = ""
@@ -707,7 +720,7 @@ struct CategoryListView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .tint(.brandCyan)
+                .tint(accentColorStore.color)
                 .searchable(text: $searchText, prompt: "Buscar")
                 .searchDictationBehavior(.automatic)
             }
@@ -754,6 +767,8 @@ struct CategoryListView: View {
 
 /// Settings tab: appearance, list display, connection warning, how USSD works, about and links.
 struct SettingsView: View {
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     @AppStorage("darkModePreference") private var darkMode: Int = 0
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
@@ -778,6 +793,21 @@ struct SettingsView: View {
                             Text(tab.displayName).tag(tab.rawValue)
                         }
                     }
+
+                    ColorPicker(
+                        "Color de Acento",
+                        selection: Binding(
+                            get: { accentColorStore.color },
+                            set: { accentColorStore.color = $0 }
+                        ),
+                        supportsOpacity: false
+                    )
+
+                    if accentColorStore.color.hexString != Color.brandCyan.hexString {
+                        Button("Restablecer Color por Defecto") {
+                            accentColorStore.resetToDefault()
+                        }
+                    }
                 }
 
                 Section("Clave de Transferencia") {
@@ -798,7 +828,7 @@ struct SettingsView: View {
                     NavigationLink {
                         HelpSettingsView()
                     } label: {
-                        Label("Ayuda", systemImage: "questionmark.circle.fill")
+                        Label("Ayuda (Manual de Uso)", systemImage: "questionmark.circle.fill")
                     }
 
                     Text("CubaCell Connect da acceso rápido a los códigos USSD de servicio de ETECSA (Cubacel): saldo, compras, transferencias y otras utilidades, todo desde una app sin conexión y sin dependencias.")
@@ -992,7 +1022,7 @@ private struct HelpSettingsView: View {
                 )
             }
         }
-        .navigationTitle("Ayuda (Manual de Uso)")
+        .navigationTitle("Ayuda")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -1002,11 +1032,13 @@ private struct SettingsInfoRow: View {
     let title: String
     let text: String
 
+    @Environment(AccentColorStore.self) private var accentColorStore
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.brandCyan)
+                .foregroundStyle(accentColorStore.color)
             Text(text)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -1017,4 +1049,6 @@ private struct SettingsInfoRow: View {
 
 #Preview {
     SettingsView()
+        .environment(USSDCodeStore())
+        .environment(AccentColorStore())
 }

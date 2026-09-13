@@ -111,12 +111,38 @@ enum CubanPhoneNumber {
 extension Color {
     /// rgb(0, 0, 102) — primary brand color.
     static let brandNavy = Color(red: 0 / 255, green: 0 / 255, blue: 102 / 255)
-    /// #09C — accent color.
+    /// #09C — the app's default accent color. The user can override this in Ajustes ›
+    /// Preferencias (see `AccentColorStore`); this constant is only the fallback/default value.
     static let brandCyan = Color(red: 0 / 255, green: 153 / 255, blue: 204 / 255)
     /// Adaptive background: white in light mode, black in dark mode.
     static let appBackground = Color(UIColor.systemBackground)
     /// Adaptive foreground: black in light mode, white in dark mode.
     static let appForeground = Color(UIColor.label)
+
+    /// Builds an opaque color from a 6-digit "RRGGBB" hex string (an optional leading "#" is
+    /// stripped). Returns `nil` for anything else — used to round-trip the user's chosen accent
+    /// color through `@AppStorage`/`UserDefaults`, which can't store `Color` directly.
+    init?(hex: String) {
+        let sanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "#", with: "")
+        guard sanitized.count == 6, let value = UInt32(sanitized, radix: 16) else { return nil }
+        self.init(
+            red: Double((value >> 16) & 0xFF) / 255,
+            green: Double((value >> 8) & 0xFF) / 255,
+            blue: Double(value & 0xFF) / 255
+        )
+    }
+
+    /// Inverse of `init?(hex:)` — the "RRGGBB" hex string for this color's RGB components
+    /// (alpha is dropped; every use in this app is opaque). Falls back to `brandCyan`'s hex if
+    /// the color can't be converted to RGB (should not happen for any color `ColorPicker` hands
+    /// back).
+    var hexString: String {
+        guard let components = UIColor(self).cgColor.components, components.count >= 3 else { return "0099CC" }
+        let r = Int((components[0] * 255).rounded())
+        let g = Int((components[1] * 255).rounded())
+        let b = Int((components[2] * 255).rounded())
+        return String(format: "%02X%02X%02X", r, g, b)
+    }
 }
 
 enum AppTheme {
