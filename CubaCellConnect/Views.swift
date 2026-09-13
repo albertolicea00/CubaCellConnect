@@ -97,6 +97,7 @@ struct HomeQuickActionsView: View {
     @State private var amount = ""
     @State private var cardNumber = ""
     @State private var showingContactPicker = false
+    @State private var debugShowSpeedTest = false
     @State private var showsInvalidNumberWarning = false
 
     /// `true` while `pin` holds the value just loaded from `TransferPinStore` and not yet typed
@@ -275,7 +276,13 @@ struct HomeQuickActionsView: View {
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .sheet(isPresented: $debugShowSpeedTest) {
+            NavigationStack {
+                SpeedTestView()
+            }
+        }
         .onAppear {
+            debugShowSpeedTest = true
             if pin.isEmpty, let saved = TransferPinStore.load() {
                 isLoadingStoredPin = true
                 pin = saved
@@ -1470,7 +1477,6 @@ struct WifiRoomsDetailView: View {
 struct SpeedTestView: View {
     @Environment(AccentColorStore.self) private var accentColorStore
     @State private var runner = SpeedTestRunner()
-    @State private var ringRotation = 0.0
 
     private var statusText: String {
         switch runner.phase {
@@ -1483,37 +1489,58 @@ struct SpeedTestView: View {
         }
     }
 
+    /// What the needle/number track for the current phase — ping is milliseconds on a 0–300
+    /// scale, download/upload are Mbps on a 0–150 scale (a reasonable ceiling for a home/mobile
+    /// connection; a real reading past that just pins the needle at max, the number keeps going).
+    private var gaugeMaxValue: Double {
+        switch runner.phase {
+        case .testingPing: return 300
+        default: return 150
+        }
+    }
+
+    private var gaugeUnit: String {
+        switch runner.phase {
+        case .testingPing: return "ms"
+        case .testingDownload, .testingUpload: return "Mbps"
+        default: return ""
+        }
+    }
+
+    /// "Intento 3 de 5" under the number while pinging — download/upload already read as "doing
+    /// something" from the number itself climbing live, ping's single small number doesn't.
+    private var liveCaption: String? {
+        guard case .testingPing = runner.phase else { return nil }
+        return "Intento \(runner.pingAttempt) de 5"
+    }
+
     var body: some View {
         Form {
             Section {
-                VStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .stroke(accentColorStore.color.opacity(0.15), lineWidth: 6)
-                            .frame(width: 96, height: 96)
+                VStack(spacing: 12) {
+                    SpeedGaugeView(
+                        value: runner.gaugeValue,
+                        maxValue: gaugeMaxValue,
+                        color: accentColorStore.color
+                    )
+                    .frame(width: 220, height: 130)
 
-                        if runner.isRunning {
-                            Circle()
-                                .trim(from: 0, to: 0.22)
-                                .stroke(accentColorStore.color, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                                .frame(width: 96, height: 96)
-                                .rotationEffect(.degrees(ringRotation))
+                    if runner.isRunning {
+                        VStack(spacing: 2) {
+                            Text(formattedGaugeValue)
+                                .font(.system(size: 34, weight: .bold, design: .rounded))
+                                .contentTransition(.numericText())
+                                .animation(.snappy, value: runner.gaugeValue)
+                                .foregroundStyle(accentColorStore.color)
+                            Text(gaugeUnit)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
                         }
 
-                        Image(systemName: "speedometer")
-                            .font(.system(size: 40))
-                            .foregroundStyle(accentColorStore.color)
-                            .symbolEffect(.pulse, isActive: runner.isRunning)
-                    }
-                    .onChange(of: runner.isRunning) { _, isRunning in
-                        if isRunning {
-                            withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                                ringRotation = 360
-                            }
-                        } else {
-                            withAnimation(.default) {
-                                ringRotation = 0
-                            }
+                        if let liveCaption {
+                            Text(liveCaption)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                         }
                     }
 
@@ -1561,6 +1588,7 @@ struct SpeedTestView: View {
         }
         .navigationTitle("Prueba de Velocidad")
         .navigationBarTitleDisplayMode(.inline)
+        .task { runner.start() } // TEMP DEBUG — remove after.
         .onDisappear {
             runner.cancel()
         }
@@ -1575,6 +1603,81 @@ struct SpeedTestView: View {
 
     private var hasAnyResult: Bool {
         runner.result.pingMs != nil || runner.result.downloadMbps != nil || runner.result.uploadMbps != nil
+    }
+
+    private var formattedGaugeValue: String {
+        switch runner.phase {
+        case .testingPing: return String(format: "%.0f", runner.gaugeValue)
+        default: return String(format: "%.1f", runner.gaugeValue)
+        }
+    }
+}
+
+/// A car-speedometer-style semicircular gauge: a needle that sweeps from left (0) to right
+/// (`maxValue`) as `value` changes, animating smoothly between readings instead of jumping —
+/// used by `SpeedTestView` to make a live ping/download/upload reading visibly "move" as it
+/// updates, the way a real speed test's needle does.
+private struct SpeedGaugeView: View {
+    let value: Double
+    let maxValue: Double
+    let color: Color
+
+    private var fraction: Double {
+        guard maxValue > 0 else { return 0 }
+        return min(max(value / maxValue, 0), 1)
+    }
+
+    /// 0 = needle pointing straight up (the `rotationEffect` rest position); the needle itself
+    /// is drawn vertical, pivoting from its bottom edge, so -90°/+90° swing it to the gauge's
+    /// left/right ends.
+    private var needleRotationDegrees: Double {
+        -90 + fraction * 180
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            let radius = min(geometry.size.width / 2, geometry.size.height)
+
+            ZStack(alignment: .bottom) {
+                Path { path in
+                    path.addArc(
+                        center: CGPoint(x: radius, y: radius),
+                        radius: radius - 10,
+                        startAngle: .degrees(180),
+                        endAngle: .degrees(360),
+                        clockwise: false
+                    )
+                }
+                .stroke(Color.secondary.opacity(0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                .frame(width: radius * 2, height: radius)
+
+                Path { path in
+                    path.addArc(
+                        center: CGPoint(x: radius, y: radius),
+                        radius: radius - 10,
+                        startAngle: .degrees(180),
+                        endAngle: .degrees(180 + fraction * 180),
+                        clockwise: false
+                    )
+                }
+                .stroke(color, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                .frame(width: radius * 2, height: radius)
+                .animation(.easeOut(duration: 0.25), value: fraction)
+
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(color)
+                    .frame(width: 4, height: radius - 22)
+                    .rotationEffect(.degrees(needleRotationDegrees), anchor: .bottom)
+                    .animation(.easeOut(duration: 0.25), value: needleRotationDegrees)
+
+                Circle()
+                    .fill(color)
+                    .frame(width: 12, height: 12)
+                    .offset(y: 6)
+            }
+            .frame(width: radius * 2, height: radius, alignment: .top)
+            .frame(maxWidth: .infinity)
+        }
     }
 }
 

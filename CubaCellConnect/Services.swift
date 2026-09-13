@@ -209,6 +209,15 @@ final class SpeedTestRunner {
     private(set) var phase: SpeedTestPhase = .idle
     private(set) var result = SpeedTestResult()
 
+    /// Live reading for whatever's being measured right now — the gauge's needle and the big
+    /// number under it both just track this. Ping's is an "ms so far" per attempt; download/
+    /// upload's is a running Mbps estimate from bytes moved so far, updated several times a
+    /// second as real progress bytes come in — not a fake/simulated ramp.
+    private(set) var gaugeValue: Double = 0
+    /// 1...5 during `.testingPing`, so the UI can show "intento 3 de 5" instead of a number with
+    /// no context.
+    private(set) var pingAttempt: Int = 0
+
     /// Handle to the in-flight run, so leaving the screen can actually stop it instead of
     /// letting it keep downloading/uploading tens of megabytes in the background and mutating
     /// `phase`/`result` after nothing is watching them.
@@ -226,6 +235,8 @@ final class SpeedTestRunner {
     func start() {
         guard !isRunning else { return }
         result = SpeedTestResult()
+        gaugeValue = 0
+        pingAttempt = 0
         task = Task { await run() }
     }
 
@@ -242,18 +253,28 @@ final class SpeedTestRunner {
     private func run() async {
         do {
             phase = .testingPing
-            result.pingMs = try await Self.measurePing()
+            result.pingMs = try await Self.measurePing { [weak self] attempt, ms in
+                self?.pingAttempt = attempt
+                self?.gaugeValue = ms
+            }
             try Task.checkCancellation()
 
             phase = .testingDownload
-            result.downloadMbps = try await Self.measureDownload()
+            gaugeValue = 0
+            result.downloadMbps = try await Self.measureDownload { [weak self] mbps in
+                self?.gaugeValue = mbps
+            }
             try Task.checkCancellation()
 
             phase = .testingUpload
-            result.uploadMbps = try await Self.measureUpload()
+            gaugeValue = 0
+            result.uploadMbps = try await Self.measureUpload { [weak self] mbps in
+                self?.gaugeValue = mbps
+            }
             try Task.checkCancellation()
 
             phase = .finished
+            gaugeValue = 0
         } catch is CancellationError {
             // Left mid-run on purpose (screen dismissed) — nothing to show an error for.
         } catch {
@@ -261,35 +282,52 @@ final class SpeedTestRunner {
         }
     }
 
-    /// Median round-trip time of a handful of zero-byte requests — rough (a real speed test
-    /// warms up the connection first), but good enough for "is this laggy or not".
-    private static func measurePing() async throws -> Double {
+    /// Round-trip time of a handful of zero-byte requests, reported live as each one lands, so
+    /// the gauge visibly reacts once per attempt instead of sitting still for the whole phase —
+    /// median of the samples is the actual reported ping. Rough (a real speed test warms up the
+    /// connection first), but good enough for "is this laggy or not".
+    private static func measurePing(onSample: @escaping (Int, Double) -> Void) async throws -> Double {
         let url = URL(string: "https://speed.cloudflare.com/__down?bytes=0")!
         var samples: [Double] = []
-        for _ in 0..<5 {
+        for attempt in 1...5 {
             var request = URLRequest(url: url)
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             let start = Date()
             _ = try await URLSession.shared.data(for: request)
-            samples.append(Date().timeIntervalSince(start) * 1000)
+            let ms = Date().timeIntervalSince(start) * 1000
+            samples.append(ms)
+            await MainActor.run { onSample(attempt, ms) }
         }
         samples.sort()
         return samples[samples.count / 2]
     }
 
-    private static func measureDownload() async throws -> Double {
+    /// Downloads via `URLSessionDownloadDelegate` (not a plain `data(for:)`) specifically so
+    /// `didWriteData` can report real bytes-received-so-far — that's what makes the gauge track
+    /// actual throughput instead of jumping straight to a final number at the end.
+    private static func measureDownload(onProgress: @escaping (Double) -> Void) async throws -> Double {
         let byteCount = 25_000_000
         var request = URLRequest(url: URL(string: "https://speed.cloudflare.com/__down?bytes=\(byteCount)")!)
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
         let start = Date()
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let elapsed = Date().timeIntervalSince(start)
+        let delegate = TransferProgressDelegate { totalBytes in
+            Task { @MainActor in
+                let elapsed = Date().timeIntervalSince(start)
+                guard elapsed > 0.05 else { return }
+                onProgress(megabits(forByteCount: Int(totalBytes), elapsed: elapsed))
+            }
+        }
+        let (tempURL, _) = try await URLSession.shared.download(for: request, delegate: delegate)
+        try? FileManager.default.removeItem(at: tempURL)
 
-        return megabits(forByteCount: data.count, elapsed: elapsed)
+        let elapsed = Date().timeIntervalSince(start)
+        return megabits(forByteCount: byteCount, elapsed: elapsed)
     }
 
-    private static func measureUpload() async throws -> Double {
+    /// Same idea as `measureDownload`, via `URLSessionTaskDelegate.didSendBodyData` for real
+    /// bytes-sent-so-far progress.
+    private static func measureUpload(onProgress: @escaping (Double) -> Void) async throws -> Double {
         let byteCount = 10_000_000
         var request = URLRequest(url: URL(string: "https://speed.cloudflare.com/__up")!)
         request.httpMethod = "POST"
@@ -297,9 +335,16 @@ final class SpeedTestRunner {
         let payload = Data(count: byteCount)
 
         let start = Date()
-        _ = try await URLSession.shared.upload(for: request, from: payload)
-        let elapsed = Date().timeIntervalSince(start)
+        let delegate = TransferProgressDelegate { totalBytes in
+            Task { @MainActor in
+                let elapsed = Date().timeIntervalSince(start)
+                guard elapsed > 0.05 else { return }
+                onProgress(megabits(forByteCount: Int(totalBytes), elapsed: elapsed))
+            }
+        }
+        _ = try await URLSession.shared.upload(for: request, from: payload, delegate: delegate)
 
+        let elapsed = Date().timeIntervalSince(start)
         return megabits(forByteCount: byteCount, elapsed: elapsed)
     }
 
@@ -307,6 +352,41 @@ final class SpeedTestRunner {
         guard elapsed > 0 else { return 0 }
         return (Double(byteCount) * 8 / 1_000_000) / elapsed
     }
+}
+
+/// Bridges `URLSessionTaskDelegate`/`URLSessionDownloadDelegate`'s progress callbacks (which
+/// aren't part of the async/await `data(for:)`/`upload(for:from:)` APIs) into a plain closure —
+/// shared by both the download and upload measurements above.
+private final class TransferProgressDelegate: NSObject, URLSessionTaskDelegate, URLSessionDownloadDelegate {
+    private let onProgress: (Int64) -> Void
+
+    init(onProgress: @escaping (Int64) -> Void) {
+        self.onProgress = onProgress
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didSendBodyData bytesSent: Int64,
+        totalBytesSent: Int64,
+        totalBytesExpectedToSend: Int64
+    ) {
+        onProgress(totalBytesSent)
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
+    ) {
+        onProgress(totalBytesWritten)
+    }
+
+    /// Required by `URLSessionDownloadDelegate`; the async `download(for:delegate:)` API hands
+    /// back the temp file URL itself, so there's nothing to do here.
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {}
 }
 
 // MARK: - Device Contacts
