@@ -117,6 +117,10 @@
               "requiresInput": false
             }
           ]
+        },
+        {
+          "name": "SMS Suscripciones",
+          "codes": []
         }
       ]
     },

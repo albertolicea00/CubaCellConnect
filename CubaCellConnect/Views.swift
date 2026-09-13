@@ -764,6 +764,89 @@ struct CategoryListView: View {
     }
 }
 
+// MARK: - SMS Subscriptions
+
+/// Ajustes › SMS Suscripciones — subscribe/unsubscribe USSD codes for ETECSA's SMS info
+/// services, pulled from the "SMS Suscripciones" group in `codes.json` (currently empty; codes
+/// go straight into the JSON once they're in hand, same as every other code in the app — never
+/// hardcoded here).
+struct SMSSubscriptionsView: View {
+    @Environment(USSDCodeStore.self) private var store
+    @Environment(AccentColorStore.self) private var accentColorStore
+
+    @State private var pendingInputCode: USSDCode?
+    @State private var inputText = ""
+
+    private var codes: [USSDCode] {
+        store.group(named: "SMS Suscripciones")?.codes ?? []
+    }
+
+    var body: some View {
+        Group {
+            if codes.isEmpty {
+                ContentUnavailableView(
+                    "Sin Códigos Todavía",
+                    systemImage: "envelope.badge",
+                    description: Text("Los códigos de suscripción de SMS se agregarán aquí próximamente.")
+                )
+            } else {
+                List {
+                    ForEach(codes) { code in
+                        CodeRowView(code: code)
+                            .contentShape(Rectangle())
+                            .onTapGesture { select(code) }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .tint(accentColorStore.color)
+            }
+        }
+        .navigationTitle("SMS Suscripciones")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert(
+            pendingInputCode?.title ?? "",
+            isPresented: Binding(
+                get: { pendingInputCode != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        pendingInputCode = nil
+                        inputText = ""
+                    }
+                }
+            ),
+            presenting: pendingInputCode
+        ) { code in
+            TextField(code.inputPlaceholder ?? "Dato", text: $inputText)
+                .keyboardType(.phonePad)
+            Button("Marcar") { dial(code, input: inputText) }
+            Button("Cancelar", role: .cancel) {}
+        } message: { code in
+            Text(code.details)
+        }
+    }
+
+    private func select(_ code: USSDCode) {
+        if code.requiresInput {
+            inputText = ""
+            pendingInputCode = code
+        } else {
+            DialService.dial(code.code)
+        }
+    }
+
+    private func dial(_ code: USSDCode, input: String) {
+        DialService.dial(code.resolvedCode(input: input))
+    }
+}
+
+#Preview {
+    NavigationStack {
+        SMSSubscriptionsView()
+    }
+    .environment(USSDCodeStore())
+    .environment(AccentColorStore())
+}
+
 // MARK: - Settings / Help Screen
 
 /// Settings tab: appearance, list display, connection warning, how USSD works, about and links.
@@ -816,6 +899,12 @@ struct SettingsView: View {
                         DirectorySearchView()
                     } label: {
                         Label("Buscar en Directorio", systemImage: "magnifyingglass")
+                    }
+
+                    NavigationLink {
+                        SMSSubscriptionsView()
+                    } label: {
+                        Label("SMS Suscripciones", systemImage: "envelope.badge")
                     }
 
                     NavigationLink {
@@ -975,44 +1064,25 @@ struct DirectorySearchView: View {
                 } message: {
                     Text(importErrorMessage ?? "")
                 }
+            } else if !hasSearchableInput {
+                // Idle state — the real, native search field lives at the top via `.searchable`
+                // below; this is just the big centered "nothing typed yet" placeholder, same
+                // pattern as Music/App Store's search tab.
+                ContentUnavailableView {
+                    Label("Buscar en Directorio", systemImage: "magnifyingglass.circle.fill")
+                } description: {
+                    Text("Escribe un número para buscar")
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if isSearching {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if results.isEmpty {
+                ContentUnavailableView.search(text: numberQuery)
             } else {
                 List {
-                    Section {
-                        VStack(alignment: .leading, spacing: 2) {
-                            TextField("Número", text: $numberQuery)
-                                .keyboardType(.phonePad)
-                            Text("Mínimo \(DirectoryDatabase.minimumNumberQueryLength) dígitos")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-
-                        // Name search intentionally disabled for privacy and security — see
-                        // README. `nameQuery` stays "" forever; the rest of the code
-                        // (DirectoryDatabase.search, hasSearchableInput) already supports it
-                        // again just by uncommenting this field.
-                        // VStack(alignment: .leading, spacing: 2) {
-                        //     TextField("Nombre", text: $nameQuery)
-                        //     Text("Mínimo \(DirectoryDatabase.minimumNameQueryLength) caracteres")
-                        //         .font(.caption)
-                        //         .foregroundStyle(.secondary)
-                        // }
-                    }
-
-                    Section {
-                        ForEach(results) { entry in
-                            DirectoryEntryRowView(entry: entry)
-                        }
-
-                        if isSearching {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                        } else if hasSearchableInput, results.isEmpty {
-                            Text("Sin resultados")
-                                .foregroundStyle(.secondary)
-                        }
+                    ForEach(results) { entry in
+                        DirectoryEntryRowView(entry: entry)
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -1020,6 +1090,12 @@ struct DirectorySearchView: View {
         }
         .navigationTitle("Buscar en Directorio")
         .navigationBarTitleDisplayMode(.inline)
+        // Name search stays disabled for privacy and security — see README. `nameQuery` stays ""
+        // forever; the rest of the code (DirectoryDatabase.search, hasSearchableInput) already
+        // supports it again just by adding its own `.searchable` back (SwiftUI only supports one
+        // native search field per view).
+        .searchable(text: $numberQuery, prompt: "Número")
+        .keyboardType(.phonePad)
         .onAppear {
             guard !hasSearchedForDatabase else { return }
             databaseFile = DirectoryDatabase.discoverDatabase()
