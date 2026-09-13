@@ -343,7 +343,10 @@ struct ContactsListView: View {
 
     private var filteredContacts: [DeviceContact] {
         guard !searchText.isEmpty else { return service.contacts }
-        return service.contacts.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        return service.contacts.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+                || $0.phoneNumber.localizedCaseInsensitiveContains(searchText)
+        }
     }
 
     /// Contacts grouped by first letter of name, sorted A→Z — no side index strip, just
@@ -381,6 +384,7 @@ struct ContactsListView: View {
                     }
                     .listStyle(.plain)
                     .searchable(text: $searchText, prompt: "Buscar")
+                    .searchDictationBehavior(.automatic)
                 }
             }
             .navigationTitle("Contactos")
@@ -429,7 +433,7 @@ private struct ContactCallRowView: View {
             Button {
                 DialService.dial("*99\(contact.phoneNumber)")
             } label: {
-                Label("99", systemImage: "phone.fill")
+                Label("Llamar 99", systemImage: "phone.fill")
             }
             .tint(.brandCyan)
         }
@@ -567,6 +571,7 @@ struct CategoryListView: View {
                 .listStyle(.insetGrouped)
                 .tint(.brandCyan)
                 .searchable(text: $searchText, prompt: "Buscar")
+                .searchDictationBehavior(.automatic)
             }
             .navigationTitle(category.name)
             .navigationBarTitleDisplayMode(.inline)
