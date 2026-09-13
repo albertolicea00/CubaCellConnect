@@ -159,7 +159,11 @@ struct HomeQuickActionsView: View {
                         Button {
                             dial(codeId: "postpaid-balance")
                         } label: {
-                            Label("Saldo Pospago o Institucional", systemImage: "building.2.fill")
+                            HStack {
+                                Label("Saldo Pospago o Institucional", systemImage: "building.2.fill")
+                                Spacer()
+                                Image(systemName: "arrow.right")
+                            }
                         }
                     }
                     .listSectionSpacing(6)
@@ -168,7 +172,11 @@ struct HomeQuickActionsView: View {
                         Button {
                             dial(codeId: "friends-plan")
                         } label: {
-                            Label("Estado del Plan Amigos", systemImage: "person.2.fill")
+                            HStack {
+                                Label("Estado del Plan Amigos", systemImage: "person.2.fill")
+                                Spacer()
+                                Image(systemName: "arrow.right")
+                            }
                         }
                     }
                     .listSectionSpacing(6)
@@ -211,7 +219,11 @@ struct HomeQuickActionsView: View {
                         Button {
                             dial(codeId: "recharge-call")
                         } label: {
-                            Label("Recargar por Llamada", systemImage: "phone.fill")
+                            HStack {
+                                Label("Recargar por Llamada", systemImage: "phone.fill")
+                                Spacer()
+                                Image(systemName: "arrow.right")
+                            }
                         }
                     }
                     .listSectionSpacing(6)
@@ -716,7 +728,15 @@ struct CategoryListView: View {
                                             } else {
                                                 Text(code.title)
                                             }
-                                            if let price = code.price {
+                                            if category.id == "purchase" {
+                                                Spacer()
+                                                if let price = code.price {
+                                                    Text(price)
+                                                        .font(.subheadline.weight(.semibold))
+                                                        .foregroundStyle(.secondary)
+                                                }
+                                                Image(systemName: "arrow.right")
+                                            } else if let price = code.price {
                                                 Spacer()
                                                 Text(price)
                                                     .font(.subheadline.weight(.semibold))
