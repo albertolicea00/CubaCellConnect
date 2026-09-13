@@ -62,6 +62,14 @@
               "details": "Transfiere saldo a otro número con tu clave de transferencia.",
               "type": "ussd",
               "requiresInput": true
+            },
+            {
+              "id": "transfer-pin-change",
+              "code": "*234*2*{current}*{new}#",
+              "title": "Cambiar Clave de Transferencia",
+              "details": "Cambia la clave que usas para transferir saldo a otros números.",
+              "type": "ussd",
+              "requiresInput": true
             }
           ]
         },

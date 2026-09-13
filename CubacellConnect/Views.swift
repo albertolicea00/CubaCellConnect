@@ -176,6 +176,7 @@ struct HomeQuickActionsView: View {
 
                         HStack(spacing: 12) {
                             TextField("Clave", text: $pin)
+                                .textContentType(.password)
                                 .keyboardType(.numberPad)
                             Divider()
                             TextField("Monto", text: $amount)
@@ -541,6 +542,7 @@ private struct ContactCallOptionsSheet: View {
 
             Section("Transferir Saldo") {
                 TextField("Clave", text: $pin)
+                    .textContentType(.password)
                     .keyboardType(.numberPad)
                 TextField("Monto", text: $amount)
                     .keyboardType(.numberPad)
@@ -704,6 +706,8 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                ChangeTransferPinSection()
+
                 NavigationLink {
                     PreferencesSettingsView()
                 } label: {
@@ -725,6 +729,56 @@ struct SettingsView: View {
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+}
+
+/// Ajustes top section: change the ETECSA transfer PIN via `transfer-pin-change`
+/// (`*234*2*{current}*{new}#`). `SecureField` + `.password`/`.newPassword` content types so iOS
+/// offers to save the new PIN to Passwords and can later suggest it back into the Transferir
+/// "Clave" field on Home and inside a contact's sheet (both marked `.password`).
+private struct ChangeTransferPinSection: View {
+    @Environment(USSDCodeStore.self) private var store
+
+    @State private var currentPin = ""
+    @State private var newPin = ""
+
+    /// Blocks empty fields and a "new" PIN identical to the current one — changing to the same
+    /// PIN isn't a change.
+    private var isDisabled: Bool {
+        currentPin.trimmingCharacters(in: .whitespaces).isEmpty
+            || newPin.trimmingCharacters(in: .whitespaces).isEmpty
+            || newPin == currentPin
+    }
+
+    var body: some View {
+        Section("Cambiar Clave de Transferencia") {
+            HStack(spacing: 12) {
+                SecureField("Clave actual", text: $currentPin)
+                    .textContentType(.password)
+                    .keyboardType(.numberPad)
+                Divider()
+                SecureField("Clave nueva", text: $newPin)
+                    .textContentType(.newPassword)
+                    .keyboardType(.numberPad)
+            }
+
+            Button {
+                dial()
+            } label: {
+                HStack(spacing: 6) {
+                    Spacer()
+                    Text("Cambiar")
+                    Image(systemName: "arrow.right")
+                }
+            }
+            .disabled(isDisabled)
+        }
+    }
+
+    private func dial() {
+        guard let code = store.code(withId: "transfer-pin-change") else { return }
+        let resolved = code.resolvedCode(with: ["current": currentPin, "new": newPin])
+        DialService.dial(resolved)
     }
 }
 
