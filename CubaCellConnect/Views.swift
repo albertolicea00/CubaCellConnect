@@ -990,8 +990,10 @@ struct SettingsView: View {
 
                                     HStack {
                                         Button("Cancelar", role: .cancel) {
-                                            manageFriendPhoneNumber = ""
-                                            isManageFriendExpanded = false
+                                            withAnimation {
+                                                manageFriendPhoneNumber = ""
+                                                isManageFriendExpanded = false
+                                            }
                                         }
                                         Spacer()
                                         Button {
@@ -1011,7 +1013,7 @@ struct SettingsView: View {
                                 .padding(.vertical, 4)
                             } else {
                                 Button {
-                                    isManageFriendExpanded = true
+                                    withAnimation { isManageFriendExpanded = true }
                                 } label: {
                                     Text(manageMemberCode.title)
                                 }
@@ -1044,9 +1046,11 @@ struct SettingsView: View {
 
                             HStack {
                                 Button("Cancelar", role: .cancel) {
-                                    currentPin = ""
-                                    newPin = ""
-                                    isChangePinExpanded = false
+                                    withAnimation {
+                                        currentPin = ""
+                                        newPin = ""
+                                        isChangePinExpanded = false
+                                    }
                                 }
                                 Spacer()
                                 Button {
@@ -1063,7 +1067,7 @@ struct SettingsView: View {
                         .padding(.vertical, 4)
                     } else {
                         Button {
-                            isChangePinExpanded = true
+                            withAnimation { isChangePinExpanded = true }
                         } label: {
                             Label("Cambiar Clave", systemImage: "key.fill")
                         }
@@ -1082,14 +1086,16 @@ struct SettingsView: View {
 
                             HStack {
                                 Button("Cancelar", role: .cancel) {
-                                    savedPin = TransferPinStore.load() ?? ""
-                                    isSavePinExpanded = false
+                                    withAnimation {
+                                        savedPin = TransferPinStore.load() ?? ""
+                                        isSavePinExpanded = false
+                                    }
                                 }
                                 Spacer()
                                 Button {
                                     TransferPinStore.save(savedPin)
                                     isSavedPinPersisted = true
-                                    isSavePinExpanded = false
+                                    withAnimation { isSavePinExpanded = false }
                                 } label: {
                                     HStack(spacing: 6) {
                                         Text("Guardar Clave")
@@ -1102,16 +1108,18 @@ struct SettingsView: View {
                             if isSavedPinPersisted {
                                 Button("Olvidar Clave Guardada", role: .destructive) {
                                     TransferPinStore.delete()
-                                    savedPin = ""
-                                    isSavedPinPersisted = false
-                                    isSavePinExpanded = false
+                                    withAnimation {
+                                        savedPin = ""
+                                        isSavedPinPersisted = false
+                                        isSavePinExpanded = false
+                                    }
                                 }
                             }
                         }
                         .padding(.vertical, 4)
                     } else {
                         Button {
-                            isSavePinExpanded = true
+                            withAnimation { isSavePinExpanded = true }
                         } label: {
                             Label("Guardar Clave", systemImage: "lock.fill")
                         }
@@ -1174,8 +1182,10 @@ struct SettingsView: View {
 
     private func dialManageFriend(_ code: USSDCode) {
         DialService.dial(code.resolvedCode(input: manageFriendPhoneNumber))
-        manageFriendPhoneNumber = ""
-        isManageFriendExpanded = false
+        withAnimation {
+            manageFriendPhoneNumber = ""
+            isManageFriendExpanded = false
+        }
     }
 
     /// No-op for a code whose dial string isn't known yet (see "Gestionar Plan Amigo" in
@@ -1209,9 +1219,11 @@ struct SettingsView: View {
         TransferPinStore.save(newPin)
         savedPin = newPin
         isSavedPinPersisted = true
-        currentPin = ""
-        newPin = ""
-        isChangePinExpanded = false
+        withAnimation {
+            currentPin = ""
+            newPin = ""
+            isChangePinExpanded = false
+        }
     }
 }
 
