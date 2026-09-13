@@ -448,14 +448,14 @@ private struct ContactCallRowView: View {
                 Button {
                     DialService.dial("#31#\(contact.phoneNumber)")
                 } label: {
-                    callButtonIcon
+                    anonymousButtonIcon
                 }
                 .accessibilityLabel("Llamar Anónimo")
 
                 Button {
                     DialService.dial("*99\(contact.phoneNumber)")
                 } label: {
-                    callButtonIcon
+                    collectButtonIcon
                 }
                 .accessibilityLabel("Llamar con 99")
 
@@ -463,7 +463,7 @@ private struct ContactCallRowView: View {
                 Button {
                     DialService.dial("*99\(contact.phoneNumber)")
                 } label: {
-                    callButtonIcon
+                    collectButtonIcon
                 }
                 .accessibilityLabel("Llamar con 99")
 
@@ -471,7 +471,7 @@ private struct ContactCallRowView: View {
                 Button {
                     DialService.dial("#31#\(contact.phoneNumber)")
                 } label: {
-                    callButtonIcon
+                    anonymousButtonIcon
                 }
                 .accessibilityLabel("Llamar Anónimo")
             }
@@ -485,6 +485,27 @@ private struct ContactCallRowView: View {
             .foregroundStyle(.white)
             .frame(width: 32, height: 32)
             .background(Color.brandCyan, in: Circle())
+    }
+
+    private var anonymousButtonIcon: some View {
+        Image(systemName: "shield.lefthalf.filled")
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(.white)
+            .frame(width: 32, height: 32)
+            .background(Color.brandCyan, in: Circle())
+    }
+
+    private var collectButtonIcon: some View {
+        HStack(spacing: 3) {
+            Image(systemName: "phone.fill")
+                .font(.system(size: 11, weight: .semibold))
+            Text("99")
+                .font(.system(size: 12, weight: .bold))
+        }
+        .foregroundStyle(.white)
+        .frame(height: 32)
+        .padding(.horizontal, 10)
+        .background(Color.brandCyan, in: Capsule())
     }
 }
 
