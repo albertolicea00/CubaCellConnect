@@ -160,7 +160,10 @@ struct HomeQuickActionsView: View {
                         } label: {
                             Label("Recargar por Llamada", systemImage: "phone.fill")
                         }
+                    }
+                    .listSectionSpacing(6)
 
+                    Section {
                         HStack(spacing: 12) {
                             Image(systemName: "camera.fill")
                                 .foregroundStyle(.secondary)
@@ -181,6 +184,7 @@ struct HomeQuickActionsView: View {
                         }
                         .disabled(isRechargeDisabled)
                     }
+                    .listSectionSpacing(6)
 
                     if let advanceBalanceGroup = store.group(named: "Servicio Adelanta Saldo") {
                         Section(advanceBalanceGroup.name ?? "") {
