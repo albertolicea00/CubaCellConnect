@@ -145,6 +145,10 @@ struct DeviceContact: Identifiable, Hashable {
 final class ContactsService {
     private(set) var contacts: [DeviceContact] = []
     private(set) var isDenied = false
+    /// True once the initial fetch has completed (with or without results) — lets the view tell
+    /// "still loading" apart from "loaded, but no Cuban numbers found", which would otherwise
+    /// both look like an empty `contacts` array and spin the loading indicator forever.
+    private(set) var isLoaded = false
 
     private let store = CNContactStore()
     private var hasLoaded = false
@@ -186,12 +190,17 @@ final class ContactsService {
         DispatchQueue.global(qos: .userInitiated).async { [store] in
             var results: [DeviceContact] = []
             try? store.enumerateContacts(with: request) { contact, _ in
-                guard let firstNumber = contact.phoneNumbers.first?.value.stringValue else { return }
+                // Skip contacts with no Cuban mobile number at all, even if a different
+                // (foreign) number is listed first — only Cuban numbers matter for USSD.
+                guard let cubanNumber = contact.phoneNumbers.lazy
+                    .compactMap({ Self.normalizeCubanMobile($0.value.stringValue) })
+                    .first
+                else { return }
                 let name = CNContactFormatter.string(from: contact, style: .fullName) ?? "Sin nombre"
                 results.append(DeviceContact(
                     id: contact.identifier,
                     name: name,
-                    phoneNumber: Self.normalize(firstNumber),
+                    phoneNumber: cubanNumber,
                     thumbnailImageData: contact.thumbnailImageData
                 ))
             }
@@ -199,6 +208,7 @@ final class ContactsService {
             Self.syncCallerIDExtension(with: sorted)
             DispatchQueue.main.async { [weak self] in
                 self?.contacts = sorted
+                self?.isLoaded = true
             }
         }
     }
@@ -216,14 +226,20 @@ final class ContactsService {
         CXCallDirectoryManager.sharedInstance.reloadExtension(withIdentifier: CallerIDStore.extensionBundleID) { _ in }
     }
 
-    /// USSD prompts take bare digits. Strips formatting and the Cuban country code so a
-    /// stored "+53 5 123 4567" becomes the 8-digit "51234567" these codes expect.
-    private static func normalize(_ rawNumber: String) -> String {
+    /// Only Cuban mobile numbers belong in this list — USSD codes are meaningless for anyone
+    /// else. Accepts either the bare 8-digit local form or `+53` plus 8 digits, and strips the
+    /// country code down to those 8 digits (e.g. "+53 5 123 4567" → "51234567"). Anything else
+    /// (a US `+1`, a Mexican `+52`, a malformed number, ...) returns `nil` and the contact — or
+    /// that specific number of theirs — is skipped entirely.
+    private static func normalizeCubanMobile(_ rawNumber: String) -> String? {
         let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
+        if digits.count == 8 {
+            return digits
+        }
         if digits.count == 10, digits.hasPrefix("53") {
             return String(digits.dropFirst(2))
         }
-        return digits
+        return nil
     }
 }
 

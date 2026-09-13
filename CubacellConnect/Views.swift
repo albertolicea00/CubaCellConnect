@@ -370,9 +370,15 @@ struct ContactsListView: View {
                         systemImage: "person.crop.circle.badge.exclamationmark",
                         description: Text("Actívalo en Ajustes del sistema › CubaCell Connect › Contactos.")
                     )
-                } else if service.contacts.isEmpty {
+                } else if !service.isLoaded {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if service.contacts.isEmpty {
+                    ContentUnavailableView(
+                        "Sin Contactos Cubanos",
+                        systemImage: "person.crop.circle.badge.questionmark",
+                        description: Text("No se encontró ningún contacto con número cubano (+53, 8 dígitos).")
+                    )
                 } else {
                     List {
                         ForEach(groupedContacts, id: \.letter) { group in
