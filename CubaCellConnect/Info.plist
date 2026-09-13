@@ -25,8 +25,12 @@
 		<string>tel</string>
 		<string>telprompt</string>
 	</array>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>Para mostrar tus contactos y llamarlos directamente desde la app.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

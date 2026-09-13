@@ -3,6 +3,7 @@ import Contacts
 import CoreTelephony
 import Foundation
 import Security
+import SQLite3
 import SwiftUI
 import UIKit
 
@@ -325,5 +326,134 @@ enum TransferPinStore {
 
     static func delete() {
         SecItemDelete(query as CFDictionary)
+    }
+}
+
+// MARK: - Directory Database
+
+/// The two schema shapes the on-device Truecaller-style dump can come in. The app never bundles
+/// or downloads either file itself — the user copies one (or both) into this app's Documents
+/// folder via Finder's "On My iPhone" file sharing (`UIFileSharingEnabled`) and the app just reads
+/// whatever it finds there. v1 is the default; v2 is picked explicitly once present.
+enum DirectoryDatabaseVersion: String, CaseIterable, Identifiable {
+    case v1
+    case v2
+
+    var id: String { rawValue }
+
+    /// Exact filename expected in Documents.
+    var filename: String {
+        switch self {
+        case .v1: return "database.v1.db"
+        case .v2: return "database.v2.db"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .v1: return "v1"
+        case .v2: return "v2"
+        }
+    }
+}
+
+/// One directory match: a number and the name it resolves to (blank for a few `fix` rows that
+/// carry no name in the source dump).
+struct DirectoryEntry: Identifiable, Hashable {
+    var id: String { number }
+    let number: String
+    let name: String
+}
+
+/// Reverse number/name lookup over whichever database version is present in Documents.
+/// v1 is a single `contacts(number, name, is_mobile)` table; v2 splits landline and mobile into
+/// separate `fix(number, name)` / `movil(number, name)` tables with no `is_mobile` column — v2's
+/// search merges both. Both databases are 400+MB with millions of rows and only `name` is
+/// indexed, so a name search is a full table scan: callers must run this off the main thread and
+/// keep queries short (`search` refuses under 3 characters) to bound how bad that scan gets.
+enum DirectoryDatabase {
+    private static let transientDestructor = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+
+    static func fileURL(for version: DirectoryDatabaseVersion) -> URL? {
+        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        else { return nil }
+        let url = documents.appendingPathComponent(version.filename)
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
+    static func isAvailable(_ version: DirectoryDatabaseVersion) -> Bool {
+        fileURL(for: version) != nil
+    }
+
+    /// Case-insensitive substring match on name, or prefix match on number — capped at `limit`
+    /// results. Returns `[]` for a query under 3 characters or when the file isn't present.
+    /// Synchronous and potentially slow (see type-level note) — call from a background task.
+    static func search(_ query: String, version: DirectoryDatabaseVersion, limit: Int32 = 100) -> [DirectoryEntry] {
+        let trimmed = query.trimmingCharacters(in: .whitespaces)
+        guard trimmed.count >= 3, let url = fileURL(for: version) else { return [] }
+
+        var db: OpaquePointer?
+        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
+            return []
+        }
+        defer { sqlite3_close(db) }
+
+        let namePattern = "%\(trimmed)%"
+        let numberPattern = "\(trimmed)%"
+
+        switch version {
+        case .v1:
+            return rows(
+                db: db,
+                table: "contacts",
+                namePattern: namePattern,
+                numberPattern: numberPattern,
+                limit: limit
+            )
+        case .v2:
+            let mobile = rows(
+                db: db,
+                table: "movil",
+                namePattern: namePattern,
+                numberPattern: numberPattern,
+                limit: limit
+            )
+            guard mobile.count < limit else { return mobile }
+            let landline = rows(
+                db: db,
+                table: "fix",
+                namePattern: namePattern,
+                numberPattern: numberPattern,
+                limit: limit - Int32(mobile.count)
+            )
+            return mobile + landline
+        }
+    }
+
+    private static func rows(
+        db: OpaquePointer,
+        table: String,
+        namePattern: String,
+        numberPattern: String,
+        limit: Int32
+    ) -> [DirectoryEntry] {
+        let sql = "SELECT number, name FROM \(table) WHERE name LIKE ? OR number LIKE ? LIMIT ?;"
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
+            return []
+        }
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_text(statement, 1, namePattern, -1, transientDestructor)
+        sqlite3_bind_text(statement, 2, numberPattern, -1, transientDestructor)
+        sqlite3_bind_int(statement, 3, limit)
+
+        var results: [DirectoryEntry] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            guard let numberCString = sqlite3_column_text(statement, 0) else { continue }
+            let name = sqlite3_column_text(statement, 1).map { String(cString: $0) } ?? ""
+            results.append(DirectoryEntry(number: String(cString: numberCString), name: name))
+        }
+        return results
     }
 }

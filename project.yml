@@ -25,6 +25,8 @@ targets:
           - tel
           - telprompt
         NSContactsUsageDescription: Para mostrar tus contactos y llamarlos directamente desde la app.
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.cubacellconnect.app

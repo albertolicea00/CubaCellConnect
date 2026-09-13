@@ -204,6 +204,47 @@ struct ContactRowView: View {
     .environment(AccentColorStore())
 }
 
+// MARK: - Directory Entry Row
+
+/// One reverse-lookup result: name (or "Sin Nombre" — v2's `fix` table has a few blank ones) and
+/// number, with a dedicated call button — same shape as `ContactRowView`, without a USSD code.
+struct DirectoryEntryRowView: View {
+    let entry: DirectoryEntry
+
+    @Environment(AccentColorStore.self) private var accentColorStore
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.name.isEmpty ? "Sin Nombre" : entry.name)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.appForeground)
+                Text(entry.number)
+                    .font(AppTheme.codeFont(size: 14))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                DialService.dial(entry.number)
+            } label: {
+                Image(systemName: "phone.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(accentColorStore.color)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    DirectoryEntryRowView(entry: DirectoryEntry(number: "51234567", name: "Juan Pérez"))
+        .padding()
+        .environment(AccentColorStore())
+}
+
 // MARK: - Connection Status Banner
 
 /// Warns when cellular signal is absent or weak, since USSD codes need voice-network

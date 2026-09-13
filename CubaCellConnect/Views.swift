@@ -810,6 +810,14 @@ struct SettingsView: View {
                     }
                 }
 
+                Section {
+                    NavigationLink {
+                        DirectorySearchView()
+                    } label: {
+                        Label("Buscar en Directorio", systemImage: "magnifyingglass")
+                    }
+                }
+
                 Section("Clave de Transferencia") {
                     Button {
                         showingChangePin = true
@@ -863,6 +871,103 @@ struct SettingsView: View {
             .sheet(isPresented: $showingSavePin) {
                 SavedTransferPinSheet()
             }
+        }
+    }
+}
+
+/// Ajustes › Buscar en Directorio — reverse number/name lookup over whichever
+/// `DirectoryDatabaseVersion` file the user has copied into this app's Documents folder (Finder
+/// file sharing; the app never downloads or bundles either one itself). Defaults to v1; the
+/// segmented picker to switch to v2 only shows once more than one version is actually present.
+struct DirectorySearchView: View {
+    @AppStorage("directoryDatabaseVersion") private var versionRaw = DirectoryDatabaseVersion.v1.rawValue
+
+    @State private var query = ""
+    @State private var results: [DirectoryEntry] = []
+    @State private var isSearching = false
+
+    private var version: DirectoryDatabaseVersion {
+        DirectoryDatabaseVersion(rawValue: versionRaw) ?? .v1
+    }
+
+    private var availableVersions: [DirectoryDatabaseVersion] {
+        DirectoryDatabaseVersion.allCases.filter { DirectoryDatabase.isAvailable($0) }
+    }
+
+    private var isDatabaseAvailable: Bool {
+        DirectoryDatabase.isAvailable(version)
+    }
+
+    /// Below this length a name search would be an unbounded full-table scan over millions of
+    /// rows for almost no signal — `DirectoryDatabase.search` refuses it too; this just keeps the
+    /// empty-state message from flashing "sin resultados" while the user is still typing.
+    private var queryIsLongEnough: Bool {
+        query.trimmingCharacters(in: .whitespaces).count >= 3
+    }
+
+    var body: some View {
+        List {
+            if availableVersions.count > 1 {
+                Section {
+                    Picker("Base de Datos", selection: $versionRaw) {
+                        ForEach(availableVersions) { version in
+                            Text(version.displayName).tag(version.rawValue)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+            }
+
+            if !isDatabaseAvailable {
+                ContentUnavailableView(
+                    "Sin Base de Datos",
+                    systemImage: "externaldrive.badge.questionmark",
+                    description: Text("Copia \(version.filename) a los archivos de esta app desde Finder (tu iPhone › CubaCell Connect) para poder buscar.")
+                )
+            } else {
+                Section {
+                    ForEach(results) { entry in
+                        DirectoryEntryRowView(entry: entry)
+                    }
+
+                    if isSearching {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                            Spacer()
+                        }
+                    } else if queryIsLongEnough, results.isEmpty {
+                        Text("Sin resultados")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .searchable(text: $query, prompt: "Nombre o número")
+        .navigationTitle("Buscar en Directorio")
+        .navigationBarTitleDisplayMode(.inline)
+        .task(id: query) {
+            guard isDatabaseAvailable, queryIsLongEnough else {
+                isSearching = false
+                results = []
+                return
+            }
+            isSearching = true
+            // Debounce: wait out a pause in typing before paying for a scan over a
+            // multi-million-row table, and bail if a newer keystroke already superseded us.
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            guard !Task.isCancelled else { return }
+
+            let searchQuery = query
+            let searchVersion = version
+            let found = await Task.detached(priority: .userInitiated) {
+                DirectoryDatabase.search(searchQuery, version: searchVersion)
+            }.value
+
+            guard !Task.isCancelled else { return }
+            results = found
+            isSearching = false
         }
     }
 }
