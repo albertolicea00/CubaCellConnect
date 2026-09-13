@@ -559,13 +559,13 @@ private struct ContactCallOptionsSheet: View {
         Form {
             Section {
                 VStack(spacing: 8) {
-                    ContactAvatarView(contact: contact, size: 64)
+                    ContactAvatarView(contact: contact, size: 54)
 
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         Text(contact.name)
                             .font(.title2.weight(.semibold))
                         Text(contact.phoneNumber)
-                            .font(AppTheme.codeFont(size: 18))
+                            .font(AppTheme.codeFont(size: 16))
                             .foregroundStyle(.secondary)
                     }
                 }
