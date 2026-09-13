@@ -39,7 +39,6 @@ struct HomeView: View {
 struct CategoryListView: View {
     let category: USSDCategory
 
-    @Environment(USSDCodeStore.self) private var store
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @State private var pendingInputCode: USSDCode?
     @State private var inputText = ""
@@ -52,10 +51,20 @@ struct CategoryListView: View {
                 }
 
                 List {
-                    ForEach(store.codes(in: category)) { code in
-                        CodeRowView(code: code)
-                            .contentShape(Rectangle())
-                            .onTapGesture { select(code) }
+                    ForEach(category.groups) { group in
+                        Section {
+                            ForEach(group.codes) { code in
+                                CodeRowView(code: code)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture { select(code) }
+                            }
+                        } header: {
+                            if let name = group.name {
+                                Text(name)
+                                    .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(Color.brandCyan)
+                            }
+                        }
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -135,10 +144,6 @@ struct SettingsView: View {
                     SettingsInfoRow(
                         title: "Códigos que piden un dato",
                         text: "Algunos códigos, como recargar con tarjeta, necesitan un número adicional (p. ej. *662*{tarjeta}#). Al tocarlos, primero se pide ese dato y luego se marca el código completo."
-                    )
-                    SettingsInfoRow(
-                        title: "Mnemotecnia",
-                        text: "Algunos códigos muestran una ayuda del teclado, p. ej. 328 = DAT, 266 = BON, 869 = VOZ — los dígitos deletrean el nombre del servicio en el teclado telefónico, como recordatorio."
                     )
                 }
 

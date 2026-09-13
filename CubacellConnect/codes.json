@@ -1,185 +1,365 @@
 {
-  "version": 1,
+  "version": 2,
   "carrier": "ETECSA (Cubacel)",
   "categories": [
-    { "id": "balance", "name": "Saldo y Planes", "icon": "gauge" },
-    { "id": "purchase", "name": "Compras y Recargas", "icon": "cart" },
-    { "id": "transfer", "name": "Transferencias", "icon": "arrow.left.arrow.right" },
-    { "id": "utilities", "name": "Otras Utilidades", "icon": "wrench.and.screwdriver" }
-  ],
-  "codes": [
     {
-      "id": "main-balance",
-      "code": "*222#",
-      "title": "Saldo Principal",
-      "details": "Consulta tu saldo, minutos, SMS y datos.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": null
+      "id": "balance",
+      "name": "Saldo y Planes",
+      "icon": "gauge",
+      "groups": [
+        {
+          "name": null,
+          "codes": [
+            {
+              "id": "main-balance",
+              "code": "*222#",
+              "title": "Saldo Principal",
+              "details": "Consulta tu saldo, minutos, SMS y datos.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-plan",
+              "code": "*222*328#",
+              "title": "Plan de Datos",
+              "details": "Consulta tu plan de datos contratado.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "bonus-usd-plans",
+              "code": "*222*266#",
+              "title": "Bonos y Planes en USD",
+              "details": "Consulta tus bonos y planes en USD.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "voice-plan",
+              "code": "*222*869#",
+              "title": "Plan de Voz",
+              "details": "Consulta tu plan de voz contratado.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-plan",
+              "code": "*222*767#",
+              "title": "Plan de SMS",
+              "details": "Consulta tu plan de SMS contratado.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "friends-plan",
+              "code": "*222*264#",
+              "title": "Estado del Plan Amigos",
+              "details": "Consulta el estado de tu Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "postpaid-balance",
+              "code": "*111#",
+              "title": "Saldo Pospago",
+              "details": "Consulta tu saldo pospago o institucional.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-availability",
+              "code": "*222*468#",
+              "title": "Disponibilidad de Datos Móviles",
+              "details": "Verifica si tienes datos móviles activos.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "data-plan",
-      "code": "*222*328#",
-      "title": "Plan de Datos",
-      "details": "Consulta tu plan de datos contratado.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": "328 = DAT (datos)"
+      "id": "purchase",
+      "name": "Compras y Recargas",
+      "icon": "cart",
+      "groups": [
+        {
+          "name": "Datos",
+          "codes": [
+            {
+              "id": "data-pay-per-use",
+              "code": "*133*1*1#",
+              "title": "Tarifa por Consumo",
+              "details": "Activa el cobro de datos por consumo, sin plan fijo.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-todus-plan",
+              "code": "*133*1*2#",
+              "title": "Plan ToDus",
+              "details": "$25.00 — datos para la app ToDus.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-daily-plan",
+              "code": "*133*1*3#",
+              "title": "Plan Diario",
+              "details": "$25.00 x 200MB.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-bundle-45gb",
+              "code": "*133*1*4*1#",
+              "title": "Bono de 4.5GB",
+              "details": "$240.00 x 4.5GB.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-bundle-2gb-combo",
+              "code": "*133*1*4*2#",
+              "title": "Combo 2GB + Min + SMS",
+              "details": "$120.00 x 2GB + 15MIN + 20SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-bundle-4gb-combo",
+              "code": "*133*1*4*3#",
+              "title": "Combo 4GB + Min + SMS",
+              "details": "$240.00 x 4GB + 35MIN + 40SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "data-bundle-6gb-combo",
+              "code": "*133*1*4*4#",
+              "title": "Combo 6GB + Min + SMS",
+              "details": "$360.00 x 6GB + 60MIN + 70SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "SMS",
+          "codes": [
+            {
+              "id": "sms-bundle-20",
+              "code": "*133*2*1#",
+              "title": "Plan de 20 SMS",
+              "details": "$15.00 x 20SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-bundle-50",
+              "code": "*133*2*2#",
+              "title": "Plan de 50 SMS",
+              "details": "$30.00 x 50SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-bundle-90",
+              "code": "*133*2*3#",
+              "title": "Plan de 90 SMS",
+              "details": "$50.00 x 90SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-bundle-120",
+              "code": "*133*2*4#",
+              "title": "Plan de 120 SMS",
+              "details": "$60.00 x 120SMS.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Voz",
+          "codes": [
+            {
+              "id": "voice-bundle-5min",
+              "code": "*133*3*1#",
+              "title": "Plan de 5 Minutos",
+              "details": "$37.50 x 5MIN.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "voice-bundle-10min",
+              "code": "*133*3*2#",
+              "title": "Plan de 10 Minutos",
+              "details": "$72.50 x 10MIN.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "voice-bundle-15min",
+              "code": "*133*3*3#",
+              "title": "Plan de 15 Minutos",
+              "details": "$105.00 x 15MIN.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "voice-bundle-25min",
+              "code": "*133*3*4#",
+              "title": "Plan de 25 Minutos",
+              "details": "$162.50 x 25MIN.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "voice-bundle-40min",
+              "code": "*133*3*5#",
+              "title": "Plan de 40 Minutos",
+              "details": "$250.00 x 40MIN.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Plan Amigos",
+          "codes": [
+            {
+              "id": "friends-plan-toggle",
+              "code": "*133*4*1#",
+              "title": "Plan Amigos: Activar/Desactivar",
+              "details": "Activa o desactiva el Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "friends-plan-add",
+              "code": "*133*4*2*1#",
+              "title": "Plan Amigos: Agregar Amigo",
+              "details": "Agrega un número al Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "friends-plan-remove",
+              "code": "*133*4*2*2#",
+              "title": "Plan Amigos: Eliminar Amigo",
+              "details": "Elimina un número del Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "friends-plan-status",
+              "code": "*133*4*3#",
+              "title": "Plan Amigos: Consultar Plan",
+              "details": "Consulta el estado de tu Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Recargas",
+          "codes": [
+            {
+              "id": "recharge-card",
+              "code": "*662*{input}#",
+              "title": "Recargar con Tarjeta",
+              "details": "Recarga tu saldo con una tarjeta prepago.",
+              "type": "ussd",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de tarjeta"
+            },
+            {
+              "id": "recharge-call",
+              "code": "*666",
+              "title": "Recargar por Llamada",
+              "details": "Recarga tu saldo llamando a este número.",
+              "type": "call",
+              "requiresInput": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "bonus-usd-plans",
-      "code": "*222*266#",
-      "title": "Bonos y Planes en USD",
-      "details": "Consulta tus bonos y planes en USD.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": "266 = BON (bono)"
+      "id": "transfer",
+      "name": "Transferencias",
+      "icon": "arrow.left.arrow.right",
+      "groups": [
+        {
+          "name": null,
+          "codes": [
+            {
+              "id": "transfer-menu",
+              "code": "*234#",
+              "title": "Menú de Transferencias",
+              "details": "Transfiere saldo o cambia tu PIN.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "voice-plan",
-      "code": "*222*869#",
-      "title": "Plan de Voz",
-      "details": "Consulta tu plan de voz contratado.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": "869 = VOZ (voz)"
-    },
-    {
-      "id": "sms-plan",
-      "code": "*222*767#",
-      "title": "Plan de SMS",
-      "details": "Consulta tu plan de SMS contratado.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": "767 = SMS"
-    },
-    {
-      "id": "friends-plan",
-      "code": "*222*264#",
-      "title": "Estado del Plan Amigos",
-      "details": "Consulta el estado de tu Plan Amigos.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": "264 = AMG (amigos)"
-    },
-    {
-      "id": "postpaid-balance",
-      "code": "*111#",
-      "title": "Saldo Pospago",
-      "details": "Consulta tu saldo pospago o institucional.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": null
-    },
-    {
-      "id": "data-availability",
-      "code": "*222*468#",
-      "title": "Disponibilidad de Datos Móviles",
-      "details": "Verifica si tienes datos móviles activos.",
-      "category": "balance",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": "468 = INT (internet)"
-    },
-    {
-      "id": "purchase-menu",
-      "code": "*133#",
-      "title": "Menú de Compras",
-      "details": "Compra datos, voz, SMS o combos.",
-      "category": "purchase",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": null
-    },
-    {
-      "id": "recharge-card",
-      "code": "*662*{input}#",
-      "title": "Recargar con Tarjeta",
-      "details": "Recarga tu saldo con una tarjeta prepago.",
-      "category": "purchase",
-      "type": "ussd",
-      "requiresInput": true,
-      "inputPlaceholder": "Número de tarjeta",
-      "mnemonic": null
-    },
-    {
-      "id": "recharge-call",
-      "code": "*666",
-      "title": "Recargar por Llamada",
-      "details": "Recarga tu saldo llamando a este número.",
-      "category": "purchase",
-      "type": "call",
-      "requiresInput": false,
-      "mnemonic": null
-    },
-    {
-      "id": "transfer-menu",
-      "code": "*234#",
-      "title": "Menú de Transferencias",
-      "details": "Transfiere saldo o cambia tu PIN.",
-      "category": "transfer",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": null
-    },
-    {
-      "id": "customer-service",
-      "code": "*2266",
-      "title": "Atención al Cliente",
-      "details": "Llama a Atención al Cliente de ETECSA.",
-      "category": "utilities",
-      "type": "call",
-      "requiresInput": false,
-      "mnemonic": null
-    },
-    {
-      "id": "collect-call",
-      "code": "*99{input}",
-      "title": "Llamada por Cobrar",
-      "details": "Llama sin saldo; paga quien recibe.",
-      "category": "utilities",
-      "type": "call",
-      "requiresInput": true,
-      "inputPlaceholder": "Número de teléfono",
-      "mnemonic": null
-    },
-    {
-      "id": "private-call",
-      "code": "#31#{input}",
-      "title": "Llamada Privada",
-      "details": "Llama ocultando tu número.",
-      "category": "utilities",
-      "type": "call",
-      "requiresInput": true,
-      "inputPlaceholder": "Número de teléfono",
-      "mnemonic": null
-    },
-    {
-      "id": "imei",
-      "code": "*#06#",
-      "title": "Mostrar IMEI",
-      "details": "Muestra el IMEI de tu teléfono.",
-      "category": "utilities",
-      "type": "ussd",
-      "requiresInput": false,
-      "mnemonic": null
-    },
-    {
-      "id": "voicemail",
-      "code": "*123",
-      "title": "Buzón de Voz",
-      "details": "Accede a tu buzón de voz.",
-      "category": "utilities",
-      "type": "call",
-      "requiresInput": false,
-      "mnemonic": null
+      "id": "utilities",
+      "name": "Otras Utilidades",
+      "icon": "wrench.and.screwdriver",
+      "groups": [
+        {
+          "name": null,
+          "codes": [
+            {
+              "id": "customer-service",
+              "code": "*2266",
+              "title": "Atención al Cliente",
+              "details": "Llama a Atención al Cliente de ETECSA.",
+              "type": "call",
+              "requiresInput": false
+            },
+            {
+              "id": "collect-call",
+              "code": "*99{input}",
+              "title": "Llamada por Cobrar",
+              "details": "Llama sin saldo; paga quien recibe.",
+              "type": "call",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de teléfono"
+            },
+            {
+              "id": "private-call",
+              "code": "#31#{input}",
+              "title": "Llamada Privada",
+              "details": "Llama ocultando tu número.",
+              "type": "call",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de teléfono"
+            },
+            {
+              "id": "imei",
+              "code": "*#06#",
+              "title": "Mostrar IMEI",
+              "details": "Muestra el IMEI de tu teléfono.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "voicemail",
+              "code": "*123",
+              "title": "Buzón de Voz",
+              "details": "Accede a tu buzón de voz.",
+              "type": "call",
+              "requiresInput": false
+            }
+          ]
+        }
+      ]
     }
   ]
 }

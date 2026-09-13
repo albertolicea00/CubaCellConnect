@@ -11,18 +11,17 @@ enum USSDActionType: String, Codable {
     case call
 }
 
-/// A single ETECSA (Cubacel) service code.
+/// A single ETECSA (Cubacel) service code. Its category and group are implied by where it sits
+/// in the catalog's nested JSON — a code carries no category/group tag of its own.
 struct USSDCode: Identifiable, Codable, Hashable {
     let id: String
     /// Raw code. May contain the `{input}` placeholder when user input is required.
     let code: String
     let title: String
     let details: String
-    let category: String
     let type: USSDActionType
     let requiresInput: Bool
     let inputPlaceholder: String?
-    let mnemonic: String?
 
     /// Code with the user-provided input substituted in.
     func resolvedCode(input: String = "") -> String {
@@ -30,12 +29,21 @@ struct USSDCode: Identifiable, Codable, Hashable {
     }
 }
 
-/// A group of related service codes.
+/// A named sub-heading of codes within a category's list, e.g. "Datos", "SMS", "Voz" inside
+/// Compras y Recargas. `name` is nil for a category with no sub-grouping, and renders with no header.
+struct USSDCodeGroup: Identifiable, Codable, Hashable {
+    var id: String { name ?? "_" }
+    let name: String?
+    let codes: [USSDCode]
+}
+
+/// A category of related service codes, shown as one tab.
 struct USSDCategory: Identifiable, Codable, Hashable {
     let id: String
     let name: String
     /// SF Symbol name used in the UI.
     let icon: String
+    let groups: [USSDCodeGroup]
 }
 
 /// Root shape of the bundled `codes.json` catalog.
@@ -43,7 +51,6 @@ struct USSDCatalog: Codable {
     let version: Int
     let carrier: String
     let categories: [USSDCategory]
-    let codes: [USSDCode]
 }
 
 // MARK: - Brand Palette

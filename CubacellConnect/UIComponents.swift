@@ -38,11 +38,9 @@ struct CodeRowView: View {
         code: "*222#",
         title: "Saldo Principal",
         details: "Consulta tu saldo, minutos, SMS y datos.",
-        category: "balance",
         type: .ussd,
         requiresInput: false,
-        inputPlaceholder: nil,
-        mnemonic: "328 = DAT (datos)"
+        inputPlaceholder: nil
     ))
     .padding()
 }

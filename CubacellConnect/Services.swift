@@ -7,19 +7,15 @@ let AppBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
 
 // MARK: - Catalog Store
 
-/// Loads and exposes the bundled USSD code catalog.
+/// Loads and exposes the bundled USSD code catalog. Categories carry their own groups and
+/// codes (see `USSDCategory`/`USSDCodeGroup`), so no separate flat lookup is needed here.
 @Observable
 final class USSDCodeStore {
     private(set) var categories: [USSDCategory] = []
-    private(set) var codes: [USSDCode] = []
     private(set) var carrier: String = ""
 
     init(bundle: Bundle = .main) {
         load(from: bundle)
-    }
-
-    func codes(in category: USSDCategory) -> [USSDCode] {
-        codes.filter { $0.category == category.id }
     }
 
     private func load(from bundle: Bundle) {
@@ -31,7 +27,6 @@ final class USSDCodeStore {
             return
         }
         categories = catalog.categories
-        codes = catalog.codes
         carrier = catalog.carrier
     }
 }
