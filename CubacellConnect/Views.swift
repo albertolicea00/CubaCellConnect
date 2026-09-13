@@ -79,21 +79,6 @@ enum HomeTab: String, CaseIterable, Identifiable {
         .environment(USSDCodeStore())
 }
 
-/// How the Contactos row's call button behaves — configurable in Ajustes › Preferencias.
-enum ContactCallMode: String, CaseIterable, Identifiable {
-    case separateButtons, collectDefault, anonymousDefault
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .separateButtons: return "Dos botones separados"
-        case .collectDefault: return "Llamar con 99 directo"
-        case .anonymousDefault: return "Llamar Anónimo directo"
-        }
-    }
-}
-
 // MARK: - Home Quick Actions
 
 /// The Home tab: one system `List` (same `.insetGrouped` style as every other tab), with
@@ -405,15 +390,14 @@ struct ContactsListView: View {
     }
 }
 
-/// One contact row: name + number, then a single round call button offering a choice between
-/// hidden caller ID (`#31#`) and collect call (`*99`) — mirroring the old Llamada Privada /
-/// Llamada por Cobrar codes, just applied directly to a picked contact instead of a manually
-/// typed number.
+/// One contact row: name + number. Swiping reveals a call action on each side — collect call
+/// (`*99`) trailing, hidden caller ID (`#31#`) leading — and tapping the row opens a bottom
+/// sheet with both choices, mirroring the old Llamada por Cobrar / Llamada Privada codes,
+/// just applied directly to a picked contact instead of a manually typed number.
 private struct ContactCallRowView: View {
     let contact: DeviceContact
 
-    @AppStorage("contactCallMode") private var modeRaw = ContactCallMode.separateButtons.rawValue
-    private var mode: ContactCallMode { ContactCallMode(rawValue: modeRaw) ?? .separateButtons }
+    @State private var showingCallOptions = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -427,62 +411,75 @@ private struct ContactCallRowView: View {
             }
 
             Spacer()
-
-            switch mode {
-            case .separateButtons:
-                Button {
-                    DialService.dial("#31#\(contact.phoneNumber)")
-                } label: {
-                    anonymousButtonIcon
-                }
-                .accessibilityLabel("Llamar Anónimo")
-
-                Button {
-                    DialService.dial("*99\(contact.phoneNumber)")
-                } label: {
-                    collectButtonIcon
-                }
-                .accessibilityLabel("Llamar con 99")
-
-            case .collectDefault:
-                Button {
-                    DialService.dial("*99\(contact.phoneNumber)")
-                } label: {
-                    collectButtonIcon
-                }
-                .accessibilityLabel("Llamar con 99")
-
-            case .anonymousDefault:
-                Button {
-                    DialService.dial("#31#\(contact.phoneNumber)")
-                } label: {
-                    anonymousButtonIcon
-                }
-                .accessibilityLabel("Llamar Anónimo")
-            }
         }
         .padding(.vertical, 2)
-    }
-
-    private var anonymousButtonIcon: some View {
-        Image(systemName: "shield.lefthalf.filled")
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(.white)
-            .frame(width: 32, height: 32)
-            .background(Color.brandCyan, in: Circle())
-    }
-
-    private var collectButtonIcon: some View {
-        HStack(spacing: 3) {
-            Image(systemName: "phone.fill")
-                .font(.system(size: 11, weight: .semibold))
-            Text("99")
-                .font(.system(size: 12, weight: .bold))
+        .contentShape(Rectangle())
+        .onTapGesture {
+            showingCallOptions = true
         }
-        .foregroundStyle(.white)
-        .frame(height: 32)
-        .padding(.horizontal, 10)
-        .background(Color.brandCyan, in: Capsule())
+        .swipeActions(edge: .leading) {
+            Button {
+                DialService.dial("#31#\(contact.phoneNumber)")
+            } label: {
+                Label("Anónimo", systemImage: "shield.lefthalf.filled")
+            }
+            .tint(.brandCyan)
+        }
+        .swipeActions(edge: .trailing) {
+            Button {
+                DialService.dial("*99\(contact.phoneNumber)")
+            } label: {
+                Label("99", systemImage: "phone.fill")
+            }
+            .tint(.brandCyan)
+        }
+        .sheet(isPresented: $showingCallOptions) {
+            ContactCallOptionsSheet(contact: contact)
+        }
+    }
+}
+
+/// Bottom sheet shown when a contact row is tapped: pick between collect call (`*99`) and
+/// hidden caller ID (`#31#`).
+private struct ContactCallOptionsSheet: View {
+    let contact: DeviceContact
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 2) {
+                Text(contact.name)
+                    .font(.headline)
+                Text(contact.phoneNumber)
+                    .font(AppTheme.codeFont(size: 14))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.top, 8)
+
+            Button {
+                DialService.dial("*99\(contact.phoneNumber)")
+                dismiss()
+            } label: {
+                Label("Llamar con 99", systemImage: "phone.fill")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.brandCyan)
+
+            Button {
+                DialService.dial("#31#\(contact.phoneNumber)")
+                dismiss()
+            } label: {
+                Label("Llamar Anónimo", systemImage: "shield.lefthalf.filled")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.brandCyan)
+        }
+        .controlSize(.large)
+        .padding(24)
+        .presentationDetents([.height(230)])
     }
 }
 
@@ -646,7 +643,6 @@ private struct PreferencesSettingsView: View {
     @AppStorage("darkModePreference") private var darkMode: Int = 0
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
-    @AppStorage("contactCallMode") private var contactCallMode = ContactCallMode.separateButtons.rawValue
 
     var body: some View {
         Form {
@@ -676,18 +672,6 @@ private struct PreferencesSettingsView: View {
                 Text("Inicio")
             } footer: {
                 Text("La pestaña que se muestra al abrir la app.")
-            }
-
-            Section {
-                Picker("Llamada desde Contactos", selection: $contactCallMode) {
-                    ForEach(ContactCallMode.allCases) { mode in
-                        Text(mode.displayName).tag(mode.rawValue)
-                    }
-                }
-            } header: {
-                Text("Contactos")
-            } footer: {
-                Text("Cómo se llama a un contacto: con los dos botones a la vista, o directo por Anónimo o por 99.")
             }
         }
         .navigationTitle("Preferencias")
