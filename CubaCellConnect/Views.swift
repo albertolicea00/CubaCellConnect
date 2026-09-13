@@ -95,6 +95,13 @@ struct HomeQuickActionsView: View {
     @State private var showingContactPicker = false
     @State private var showsInvalidNumberWarning = false
 
+    /// `true` while `pin` holds the value just loaded from `TransferPinStore` and not yet typed
+    /// over by the user — drives whether the "Clave" field masks itself (see `PinRevealField`).
+    @State private var pinIsFromStore = false
+    /// Set right before assigning `pin` from the store so the `onChange(of: pin)` below can tell
+    /// that mutation apart from the user actually typing, instead of immediately unmasking it.
+    @State private var isLoadingStoredPin = false
+
     private var isTransferDisabled: Bool {
         phoneNumber.trimmingCharacters(in: .whitespaces).isEmpty
             || pin.trimmingCharacters(in: .whitespaces).isEmpty
@@ -176,9 +183,7 @@ struct HomeQuickActionsView: View {
                         }
 
                         HStack(spacing: 12) {
-                            TextField("Clave", text: $pin)
-                                .textContentType(.password)
-                                .keyboardType(.numberPad)
+                            PinRevealField(title: "Clave", text: $pin, isMasked: pinIsFromStore)
                             Divider()
                             TextField("Monto", text: $amount)
                                 .keyboardType(.numberPad)
@@ -268,7 +273,16 @@ struct HomeQuickActionsView: View {
         }
         .onAppear {
             if pin.isEmpty, let saved = TransferPinStore.load() {
+                isLoadingStoredPin = true
                 pin = saved
+            }
+        }
+        .onChange(of: pin) {
+            if isLoadingStoredPin {
+                pinIsFromStore = true
+                isLoadingStoredPin = false
+            } else {
+                pinIsFromStore = false
             }
         }
     }
@@ -507,6 +521,10 @@ private struct ContactCallOptionsSheet: View {
     @State private var pin = ""
     @State private var amount = ""
 
+    /// Same store-vs-typed tracking as Home's Transferir — see `HomeQuickActionsView`.
+    @State private var pinIsFromStore = false
+    @State private var isLoadingStoredPin = false
+
     private var isTransferDisabled: Bool {
         pin.trimmingCharacters(in: .whitespaces).isEmpty
             || amount.trimmingCharacters(in: .whitespaces).isEmpty
@@ -560,9 +578,7 @@ private struct ContactCallOptionsSheet: View {
 
             Section("Transferir Saldo") {
                 HStack(spacing: 12) {
-                    TextField("Clave", text: $pin)
-                        .textContentType(.password)
-                        .keyboardType(.numberPad)
+                    PinRevealField(title: "Clave", text: $pin, isMasked: pinIsFromStore)
                     Divider()
                     TextField("Monto", text: $amount)
                         .keyboardType(.numberPad)
@@ -585,7 +601,16 @@ private struct ContactCallOptionsSheet: View {
         .presentationDragIndicator(.visible)
         .onAppear {
             if pin.isEmpty, let saved = TransferPinStore.load() {
+                isLoadingStoredPin = true
                 pin = saved
+            }
+        }
+        .onChange(of: pin) {
+            if isLoadingStoredPin {
+                pinIsFromStore = true
+                isLoadingStoredPin = false
+            } else {
+                pinIsFromStore = false
             }
         }
     }
@@ -863,9 +888,7 @@ private struct SavedTransferPinSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Clave", text: $pin)
-                        .textContentType(.password)
-                        .keyboardType(.numberPad)
+                    PinRevealField(title: "Clave", text: $pin, isMasked: true)
                 } footer: {
                     Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
                 }

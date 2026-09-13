@@ -44,6 +44,44 @@ struct ContactPickerView: UIViewControllerRepresentable {
     }
 }
 
+// MARK: - Pin Reveal Field
+
+/// A "Clave" field that masks itself with dots plus an eye toggle when `isMasked` is true (the
+/// value came from a saved/system password — `TransferPinStore` or Apple Passwords autofill),
+/// and shows plain text with no toggle when `isMasked` is false (the user is typing it in by
+/// hand, so there's nothing to hide from them).
+struct PinRevealField: View {
+    let title: String
+    @Binding var text: String
+    var isMasked: Bool
+
+    @State private var isRevealed = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Group {
+                if isMasked && !isRevealed {
+                    SecureField(title, text: $text)
+                } else {
+                    TextField(title, text: $text)
+                }
+            }
+            .textContentType(.password)
+            .keyboardType(.numberPad)
+
+            if isMasked {
+                Button {
+                    isRevealed.toggle()
+                } label: {
+                    Image(systemName: isRevealed ? "eye.slash" : "eye")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+
 // MARK: - Code Row
 
 /// One row in the code list: title, plus a trailing price when the code has one. A priced code's
