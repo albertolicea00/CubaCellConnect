@@ -97,7 +97,6 @@ struct HomeQuickActionsView: View {
     @State private var amount = ""
     @State private var cardNumber = ""
     @State private var showingContactPicker = false
-    @State private var debugShowSpeedTest = false
     @State private var showsInvalidNumberWarning = false
 
     /// `true` while `pin` holds the value just loaded from `TransferPinStore` and not yet typed
@@ -276,13 +275,7 @@ struct HomeQuickActionsView: View {
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .sheet(isPresented: $debugShowSpeedTest) {
-            NavigationStack {
-                SpeedTestView()
-            }
-        }
         .onAppear {
-            debugShowSpeedTest = true
             if pin.isEmpty, let saved = TransferPinStore.load() {
                 isLoadingStoredPin = true
                 pin = saved
@@ -1588,7 +1581,6 @@ struct SpeedTestView: View {
         }
         .navigationTitle("Prueba de Velocidad")
         .navigationBarTitleDisplayMode(.inline)
-        .task { runner.start() } // TEMP DEBUG — remove after.
         .onDisappear {
             runner.cancel()
         }
