@@ -17,7 +17,7 @@
 
 /* Begin PBXFileReference section */
 		2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponents.swift; sourceTree = "<group>"; };
-		39C162F860A97892042A87C0 /* CubaCellConnect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		39C162F860A97892042A87C0 /* CubaCellConnect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		767C11CEA2E45E76EA941172 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		ABCF6546FD849E3569404C90 /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
 		B42F76B0A40014FFAE60B01C /* CubaCellConnectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubaCellConnectApp.swift; sourceTree = "<group>"; };
@@ -86,10 +86,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
-			buildConfigurationList = 2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubaCellConnect" */;
+			buildConfigurationList = 2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubacellConnect" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -197,6 +195,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7W3D3JL6PV;
 				INFOPLIST_FILE = CubaCellConnect/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -216,6 +215,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7W3D3JL6PV;
 				INFOPLIST_FILE = CubaCellConnect/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -295,7 +295,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubaCellConnect" */ = {
+		2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubacellConnect" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E902A6AA461F49BB27195211 /* Debug */,
