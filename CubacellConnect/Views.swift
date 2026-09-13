@@ -443,47 +443,93 @@ private struct ContactCallRowView: View {
     }
 }
 
-/// Bottom sheet shown when a contact row is tapped: pick between collect call (`*99`) and
-/// hidden caller ID (`#31#`).
+/// Bottom sheet shown when a contact row is tapped: call the contact (collect via `*99` or
+/// hidden caller ID via `#31#`), or transfer balance to it — same Clave/Monto form as Home's
+/// Transferir, just with the number already filled in from the contact.
 private struct ContactCallOptionsSheet: View {
     let contact: DeviceContact
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(USSDCodeStore.self) private var store
+
+    @State private var pin = ""
+    @State private var amount = ""
+
+    private var isTransferDisabled: Bool {
+        pin.trimmingCharacters(in: .whitespaces).isEmpty
+            || amount.trimmingCharacters(in: .whitespaces).isEmpty
+    }
 
     var body: some View {
-        VStack(spacing: 16) {
-            VStack(spacing: 2) {
-                Text(contact.name)
-                    .font(.headline)
-                Text(contact.phoneNumber)
-                    .font(AppTheme.codeFont(size: 14))
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.top, 8)
+        Form {
+            Section {
+                VStack(spacing: 2) {
+                    Text(contact.name)
+                        .font(.headline)
+                    Text(contact.phoneNumber)
+                        .font(AppTheme.codeFont(size: 14))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .listRowBackground(Color.clear)
 
-            Button {
-                DialService.dial("*99\(contact.phoneNumber)")
-                dismiss()
-            } label: {
-                Label("Llamar con 99", systemImage: "phone.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.brandCyan)
+                VStack(spacing: 10) {
+                    Button {
+                        DialService.dial("*99\(contact.phoneNumber)")
+                        dismiss()
+                    } label: {
+                        Label("Llamar con 99", systemImage: "phone.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.brandCyan)
 
-            Button {
-                DialService.dial("#31#\(contact.phoneNumber)")
-                dismiss()
-            } label: {
-                Label("Llamar Anónimo", systemImage: "shield.lefthalf.filled")
-                    .frame(maxWidth: .infinity)
+                    Button {
+                        DialService.dial("#31#\(contact.phoneNumber)")
+                        dismiss()
+                    } label: {
+                        Label("Llamar Anónimo", systemImage: "shield.lefthalf.filled")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.brandCyan)
+                }
+                .controlSize(.large)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
             }
-            .buttonStyle(.bordered)
-            .tint(.brandCyan)
+            .listSectionSpacing(6)
+
+            Section("Transferir Saldo") {
+                TextField("Clave", text: $pin)
+                    .keyboardType(.numberPad)
+                TextField("Monto", text: $amount)
+                    .keyboardType(.numberPad)
+
+                Button {
+                    dialTransfer()
+                } label: {
+                    HStack(spacing: 6) {
+                        Spacer()
+                        Text("Transferir")
+                        Image(systemName: "arrow.right")
+                    }
+                }
+                .disabled(isTransferDisabled)
+            }
         }
-        .controlSize(.large)
-        .padding(24)
-        .presentationDetents([.height(230)])
+        .scrollBounceBehavior(.basedOnSize)
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    /// Composes `transfer-direct`'s `{phoneNumber}`/`{pin}`/`{amount}` placeholders — same as
+    /// Home's Transferir, with the contact's number already supplied.
+    private func dialTransfer() {
+        guard let code = store.code(withId: "transfer-direct") else { return }
+        let resolved = code.resolvedCode(with: ["phoneNumber": contact.phoneNumber, "pin": pin, "amount": amount])
+        DialService.dial(resolved)
+        dismiss()
     }
 }
 
