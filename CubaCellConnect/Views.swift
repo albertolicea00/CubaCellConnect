@@ -754,28 +754,44 @@ struct CategoryListView: View {
 
 /// Settings tab: appearance, list display, connection warning, how USSD works, about and links.
 struct SettingsView: View {
+    @AppStorage("darkModePreference") private var darkMode: Int = 0
+    @AppStorage("showNetworkStatus") private var showNetworkStatus = false
+    @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
+
     @State private var showingChangePin = false
     @State private var showingSavePin = false
 
     var body: some View {
         NavigationStack {
             List {
-                Button {
-                    showingChangePin = true
-                } label: {
-                    Label("Cambiar Clave de Transferencia", systemImage: "key.fill")
+                Section("Preferencias") {
+                    Picker("Tema", selection: $darkMode) {
+                        Text("Por Defecto").tag(0)
+                        Text("Claro").tag(1)
+                        Text("Oscuro").tag(2)
+                    }
+
+                    Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
+
+                    Picker("Pestaña Inicial", selection: $defaultTab) {
+                        ForEach(HomeTab.allCases) { tab in
+                            Text(tab.displayName).tag(tab.rawValue)
+                        }
+                    }
                 }
 
-                Button {
-                    showingSavePin = true
-                } label: {
-                    Label("Guardar Clave de Transferencia", systemImage: "lock.fill")
-                }
+                Section("Clave de Transferencia") {
+                    Button {
+                        showingChangePin = true
+                    } label: {
+                        Label("Cambiar Clave", systemImage: "key.fill")
+                    }
 
-                NavigationLink {
-                    PreferencesSettingsView()
-                } label: {
-                    Label("Preferencias", systemImage: "gearshape.fill")
+                    Button {
+                        showingSavePin = true
+                    } label: {
+                        Label("Guardar Clave", systemImage: "lock.fill")
+                    }
                 }
 
                 NavigationLink {
@@ -931,46 +947,6 @@ private struct SavedTransferPinSheet: View {
 }
 
 /// Ajustes › Preferencias — appearance and general behavior toggles.
-private struct PreferencesSettingsView: View {
-    @AppStorage("darkModePreference") private var darkMode: Int = 0
-    @AppStorage("showNetworkStatus") private var showNetworkStatus = false
-    @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
-
-    var body: some View {
-        Form {
-            Section("Apariencia") {
-                Picker("Tema", selection: $darkMode) {
-                    Text("Por Defecto").tag(0)
-                    Text("Claro").tag(1)
-                    Text("Oscuro").tag(2)
-                }
-            }
-
-            Section {
-                Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
-            } header: {
-                Text("General")
-            } footer: {
-                Text("Muestra un aviso cuando no hay señal celular o es débil. El USSD necesita señal de voz, no datos ni Wi-Fi.")
-            }
-
-            Section {
-                Picker("Pestaña Inicial", selection: $defaultTab) {
-                    ForEach(HomeTab.allCases) { tab in
-                        Text(tab.displayName).tag(tab.rawValue)
-                    }
-                }
-            } header: {
-                Text("Inicio")
-            } footer: {
-                Text("La pestaña que se muestra al abrir la app.")
-            }
-        }
-        .navigationTitle("Preferencias")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
 /// Ajustes › Ayuda — how USSD works, in plain language.
 private struct HelpSettingsView: View {
     var body: some View {
