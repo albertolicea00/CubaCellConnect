@@ -2,23 +2,39 @@ import SwiftUI
 
 // MARK: - Home Screen
 
-/// Root screen: a custom Home tab, one tab per remaining catalog category, plus Settings.
+/// Root screen. Tab order is explicit (not a generic `ForEach` over every category) since Home
+/// must sit in the middle, flanked by Contactos/Líneas de Ayuda on one side and Compras on the
+/// other: Líneas de Ayuda, Contactos, Home, Compras, Ajustes.
 struct HomeView: View {
     @Environment(USSDCodeStore.self) private var store
 
     var body: some View {
         TabView {
+            if let helplines = store.tabCategories.first(where: { $0.id == "helplines" }) {
+                CategoryListView(category: helplines)
+                    .tabItem {
+                        Image(systemName: helplines.icon)
+                            .accessibilityLabel(helplines.name)
+                    }
+            }
+
+            ContactsListView()
+                .tabItem {
+                    Image(systemName: "person.crop.circle.fill")
+                        .accessibilityLabel("Contactos")
+                }
+
             HomeQuickActionsView()
                 .tabItem {
                     Image(systemName: "house.fill")
                         .accessibilityLabel("Home")
                 }
 
-            ForEach(store.tabCategories) { category in
-                CategoryListView(category: category)
+            if let purchase = store.tabCategories.first(where: { $0.id == "purchase" }) {
+                CategoryListView(category: purchase)
                     .tabItem {
-                        Image(systemName: category.icon)
-                            .accessibilityLabel(category.name)
+                        Image(systemName: purchase.icon)
+                            .accessibilityLabel(purchase.name)
                     }
             }
 
@@ -287,6 +303,105 @@ private struct QuickActionTile: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Contacts Screen
+
+/// Contactos tab: the device's own address book, listed alphabetically with a search bar —
+/// each row gets two extra call buttons (collect call via `*99`, hidden-number call via `#31#`)
+/// instead of a single generic "call" action, since that's the whole point of this screen.
+struct ContactsListView: View {
+    @State private var service = ContactsService()
+    @State private var searchText = ""
+
+    private var filteredContacts: [DeviceContact] {
+        guard !searchText.isEmpty else { return service.contacts }
+        return service.contacts.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    /// Contacts grouped by first letter of name, sorted A→Z — no side index strip, just
+    /// section headers plus the search bar to narrow things down.
+    private var groupedContacts: [(letter: String, contacts: [DeviceContact])] {
+        let groups = Dictionary(grouping: filteredContacts) { contact in
+            String(contact.name.prefix(1)).uppercased()
+        }
+        return groups.keys.sorted().map { letter in
+            (letter, groups[letter]!.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending })
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if service.isDenied {
+                    ContentUnavailableView(
+                        "Sin Acceso a Contactos",
+                        systemImage: "person.crop.circle.badge.exclamationmark",
+                        description: Text("Actívalo en Ajustes del sistema › CubaCell Connect › Contactos.")
+                    )
+                } else if service.contacts.isEmpty {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List {
+                        ForEach(groupedContacts, id: \.letter) { group in
+                            Section(group.letter) {
+                                ForEach(group.contacts) { contact in
+                                    ContactCallRowView(contact: contact)
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(.plain)
+                    .searchable(text: $searchText, prompt: "Buscar")
+                }
+            }
+            .navigationTitle("Contactos")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .onAppear { service.loadIfNeeded() }
+    }
+}
+
+/// One contact row: name + number, then two call buttons — collect call (`*99`) and hidden
+/// caller ID (`#31#`) — mirroring the old Llamada por Cobrar / Llamada Privada codes, just
+/// applied directly to a picked contact instead of a manually typed number.
+private struct ContactCallRowView: View {
+    let contact: DeviceContact
+
+    var body: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(contact.name)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.appForeground)
+                Text(contact.phoneNumber)
+                    .font(AppTheme.codeFont(size: 14))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                DialService.dial("*99\(contact.phoneNumber)")
+            } label: {
+                Image(systemName: "creditcard.and.123")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.brandCyan)
+            .accessibilityLabel("Llamar por cobrar")
+
+            Button {
+                DialService.dial("#31#\(contact.phoneNumber)")
+            } label: {
+                Image(systemName: "eye.slash.fill")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.brandCyan)
+            .accessibilityLabel("Llamar oculto")
+        }
+        .padding(.vertical, 2)
     }
 }
 

@@ -1,3 +1,4 @@
+import Contacts
 import CoreTelephony
 import Foundation
 import UIKit
@@ -121,6 +122,90 @@ final class CellularMonitor {
             networkType = "Red celular"
             signalQuality = 2
         }
+    }
+}
+
+// MARK: - Device Contacts
+
+/// One entry from the device address book: just enough to list and dial it. Uses the first
+/// phone number on the contact — contacts with several numbers only show that one.
+struct DeviceContact: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let phoneNumber: String
+}
+
+/// Reads the full address book so the Contactos tab can render its own alphabetical list
+/// instead of the one-at-a-time system picker used in Transferir. This needs full Contacts
+/// access (`NSContactsUsageDescription`), unlike `ContactPickerView`, which needs no permission
+/// at all since it runs out-of-process.
+@Observable
+final class ContactsService {
+    private(set) var contacts: [DeviceContact] = []
+    private(set) var isDenied = false
+
+    private let store = CNContactStore()
+    private var hasLoaded = false
+
+    /// Requests access (once) and loads contacts. Safe to call from `onAppear` repeatedly.
+    func loadIfNeeded() {
+        guard !hasLoaded else { return }
+
+        switch CNContactStore.authorizationStatus(for: .contacts) {
+        case .authorized:
+            hasLoaded = true
+            fetch()
+        case .notDetermined:
+            hasLoaded = true
+            store.requestAccess(for: .contacts) { [weak self] granted, _ in
+                DispatchQueue.main.async {
+                    if granted {
+                        self?.fetch()
+                    } else {
+                        self?.isDenied = true
+                    }
+                }
+            }
+        default:
+            hasLoaded = true
+            isDenied = true
+        }
+    }
+
+    private func fetch() {
+        let keys: [CNKeyDescriptor] = [
+            CNContactFormatter.descriptorForRequiredKeys(for: .fullName),
+            CNContactPhoneNumbersKey as CNKeyDescriptor,
+        ]
+        let request = CNContactFetchRequest(keysToFetch: keys)
+        request.sortOrder = .givenName
+
+        DispatchQueue.global(qos: .userInitiated).async { [store] in
+            var results: [DeviceContact] = []
+            try? store.enumerateContacts(with: request) { contact, _ in
+                guard let firstNumber = contact.phoneNumbers.first?.value.stringValue else { return }
+                let name = CNContactFormatter.string(from: contact, style: .fullName) ?? "Sin nombre"
+                results.append(DeviceContact(
+                    id: contact.identifier,
+                    name: name,
+                    phoneNumber: Self.normalize(firstNumber)
+                ))
+            }
+            let sorted = results.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            DispatchQueue.main.async { [weak self] in
+                self?.contacts = sorted
+            }
+        }
+    }
+
+    /// USSD prompts take bare digits. Strips formatting and the Cuban country code so a
+    /// stored "+53 5 123 4567" becomes the 8-digit "51234567" these codes expect.
+    private static func normalize(_ rawNumber: String) -> String {
+        let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
+        if digits.count == 10, digits.hasPrefix("53") {
+            return String(digits.dropFirst(2))
+        }
+        return digits
     }
 }
 

@@ -23,6 +23,7 @@ targets:
         LSApplicationQueriesSchemes:
           - tel
           - telprompt
+        NSContactsUsageDescription: Para mostrar tus contactos y llamarlos directamente desde la app.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.cubacellconnect.app

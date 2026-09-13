@@ -25,6 +25,8 @@
 		<string>tel</string>
 		<string>telprompt</string>
 	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>Para mostrar tus contactos y llamarlos directamente desde la app.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>
