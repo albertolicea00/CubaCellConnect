@@ -220,11 +220,11 @@ struct DirectoryEntryRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             // Not a real photo — no contact-photo data exists for a directory dump, only the
-            // line type — so this is a mobile-vs-landline icon standing in for an avatar.
-            Image(systemName: entry.isMobile ? "iphone" : "phone.fill")
-                .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
-                .background(accentColorStore.color, in: Circle())
+            // line type — so this is a mobile-vs-landline icon standing in for an avatar. Both
+            // symbols already render as a self-contained circular badge, so no extra background.
+            Image(systemName: entry.isMobile ? "iphone.gen1.crop.circle" : "teletype.circle")
+                .font(.system(size: 32))
+                .foregroundStyle(accentColorStore.color)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.displayName)
@@ -249,7 +249,7 @@ struct DirectoryEntryRowView: View {
                 }
             } label: {
                 Image(systemName: didCopy ? "checkmark.circle.fill" : "doc.on.doc")
-                    .font(.title2)
+                    .font(.system(size: 18, weight: .thin))
                     .foregroundStyle(didCopy ? .green : accentColorStore.color)
             }
             .buttonStyle(.plain)
