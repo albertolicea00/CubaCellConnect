@@ -879,9 +879,18 @@ struct SettingsView: View {
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
 
-    @State private var showingChangePin = false
-    @State private var showingSavePin = false
-    @State private var manageFriendCode: USSDCode?
+    @State private var isChangePinExpanded = false
+    @State private var currentPin = ""
+    @State private var newPin = ""
+
+    @State private var isSavePinExpanded = false
+    @State private var savedPin = ""
+    @State private var isSavedPinPersisted = false
+
+    @State private var isManageFriendExpanded = false
+    @State private var manageFriendPhoneNumber = ""
+    @State private var showingManageFriendContactPicker = false
+    @State private var showsManageFriendInvalidNumberWarning = false
 
     var body: some View {
         NavigationStack {
@@ -945,33 +954,163 @@ struct SettingsView: View {
 
                 if let friendsPlanGroup = store.group(named: "Gestionar Plan Amigo") {
                     Section("Gestionar Plan Amigo") {
-                        ForEach(friendsPlanGroup.codes) { code in
+                        // "Activar/Desactivar" is about your own line — no target number needed,
+                        // dials directly. "Agregar/Eliminar Amigo" needs one, so it gets an
+                        // inline Número field (+ contact picker) right in this section instead,
+                        // same shape as Home's Transferir card.
+                        ForEach(friendsPlanGroup.codes.filter { $0.id != "friends-plan-manage-member" }) { code in
                             Button {
-                                // Needs a target number; unlike "Activar/Desactivar" (your own
-                                // line), so it prompts for one instead of dialing directly.
-                                if code.id == "friends-plan-manage-member" {
-                                    manageFriendCode = code
-                                } else {
-                                    dial(code)
-                                }
+                                dial(code)
                             } label: {
                                 Text(code.title)
+                            }
+                        }
+
+                        if let manageMemberCode = friendsPlanGroup.codes.first(where: { $0.id == "friends-plan-manage-member" }) {
+                            if isManageFriendExpanded {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text(manageMemberCode.title)
+                                        .font(.subheadline.weight(.medium))
+
+                                    HStack(spacing: 12) {
+                                        Button {
+                                            showingManageFriendContactPicker = true
+                                        } label: {
+                                            Image(systemName: "person.crop.circle")
+                                                .foregroundStyle(.secondary)
+                                        }
+
+                                        TextField("Número (+53 ...)", text: $manageFriendPhoneNumber)
+                                            .keyboardType(.numberPad)
+                                    }
+
+                                    HStack {
+                                        Button("Cancelar", role: .cancel) {
+                                            manageFriendPhoneNumber = ""
+                                            isManageFriendExpanded = false
+                                        }
+                                        Spacer()
+                                        Button {
+                                            dialManageFriend(manageMemberCode)
+                                        } label: {
+                                            HStack(spacing: 6) {
+                                                Text("Marcar")
+                                                Image(systemName: "arrow.right")
+                                            }
+                                        }
+                                        .disabled(
+                                            manageFriendPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty
+                                                || manageMemberCode.code.isEmpty
+                                        )
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            } else {
+                                Button {
+                                    isManageFriendExpanded = true
+                                } label: {
+                                    Text(manageMemberCode.title)
+                                }
                             }
                         }
                     }
                 }
 
                 Section("Clave de Transferencia") {
-                    Button {
-                        showingChangePin = true
-                    } label: {
-                        Label("Cambiar Clave", systemImage: "key.fill")
+                    if isChangePinExpanded {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Cambiar Clave")
+                                .font(.subheadline.weight(.medium))
+
+                            HStack(spacing: 12) {
+                                TextField("Clave actual", text: $currentPin)
+                                    .textContentType(.password)
+                                    .keyboardType(.numberPad)
+                                Divider()
+                                TextField("Clave nueva", text: $newPin)
+                                    .textContentType(.newPassword)
+                                    .keyboardType(.numberPad)
+                            }
+
+                            if showsSamePinError {
+                                Text("La clave nueva es igual a la actual.")
+                                    .font(.footnote)
+                                    .foregroundStyle(.red)
+                            }
+
+                            HStack {
+                                Button("Cancelar", role: .cancel) {
+                                    currentPin = ""
+                                    newPin = ""
+                                    isChangePinExpanded = false
+                                }
+                                Spacer()
+                                Button {
+                                    changePin()
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Text("Cambiar Clave")
+                                        Image(systemName: "arrow.right")
+                                    }
+                                }
+                                .disabled(isChangePinDisabled)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } else {
+                        Button {
+                            isChangePinExpanded = true
+                        } label: {
+                            Label("Cambiar Clave", systemImage: "key.fill")
+                        }
                     }
 
-                    Button {
-                        showingSavePin = true
-                    } label: {
-                        Label("Guardar Clave", systemImage: "lock.fill")
+                    if isSavePinExpanded {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Clave Guardada")
+                                .font(.subheadline.weight(.medium))
+
+                            PinRevealField(title: "Clave", text: $savedPin, isMasked: true)
+
+                            Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+
+                            HStack {
+                                Button("Cancelar", role: .cancel) {
+                                    savedPin = TransferPinStore.load() ?? ""
+                                    isSavePinExpanded = false
+                                }
+                                Spacer()
+                                Button {
+                                    TransferPinStore.save(savedPin)
+                                    isSavedPinPersisted = true
+                                    isSavePinExpanded = false
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Text("Guardar Clave")
+                                        Image(systemName: "arrow.right")
+                                    }
+                                }
+                                .disabled(savedPin.trimmingCharacters(in: .whitespaces).isEmpty)
+                            }
+
+                            if isSavedPinPersisted {
+                                Button("Olvidar Clave Guardada", role: .destructive) {
+                                    TransferPinStore.delete()
+                                    savedPin = ""
+                                    isSavedPinPersisted = false
+                                    isSavePinExpanded = false
+                                }
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } else {
+                        Button {
+                            isSavePinExpanded = true
+                        } label: {
+                            Label("Guardar Clave", systemImage: "lock.fill")
+                        }
                     }
                 }
 
@@ -1008,19 +1147,31 @@ struct SettingsView: View {
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showingChangePin) {
-                ChangeTransferPinSheet()
-            }
-            .sheet(isPresented: $showingSavePin) {
-                SavedTransferPinSheet()
-            }
-            .sheet(item: $manageFriendCode) { code in
-                ManageFriendsPlanSheet(code: code)
-            }
             .onAppear {
-                manageFriendCode = store.code(withId: "friends-plan-manage-member") // TEMP DEBUG
+                if let stored = TransferPinStore.load() {
+                    savedPin = stored
+                    isSavedPinPersisted = true
+                }
+            }
+            .sheet(isPresented: $showingManageFriendContactPicker) {
+                ContactPickerView { number, isValidCubanNumber in
+                    manageFriendPhoneNumber = number
+                    showsManageFriendInvalidNumberWarning = !isValidCubanNumber
+                }
+                .ignoresSafeArea()
+            }
+            .alert("Número no parece cubano", isPresented: $showsManageFriendInvalidNumberWarning) {
+                Button("Entendido", role: .cancel) {}
+            } message: {
+                Text("Este contacto no tiene un número con formato de móvil cubano (+53 y 8 dígitos). Revísalo antes de marcar.")
             }
         }
+    }
+
+    private func dialManageFriend(_ code: USSDCode) {
+        DialService.dial(code.resolvedCode(input: manageFriendPhoneNumber))
+        manageFriendPhoneNumber = ""
+        isManageFriendExpanded = false
     }
 
     /// No-op for a code whose dial string isn't known yet (see "Gestionar Plan Amigo" in
@@ -1029,74 +1180,34 @@ struct SettingsView: View {
         guard !code.code.isEmpty else { return }
         DialService.dial(code.code)
     }
-}
 
-/// Prompts for a phone number — typed or picked from Contacts — to run
-/// `friends-plan-manage-member` against, for when it's tapped from Ajustes directly rather than
-/// from inside a contact (where the number's already known; see `ContactCallOptionsSheet`).
-private struct ManageFriendsPlanSheet: View {
-    let code: USSDCode
-
-    @Environment(\.dismiss) private var dismiss
-    @Environment(AccentColorStore.self) private var accentColorStore
-
-    @State private var phoneNumber = ""
-    @State private var showingContactPicker = false
-    @State private var showsInvalidNumberWarning = false
-
-    private var isDisabled: Bool {
-        phoneNumber.trimmingCharacters(in: .whitespaces).isEmpty || code.code.isEmpty
+    /// Blocks empty fields and a "new" PIN identical to the current one — changing to the same
+    /// PIN isn't a change.
+    private var isChangePinDisabled: Bool {
+        currentPin.trimmingCharacters(in: .whitespaces).isEmpty
+            || newPin.trimmingCharacters(in: .whitespaces).isEmpty
+            || newPin == currentPin
     }
 
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    HStack(spacing: 12) {
-                        Button {
-                            showingContactPicker = true
-                        } label: {
-                            Image(systemName: "person.crop.circle")
-                                .foregroundStyle(.secondary)
-                        }
+    /// Only flagged once both fields are filled in — an empty field is caught by
+    /// `isChangePinDisabled` alone and doesn't need an explicit error.
+    private var showsSamePinError: Bool {
+        !currentPin.isEmpty && !newPin.isEmpty && newPin == currentPin
+    }
 
-                        TextField("Número (+53 ...)", text: $phoneNumber)
-                            .keyboardType(.numberPad)
-                    }
-                } footer: {
-                    Text(code.details)
-                }
-            }
-            .navigationTitle(code.title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Marcar") {
-                        DialService.dial(code.resolvedCode(input: phoneNumber))
-                        dismiss()
-                    }
-                    .tint(accentColorStore.color)
-                    .disabled(isDisabled)
-                }
-            }
-        }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
-        .sheet(isPresented: $showingContactPicker) {
-            ContactPickerView { number, isValidCubanNumber in
-                phoneNumber = number
-                showsInvalidNumberWarning = !isValidCubanNumber
-            }
-            .ignoresSafeArea()
-        }
-        .alert("Número no parece cubano", isPresented: $showsInvalidNumberWarning) {
-            Button("Entendido", role: .cancel) {}
-        } message: {
-            Text("Este contacto no tiene un número con formato de móvil cubano (+53 y 8 dígitos). Revísalo antes de marcar.")
-        }
+    /// Dials `transfer-pin-change` (`*234*2*{current}*{new}#`), saves the new PIN to
+    /// `TransferPinStore` so it stays in sync with what Transferir prefills, and clears the
+    /// fields — same effect `ChangeTransferPinSheet` used to have as a separate modal.
+    private func changePin() {
+        guard let code = store.code(withId: "transfer-pin-change") else { return }
+        let resolved = code.resolvedCode(with: ["current": currentPin, "new": newPin])
+        DialService.dial(resolved)
+        TransferPinStore.save(newPin)
+        savedPin = newPin
+        isSavedPinPersisted = true
+        currentPin = ""
+        newPin = ""
+        isChangePinExpanded = false
     }
 }
 
@@ -1342,134 +1453,6 @@ private struct DirectoryActionRow: View {
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
-    }
-}
-
-/// Bottom sheet opened from Ajustes' "Cambiar Clave de Transferencia" row: dials
-/// `transfer-pin-change` (`*234*2*{current}*{new}#`). `.password`/`.newPassword` content types
-/// so iOS also offers to save the new PIN to Passwords. On save, the new PIN is written to
-/// `TransferPinStore` (the Keychain-backed store `SavedTransferPinSheet` manages directly) so it
-/// stays in sync with what Transferir prefills.
-private struct ChangeTransferPinSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(USSDCodeStore.self) private var store
-
-    @State private var currentPin = ""
-    @State private var newPin = ""
-
-    /// Blocks empty fields and a "new" PIN identical to the current one — changing to the same
-    /// PIN isn't a change.
-    private var isDisabled: Bool {
-        currentPin.trimmingCharacters(in: .whitespaces).isEmpty
-            || newPin.trimmingCharacters(in: .whitespaces).isEmpty
-            || newPin == currentPin
-    }
-
-    /// Only flagged once both fields are filled in — an empty field is caught by `isDisabled`
-    /// alone and doesn't need an explicit error.
-    private var showsSamePinError: Bool {
-        !currentPin.isEmpty && !newPin.isEmpty && newPin == currentPin
-    }
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    HStack(spacing: 12) {
-                        TextField("Clave actual", text: $currentPin)
-                            .textContentType(.password)
-                            .keyboardType(.numberPad)
-                        Divider()
-                        TextField("Clave nueva", text: $newPin)
-                            .textContentType(.newPassword)
-                            .keyboardType(.numberPad)
-                    }
-                } footer: {
-                    if showsSamePinError {
-                        Text("La clave nueva es igual a la actual.")
-                            .foregroundStyle(.red)
-                    }
-                }
-            }
-            .navigationTitle("Cambiar Clave")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Guardar") {
-                        save()
-                        dismiss()
-                    }
-                    .disabled(isDisabled)
-                }
-            }
-        }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
-    }
-
-    private func save() {
-        guard let code = store.code(withId: "transfer-pin-change") else { return }
-        let resolved = code.resolvedCode(with: ["current": currentPin, "new": newPin])
-        DialService.dial(resolved)
-        TransferPinStore.save(newPin)
-    }
-}
-
-/// Bottom sheet opened from Ajustes' "Guardar Clave de Transferencia" row: persists the PIN to
-/// the Keychain (see `TransferPinStore`) so Transferir's "Clave" field prefills itself on Home
-/// and inside a contact's sheet, instead of asking the user to retype it every time.
-private struct SavedTransferPinSheet: View {
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var pin = ""
-    @State private var isSaved = false
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    PinRevealField(title: "Clave", text: $pin, isMasked: true)
-                } footer: {
-                    Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
-                }
-
-                if isSaved {
-                    Section {
-                        Button("Olvidar Clave Guardada", role: .destructive) {
-                            TransferPinStore.delete()
-                            pin = ""
-                            isSaved = false
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Guardar Clave")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Guardar") {
-                        TransferPinStore.save(pin)
-                        isSaved = true
-                        dismiss()
-                    }
-                    .disabled(pin.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-        }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
-        .onAppear {
-            if let stored = TransferPinStore.load() {
-                pin = stored
-                isSaved = true
-            }
-        }
     }
 }
 
