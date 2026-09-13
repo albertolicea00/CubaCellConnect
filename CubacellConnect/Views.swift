@@ -423,14 +423,6 @@ private struct ContactCallRowView: View {
         .onTapGesture {
             showingCallOptions = true
         }
-        .swipeActions(edge: .leading) {
-            Button {
-                DialService.dial("#31#\(contact.phoneNumber)")
-            } label: {
-                Label("Anónimo", systemImage: "shield.lefthalf.filled")
-            }
-            .tint(.brandCyan)
-        }
         .swipeActions(edge: .trailing) {
             Button {
                 DialService.dial("*99\(contact.phoneNumber)")
@@ -438,6 +430,13 @@ private struct ContactCallRowView: View {
                 Label("Llamar 99", systemImage: "phone.fill")
             }
             .tint(.brandCyan)
+
+            Button {
+                DialService.dial("#31#\(contact.phoneNumber)")
+            } label: {
+                Label("Anónimo", systemImage: "shield.lefthalf.filled")
+            }
+            .tint(.brandCyan.opacity(0.6))
         }
         .sheet(isPresented: $showingCallOptions) {
             ContactCallOptionsSheet(contact: contact)
