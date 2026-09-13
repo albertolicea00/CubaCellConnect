@@ -817,6 +817,12 @@ struct SettingsView: View {
                     } label: {
                         Label("Buscar en Directorio", systemImage: "magnifyingglass")
                     }
+
+                    NavigationLink {
+                        WifiRoomsProvinceListView()
+                    } label: {
+                        Label("Salas y Zonas WiFi", systemImage: "wifi")
+                    }
                 }
 
                 Section("Clave de Transferencia") {
@@ -1232,4 +1238,107 @@ private struct SettingsInfoRow: View {
     SettingsView()
         .environment(USSDCodeStore())
         .environment(AccentColorStore())
+        .environment(WifiRoomsStore())
+}
+
+// MARK: - Wifi Navigation Rooms & Hotspots
+
+/// Ajustes › Salas y Zonas WiFi — every Cuban province from ETECSA's own public "Navigation
+/// rooms and public spaces (WIFI)" directory (`wifi_navigation_rooms.json`, scraped once from
+/// https://www.etecsa.cu/en/rooms-public-spaces — see README for the exact source URLs). Picking
+/// a province shows its navigation rooms (seat counts) and free WIFI hotspots by municipality.
+struct WifiRoomsProvinceListView: View {
+    @Environment(WifiRoomsStore.self) private var store
+
+    var body: some View {
+        List(store.provinces) { province in
+            NavigationLink {
+                WifiRoomsDetailView(province: province)
+            } label: {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(province.province)
+                        .font(.body.weight(.medium))
+                    Text("\(province.rooms.count) salas de navegación · \(province.hotspots.reduce(0) { $0 + $1.spots.count }) zonas wifi")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 2)
+            }
+        }
+        .navigationTitle("Salas y Zonas WiFi")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        WifiRoomsProvinceListView()
+    }
+    .environment(WifiRoomsStore())
+}
+
+/// One province's navigation rooms (paid, with seat counts) and free WIFI hotspots, grouped by
+/// municipality and collapsed behind a `DisclosureGroup` since a big province can list 100+ spots.
+struct WifiRoomsDetailView: View {
+    let province: WifiProvince
+
+    var body: some View {
+        List {
+            if !province.rooms.isEmpty {
+                Section("Salas de Navegación") {
+                    ForEach(province.rooms) { room in
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text(room.name)
+                                    .font(.body.weight(.medium))
+                                Spacer()
+                                if let positions = room.positions {
+                                    Text("\(positions) puestos")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            if !room.address.isEmpty {
+                                Text(room.address)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+            }
+
+            if !province.hotspots.isEmpty {
+                Section("Zonas WiFi Públicas") {
+                    ForEach(province.hotspots) { group in
+                        DisclosureGroup("\(group.municipality) (\(group.spots.count))") {
+                            ForEach(group.spots, id: \.self) { spot in
+                                Text(spot)
+                                    .font(.subheadline)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle(province.province)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        WifiRoomsDetailView(province: WifiProvince(
+            province: "Artemisa",
+            rooms: [
+                WifiRoom(name: "Multiservice Center Artemisa", address: "Calle 50 e/ 27 y 29", positions: 4),
+                WifiRoom(name: "Youth Club Bauta III", address: "", positions: nil),
+            ],
+            hotspots: [
+                WifiHotspotGroup(municipality: "Artemisa", spots: ["Park Las Cañas", "Boulevard"]),
+            ]
+        ))
+    }
 }

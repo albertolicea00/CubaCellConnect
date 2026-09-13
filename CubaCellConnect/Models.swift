@@ -151,3 +151,33 @@ enum AppTheme {
         .system(size: size, weight: .semibold, design: .monospaced)
     }
 }
+
+// MARK: - Wifi Navigation Rooms & Hotspots
+
+/// One province's data from ETECSA's public "Navigation rooms and public spaces (WIFI)"
+/// directory (`wifi_navigation_rooms.json`, scraped from
+/// https://www.etecsa.cu/en/rooms-public-spaces — a public service locator, not customer data).
+struct WifiProvince: Identifiable, Codable, Hashable {
+    var id: String { province }
+    let province: String
+    /// Navigation rooms (paid internet-access points with computers/positions) in this province.
+    let rooms: [WifiRoom]
+    /// Free public WIFI hotspots, grouped by municipality.
+    let hotspots: [WifiHotspotGroup]
+}
+
+/// One navigation room: a name, an address (sometimes blank — ETECSA's own listing omits it for
+/// a few rooms), and a seat/"position" count (`nil` when ETECSA's listing omits that too).
+struct WifiRoom: Identifiable, Codable, Hashable {
+    var id: String { name + address }
+    let name: String
+    let address: String
+    let positions: Int?
+}
+
+/// Free WIFI hotspot locations (parks, plazas, ...) in one municipality.
+struct WifiHotspotGroup: Identifiable, Codable, Hashable {
+    var id: String { municipality }
+    let municipality: String
+    let spots: [String]
+}

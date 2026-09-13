@@ -39,6 +39,27 @@ final class AccentColorStore {
     }
 }
 
+// MARK: - Wifi Rooms Store
+
+/// Loads the bundled `wifi_navigation_rooms.json` (ETECSA's public navigation-room/hotspot
+/// directory, one entry per province) once at init — same "load once, read-only" shape as
+/// `USSDCodeStore`.
+@Observable
+final class WifiRoomsStore {
+    private(set) var provinces: [WifiProvince] = []
+
+    init(bundle: Bundle = .main) {
+        guard let url = bundle.url(forResource: "wifi_navigation_rooms", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode([WifiProvince].self, from: data)
+        else {
+            assertionFailure("Failed to load wifi_navigation_rooms.json from the app bundle")
+            return
+        }
+        provinces = decoded
+    }
+}
+
 // MARK: - Catalog Store
 
 /// Loads and exposes the bundled USSD code catalog. Categories carry their own groups and

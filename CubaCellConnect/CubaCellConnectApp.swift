@@ -4,6 +4,7 @@ import SwiftUI
 struct CubaCellConnectApp: App {
     @State private var store = USSDCodeStore()
     @State private var accentColorStore = AccentColorStore()
+    @State private var wifiRoomsStore = WifiRoomsStore()
     @AppStorage("darkModePreference") private var darkModePreference: Int = 0
 
     var body: some Scene {
@@ -11,6 +12,7 @@ struct CubaCellConnectApp: App {
             HomeView()
                 .environment(store)
                 .environment(accentColorStore)
+                .environment(wifiRoomsStore)
                 .tint(accentColorStore.color)
                 .preferredColorScheme(darkModePreference == 1 ? .light : (darkModePreference == 2 ? .dark : nil))
         }
