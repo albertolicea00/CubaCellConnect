@@ -97,7 +97,6 @@ struct HomeQuickActionsView: View {
     @State private var amount = ""
     @State private var cardNumber = ""
     @State private var showingContactPicker = false
-    @State private var debugShowSpeedTest = false
     @State private var showsInvalidNumberWarning = false
 
     /// `true` while `pin` holds the value just loaded from `TransferPinStore` and not yet typed
@@ -1519,7 +1518,6 @@ struct SpeedTestView: View {
         }
         .navigationTitle("Prueba de Velocidad")
         .navigationBarTitleDisplayMode(.inline)
-        .task { runner.start() } // TEMP DEBUG — auto-runs for verification, remove after.
     }
 
     private var isFinishedOrFailed: Bool {
