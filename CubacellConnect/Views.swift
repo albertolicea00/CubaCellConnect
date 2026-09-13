@@ -547,11 +547,14 @@ private struct ContactCallOptionsSheet: View {
             .listSectionSpacing(6)
 
             Section("Transferir Saldo") {
-                TextField("Clave", text: $pin)
-                    .textContentType(.password)
-                    .keyboardType(.numberPad)
-                TextField("Monto", text: $amount)
-                    .keyboardType(.numberPad)
+                HStack(spacing: 12) {
+                    TextField("Clave", text: $pin)
+                        .textContentType(.password)
+                        .keyboardType(.numberPad)
+                    Divider()
+                    TextField("Monto", text: $amount)
+                        .keyboardType(.numberPad)
+                }
 
                 Button {
                     dialTransfer()
