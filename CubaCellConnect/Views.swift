@@ -729,11 +729,23 @@ struct CategoryListView: View {
 
 /// Settings tab: appearance, list display, connection warning, how USSD works, about and links.
 struct SettingsView: View {
+    @State private var showingChangePin = false
+    @State private var showingSavePin = false
+
     var body: some View {
         NavigationStack {
             List {
-                ChangeTransferPinSection()
-                SavedTransferPinSection()
+                Button {
+                    showingChangePin = true
+                } label: {
+                    Label("Cambiar Clave de Transferencia", systemImage: "key.fill")
+                }
+
+                Button {
+                    showingSavePin = true
+                } label: {
+                    Label("Guardar Clave de Transferencia", systemImage: "lock.fill")
+                }
 
                 NavigationLink {
                     PreferencesSettingsView()
@@ -755,16 +767,23 @@ struct SettingsView: View {
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showingChangePin) {
+                ChangeTransferPinSheet()
+            }
+            .sheet(isPresented: $showingSavePin) {
+                SavedTransferPinSheet()
+            }
         }
     }
 }
 
-/// Ajustes top section: change the ETECSA transfer PIN via `transfer-pin-change`
-/// (`*234*2*{current}*{new}#`). `.password`/`.newPassword` content types so iOS also offers to
-/// save the new PIN to Passwords. On dial, the new PIN is written to `TransferPinStore` (the
-/// Keychain-backed store `SavedTransferPinSection` below manages directly) so it stays in sync
-/// with what Transferir prefills.
-private struct ChangeTransferPinSection: View {
+/// Bottom sheet opened from Ajustes' "Cambiar Clave de Transferencia" row: dials
+/// `transfer-pin-change` (`*234*2*{current}*{new}#`). `.password`/`.newPassword` content types
+/// so iOS also offers to save the new PIN to Passwords. On save, the new PIN is written to
+/// `TransferPinStore` (the Keychain-backed store `SavedTransferPinSheet` manages directly) so it
+/// stays in sync with what Transferir prefills.
+private struct ChangeTransferPinSheet: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(USSDCodeStore.self) private var store
 
     @State private var currentPin = ""
@@ -785,89 +804,100 @@ private struct ChangeTransferPinSection: View {
     }
 
     var body: some View {
-        Section("Cambiar Clave de Transferencia") {
-            HStack(spacing: 12) {
-                TextField("Clave actual", text: $currentPin)
-                    .textContentType(.password)
-                    .keyboardType(.numberPad)
-                Divider()
-                TextField("Clave nueva", text: $newPin)
-                    .textContentType(.newPassword)
-                    .keyboardType(.numberPad)
-            }
-
-            HStack(spacing: 6) {
-                if showsSamePinError {
-                    Text("La clave nueva es igual a la actual")
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                }
-
-                Spacer()
-
-                Button {
-                    dial()
-                } label: {
-                    HStack(spacing: 6) {
-                        Text("Cambiar")
-                        Image(systemName: "arrow.right")
+        NavigationStack {
+            Form {
+                Section {
+                    HStack(spacing: 12) {
+                        TextField("Clave actual", text: $currentPin)
+                            .textContentType(.password)
+                            .keyboardType(.numberPad)
+                        Divider()
+                        TextField("Clave nueva", text: $newPin)
+                            .textContentType(.newPassword)
+                            .keyboardType(.numberPad)
+                    }
+                } footer: {
+                    if showsSamePinError {
+                        Text("La clave nueva es igual a la actual.")
+                            .foregroundStyle(.red)
                     }
                 }
-                .disabled(isDisabled)
+            }
+            .navigationTitle("Cambiar Clave")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Guardar") {
+                        save()
+                        dismiss()
+                    }
+                    .disabled(isDisabled)
+                }
             }
         }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
     }
 
-    private func dial() {
+    private func save() {
         guard let code = store.code(withId: "transfer-pin-change") else { return }
         let resolved = code.resolvedCode(with: ["current": currentPin, "new": newPin])
         DialService.dial(resolved)
-        // Keep the saved PIN (below, and what Transferir prefills) in sync with the change.
         TransferPinStore.save(newPin)
     }
 }
 
-/// Ajustes › Guardar Clave de Transferencia — persists the PIN to the Keychain (see
-/// `TransferPinStore`) so Transferir's "Clave" field prefills itself on Home and inside a
-/// contact's sheet, instead of asking the user to retype it every time.
-private struct SavedTransferPinSection: View {
+/// Bottom sheet opened from Ajustes' "Guardar Clave de Transferencia" row: persists the PIN to
+/// the Keychain (see `TransferPinStore`) so Transferir's "Clave" field prefills itself on Home
+/// and inside a contact's sheet, instead of asking the user to retype it every time.
+private struct SavedTransferPinSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
     @State private var pin = ""
     @State private var isSaved = false
 
     var body: some View {
-        Section {
-            TextField("Clave", text: $pin)
-                .textContentType(.password)
-                .keyboardType(.numberPad)
-
-            HStack(spacing: 12) {
-                if isSaved {
-                    Label("Guardada", systemImage: "checkmark.seal.fill")
-                        .font(.footnote)
-                        .foregroundStyle(.green)
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Clave", text: $pin)
+                        .textContentType(.password)
+                        .keyboardType(.numberPad)
+                } footer: {
+                    Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
                 }
 
-                Spacer()
-
                 if isSaved {
-                    Button("Olvidar", role: .destructive) {
-                        TransferPinStore.delete()
-                        pin = ""
-                        isSaved = false
+                    Section {
+                        Button("Olvidar Clave Guardada", role: .destructive) {
+                            TransferPinStore.delete()
+                            pin = ""
+                            isSaved = false
+                        }
                     }
                 }
-
-                Button("Guardar") {
-                    TransferPinStore.save(pin)
-                    isSaved = true
-                }
-                .disabled(pin.trimmingCharacters(in: .whitespaces).isEmpty)
             }
-        } header: {
-            Text("Guardar Clave de Transferencia")
-        } footer: {
-            Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
+            .navigationTitle("Guardar Clave")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Guardar") {
+                        TransferPinStore.save(pin)
+                        isSaved = true
+                        dismiss()
+                    }
+                    .disabled(pin.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
         }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
         .onAppear {
             if let stored = TransferPinStore.load() {
                 pin = stored
