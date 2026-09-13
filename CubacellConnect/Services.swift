@@ -1,3 +1,4 @@
+import CoreTelephony
 import Foundation
 import UIKit
 
@@ -32,6 +33,67 @@ final class USSDCodeStore {
         categories = catalog.categories
         codes = catalog.codes
         carrier = catalog.carrier
+    }
+}
+
+// MARK: - Cellular Signal Monitor
+
+/// Tracks the device's current radio access technology so the UI can warn before a USSD
+/// code is dialed with no/weak signal — USSD needs voice-network reachability, not data or Wi-Fi.
+@Observable
+final class CellularMonitor {
+    static let shared = CellularMonitor()
+
+    private let telephonyInfo = CTTelephonyNetworkInfo()
+
+    private(set) var hasService = false
+    /// User-facing network type label, e.g. "4G / LTE". Spanish since it is shown in the UI.
+    private(set) var networkType = "Buscando red..."
+    /// 0 (no service) through 3 (best).
+    private(set) var signalQuality = 0
+
+    private init() {
+        updateStatus()
+        NotificationCenter.default.addObserver(
+            forName: .CTServiceRadioAccessTechnologyDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateStatus()
+        }
+    }
+
+    private func updateStatus() {
+        guard let techByService = telephonyInfo.serviceCurrentRadioAccessTechnology,
+              let tech = techByService.values.first, !tech.isEmpty
+        else {
+            hasService = false
+            networkType = "Sin servicio celular"
+            signalQuality = 0
+            return
+        }
+
+        hasService = true
+        switch tech {
+        case CTRadioAccessTechnologyNR, CTRadioAccessTechnologyNRNSA:
+            networkType = "5G"
+            signalQuality = 3
+        case CTRadioAccessTechnologyLTE:
+            networkType = "4G / LTE"
+            signalQuality = 3
+        case CTRadioAccessTechnologyWCDMA, CTRadioAccessTechnologyHSDPA, CTRadioAccessTechnologyHSUPA,
+             CTRadioAccessTechnologyCDMA1x, CTRadioAccessTechnologyCDMAEVDORev0,
+             CTRadioAccessTechnologyCDMAEVDORevA, CTRadioAccessTechnologyCDMAEVDORevB,
+             CTRadioAccessTechnologyeHRPD:
+            networkType = "3G"
+            signalQuality = 2
+        case CTRadioAccessTechnologyEdge, CTRadioAccessTechnologyGPRS:
+            networkType = "2G / EDGE"
+            signalQuality = 1
+        default:
+            networkType = "Red celular"
+            signalQuality = 2
+        }
     }
 }
 
