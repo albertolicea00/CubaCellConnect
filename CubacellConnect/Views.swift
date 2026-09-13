@@ -463,11 +463,11 @@ private struct ContactCallOptionsSheet: View {
     var body: some View {
         Form {
             Section {
-                VStack(spacing: 2) {
+                VStack(spacing: 4) {
                     Text(contact.name)
-                        .font(.headline)
+                        .font(.title2.weight(.semibold))
                     Text(contact.phoneNumber)
-                        .font(AppTheme.codeFont(size: 14))
+                        .font(AppTheme.codeFont(size: 18))
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
@@ -478,7 +478,8 @@ private struct ContactCallOptionsSheet: View {
                         DialService.dial("*99\(contact.phoneNumber)")
                         dismiss()
                     } label: {
-                        Label("Llamar con 99", systemImage: "phone.fill")
+                        Label("Llamar con *99", systemImage: "phone.fill")
+                            .labelStyle(.titleAndIcon)
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
@@ -489,6 +490,7 @@ private struct ContactCallOptionsSheet: View {
                         dismiss()
                     } label: {
                         Label("Llamar Anónimo", systemImage: "shield.lefthalf.filled")
+                            .labelStyle(.titleAndIcon)
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
