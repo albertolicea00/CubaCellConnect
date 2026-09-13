@@ -34,7 +34,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 git clone https://github.com/albertolicea00/cubacell-connect.git
 cd cubacell-connect
 xcodegen generate
-open CubacellConnect.xcodeproj
+open CubaCellConnect.xcodeproj
 ```
 
 Build and run on a device. **USSD dialing requires a physical iPhone with a Cubacel SIM** 📲 — the simulator cannot place calls.
@@ -42,13 +42,13 @@ Build and run on a device. **USSD dialing requires a physical iPhone with a Cuba
 ## 🗂️ Project Structure
 
 ```
-CubacellConnect/
-├── App/          # App entry point
-├── Models/       # USSDCode, USSDCategory, catalog decoding
-├── Services/     # JSON catalog store, system dialer bridge
-├── Theme/        # Brand colors and typography
-├── Views/        # Home list, row, detail sheet
-└── Resources/    # ussd_codes.json catalog
+CubaCellConnect/
+├── CubaCellConnectApp.swift  # App entry point
+├── Models.swift              # USSDCode, USSDCategory, catalog decoding, brand palette
+├── Services.swift            # JSON catalog store, system dialer bridge
+├── UIComponents.swift        # Reusable presentational views (code row)
+├── Views.swift               # Home list and detail sheet screens
+└── codes.json                # Bundled USSD code catalog
 ```
 
 ## 🔄 Code source of truth

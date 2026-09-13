@@ -1,83 +1,108 @@
-# Architecture
+# CubaCell Connect :: Architecture
 
-This document describes how CubaCell Connect is structured and why. For contribution workflow see [CONTRIBUTING.md](CONTRIBUTING.md).
+For contribution workflow see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Overview
+This document describes the technical architecture of CubaCell Connect, a native iOS app that lets users dial ETECSA (Cubacel) USSD service codes (`*222#` style dial strings) without needing to remember them.
 
-CubaCell Connect is a small, dependency-free SwiftUI app. Its entire job:
+It is a single-target, dependency-free SwiftUI app with no backend, no network calls, and no persistence beyond the bundled catalog. There is no user data of any kind — everything the app shows comes from one read-only JSON file.
 
-1. Load a bundled catalog of ETECSA USSD codes.
-2. Present them grouped by category.
-3. Hand a selected code to the system dialer (or the clipboard).
+---
 
-There is **no networking, no persistence, no state beyond the UI**. The catalog JSON is the single source of truth; everything else renders or executes it.
-
-## Layer Diagram
+## 1. High-Level Overview
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                     Views                       │
-│  HomeView ──▶ CodeRowView                       │
-│      │                                          │
-│      └──▶ CodeDetailView (sheet)                │
-│               │            │                    │
-│               ▼            ▼                    │
-│         DialService   UIPasteboard              │
-└──────────────│──────────────────────────────────┘
-               │ reads
-┌──────────────▼──────────────────────────────────┐
-│                   Services                      │
-│  USSDCodeStore (@Observable)                    │
-│  DialService (stateless enum)                   │
-└──────────────│──────────────────────────────────┘
-               │ decodes
-┌──────────────▼──────────────────────────────────┐
-│              Models + Resources                 │
-│  USSDCatalog / USSDCategory / USSDCode          │
-│  ussd_codes.json (bundled, read-only)           │
-└─────────────────────────────────────────────────┘
+│                CubaCellConnectApp                │
+│         (App entry point · injects store)        │
+└───────────────────────────┬───────────────────────┘
+                            │
+                            ▼
+                        HomeView
+              (category list · selects a code)
+                            │
+                            ▼
+                    CodeDetailView (sheet)
+              (input, copy to clipboard, dial)
+                    │                │
+                    ▼                ▼
+              DialService      UIPasteboard
+           (opens tel:// URL)
+
+
+          USSDCodeStore ── decodes ──▶ USSDCatalog
+                  │
+                  └── loads CubaCellConnect/codes.json (bundled, read-only)
 ```
 
-## Components
+There is no MVVM view-model layer, no navigation state machine, and no singleton services beyond the one `@Observable` catalog store injected at the app root. State flows one way — store (read-only) → views — and the only mutable state anywhere in the app is `selectedCode` in `HomeView` and `input`/`copied` in `CodeDetailView`. This keeps the codebase intentionally tiny (≈250 lines of Swift across 5 files).
 
-### Models (`CubacellConnect/Models/`)
+---
 
-Plain `Codable` value types mirroring the JSON schema:
+## 2. Source Layout
 
-- `USSDCatalog` — root: version, carrier, categories, codes.
-- `USSDCategory` — id, display name, SF Symbol icon.
-- `USSDCode` — the code itself plus presentation metadata. `resolvedCode(input:)` substitutes the `{input}` placeholder with user-provided text (card number, phone number).
-- `USSDActionType` — `ussd` (dialed sequence) vs `call` (plain number). Drives the row badge icon and the detail button label; execution path is identical (both go through the dialer).
+| File | Responsibility |
+|---|---|
+| `CubaCellConnect/CubaCellConnectApp.swift` | `@main` entry point. Creates the single `USSDCodeStore` and injects it into `HomeView` via `.environment`. |
+| `CubaCellConnect/Models.swift` | `Codable` catalog models (`USSDCatalog`, `USSDCategory`, `USSDCode`, `USSDActionType`) plus the brand palette (`Color.brandNavy`, `.brandCyan`, `.appBackground`, `.appForeground`) and `AppTheme.codeFont`. |
+| `CubaCellConnect/Services.swift` | `USSDCodeStore` (`@Observable`, loads and decodes `codes.json` from the bundle) and `DialService` (stateless enum that builds and opens `tel://` URLs). |
+| `CubaCellConnect/UIComponents.swift` | Reusable, presentation-only views: `CodeRowView`, a pure function of a `USSDCode`. |
+| `CubaCellConnect/Views.swift` | The two screens: `HomeView` (category list, owns `selectedCode`) and `CodeDetailView` (the sheet with the only real logic in the app). |
+| `CubaCellConnect/codes.json` | Static, bundled dataset: version, carrier, categories, and every service code with its dial string and presentation metadata. |
+| `CubaCellConnect.xcassets/` | `AccentColor` (brand cyan, `#09C`) and `AppIcon`. |
 
-### Services (`CubacellConnect/Services/`)
+No separate persistence layer, networking layer, or dependency-injection container exists — `Services.swift` *is* the service layer, and there is exactly one store instance, created once and passed down.
 
-- **`USSDCodeStore`** — `@Observable` class, loads and decodes `ussd_codes.json` from the bundle at init. Exposes `categories`, `codes`, and `codes(in:)` for category filtering. Injected once at app root via `.environment`. A missing or malformed catalog trips an `assertionFailure` in debug and renders an empty list in release — the file is bundled, so this only happens on developer error.
-- **`DialService`** — stateless enum. Builds `tel://` URLs and opens them. The one non-obvious rule of the whole app lives here: **`#` must be percent-encoded as `%23`** or `URL(string:)`/iOS rejects the sequence. Returns `false` when the device cannot place calls (iPad, simulator) instead of failing silently.
+---
 
-### Theme (`CubacellConnect/Theme/`)
+## 3. Configuration Data: `codes.json`
 
-Brand palette as `Color` extensions — navy `rgb(0, 0, 102)`, cyan `#09C`, plus adaptive black/white via `systemBackground`/`label`. `AppTheme.codeFont` provides the monospaced style for anything dialable. All color usage in views must go through these tokens; no ad-hoc colors.
+`codes.json` is the single source of truth for **what USSD codes exist** and is treated as read-only, bundled data. It decodes into:
 
-### Views (`CubacellConnect/Views/`)
+```
+USSDCatalog
+ ├─ version, carrier
+ ├─ categories: [USSDCategory]
+ │   └─ id, name, icon (SF Symbol)
+ └─ codes: [USSDCode]
+     ├─ id, code, title, details, category, mnemonic?
+     ├─ type: USSDActionType        (.ussd or .call — drives badge icon and button label)
+     ├─ requiresInput: Bool
+     └─ inputPlaceholder: String?
+```
 
-- **`HomeView`** — `NavigationStack` + grouped `List`, one section per category. Owns the `selectedCode` state that drives the detail sheet. Navy toolbar, cyan tint.
-- **`CodeRowView`** — pure function of a `USSDCode`: title, monospaced code, type badge (phone vs `#`).
-- **`CodeDetailView`** — the only view with real logic: local `input` state for `{input}` codes, dial button disabled until input is non-empty, copy-to-clipboard fallback, dismisses after dialing.
+`USSDCodeStore.load(from:)` reads and decodes this once, synchronously, at `init`. There is **no schema versioning enforcement and no remote fetch** — updating codes requires shipping a new app build. A missing or malformed catalog trips an `assertionFailure` in debug and renders an empty list in release; since the file is bundled, this only happens on developer error.
 
-State flows one way: store (read-only catalog) → views; the only mutable state is `selectedCode` in `HomeView` and `input`/`copied` in `CodeDetailView`.
+**External sync guard**: a GitHub Actions workflow (`.github/workflows/ussd-sync-check.yml`, script `.github/scripts/check-ussd-sync.mjs`) compares this file's *dial-string set* against the canonical `MyUSSDCodes-collection` repo (`cuba-cubacel.json`) and opens a tracking issue on drift. This is a CI-side consistency check, not a runtime mechanism — the app itself never talks to that repo.
 
-## Key Decisions
+---
 
-| Decision | Rationale |
-| --- | --- |
-| Catalog as bundled JSON, not Swift constants | Non-developers can review/update codes; schema is documented and diff-friendly; opens the door to remote catalog updates later without restructuring. |
-| No networking | Target users often have expensive/limited connectivity — the app must be 100% offline. |
-| No third-party dependencies | Nothing here needs one; keeps the build reproducible with `xcodegen generate` alone. |
-| XcodeGen, project not committed | `project.pbxproj` merge conflicts are the worst part of iOS collaboration; `project.yml` is reviewable. |
-| `@Observable` over `ObservableObject` | iOS 17 baseline makes the modern observation model available; less boilerplate. |
-| Dial via `tel://`, not CoreTelephony/CallKit | iOS offers no API to run USSD programmatically; opening the dialer is the only sanctioned path. |
+## 4. Navigation Model
 
-## Platform Constraints
+There is exactly one navigation surface: `HomeView` is a `NavigationStack` wrapping a grouped `List`, one section per category. Tapping a row sets `selectedCode`, which drives a `.sheet(item:)` presenting `CodeDetailView` at `.medium`/`.large` detents. Dismissing the sheet (by dialing or by swipe) simply clears `selectedCode` — there is no back-stack, no deep linking, and no state that survives relaunch.
+
+---
+
+## 5. USSD Execution Path
+
+1. `CodeRowView` tap → `HomeView` sets `selectedCode`, presenting `CodeDetailView`.
+2. If the code requires input (`requiresInput == true`), the sheet shows a `TextField` and disables the dial button until it is non-empty; `USSDCode.resolvedCode(input:)` substitutes the `{input}` placeholder.
+3. **Copy** writes `resolvedCode` to `UIPasteboard.general` directly — no expiry, no local-only flag, since nothing copied here is a secret (it is a dial string, not a PIN or card number).
+4. **Dial** calls `DialService.dial(_:)`, which percent-encodes `#` as `%23` (iOS rejects a raw `#` in a `tel://` URL), builds the URL, and calls `UIApplication.shared.open`. Returns `false` when the device cannot place calls (iPad, simulator, Wi-Fi-only) instead of failing silently; the sheet dismisses either way since iOS itself will show its own confirmation prompt or simply do nothing.
+
+There is no prefill/resolver indirection here (unlike apps that inject saved user data before dialing) — a code either needs typed input or it doesn't, and that is the entire decision tree.
+
+---
+
+## 6. Theming
+
+- **Brand palette**: `Color.brandNavy` (`rgb(0,0,102)`) and `Color.brandCyan` (`#09C`) are fixed static properties on `Color`, defined in `Models.swift` — not user-configurable, unlike apps that expose a `ColorPicker` for the accent. `AccentColor` in the asset catalog is set to the same cyan so system controls (nav bar tint, `.tint(.brandCyan)`) match without restating the value.
+- **Adaptive colors**: `Color.appBackground`/`.appForeground` wrap `UIColor.systemBackground`/`.label` so light/dark mode "just works" without any app-level dark-mode toggle or `@AppStorage` preference.
+- **Typography**: `AppTheme.codeFont(size:)` is the one shared style — a semibold monospaced font — used everywhere a dial string is displayed, so codes always read as "code" rather than prose.
+- All color usage in views must go through these tokens; no ad-hoc colors.
+
+---
+
+## 7. Platform Constraints
 
 These shape the UX and are not fixable in code:
 
@@ -86,10 +111,21 @@ These shape the UX and are not fixable in code:
 - `*#06#` (IMEI) is parsed by the dialer only when typed manually; via `tel://` it generally does nothing.
 - Simulator and Wi-Fi-only devices cannot place calls; `DialService.dial` returns `false` there.
 
-## Extension Points
+---
 
-- **New code or category** → edit `ussd_codes.json` only; UI adapts automatically.
+## 8. Notable Constraints & Trade-offs (for future contributors)
+
+- **No dependency injection / testability seams**: `USSDCodeStore` is created once in `CubaCellConnectApp` and passed via `.environment` — there is no protocol/mock seam, but the app is small enough that this has not mattered.
+- **Silent failure on decode errors**: a malformed `codes.json` trips `assertionFailure` in debug and silently renders an empty list in release, rather than surfacing an error — acceptable only because the file is bundled and never user-supplied.
+- **No data migrations**: `codes.json` has a `version` field that nothing currently reads; adding a new field to `USSDCode` is safe (optional fields decode fine), but renaming/retyping an existing field will break decoding for the exact build that ships it.
+- **`codes.json` is compiled-in**: adding a new code or category requires a new app build and App Store review — there is no remote-config or in-app update path, unlike apps whose `version` field exists specifically to unlock that later (see Extension Points below).
+
+---
+
+## 9. Extension Points
+
+- **New code or category** → edit `codes.json` only; UI adapts automatically.
 - **Search** → filter `store.codes` in `HomeView`; no structural change needed.
-- **Favorites / recents** → first real persistence; add a small `UserDefaults`-backed service beside `USSDCodeStore`, keep the catalog itself read-only.
+- **Favorites / recents** → first real persistence; add a small `UserDefaults`-backed store beside `USSDCodeStore`, keep the catalog itself read-only.
 - **Remote catalog updates** → replace `USSDCodeStore.load(from:)` with a cached-remote strategy; the `version` field in the JSON exists for this.
 - **Localization** — UI copy is English; catalog `title`/`details` would move to localized variants keyed by the same `id`.

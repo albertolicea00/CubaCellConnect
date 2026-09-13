@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - Code Row
+
 /// One row in the code list: title, dialable code and action hint.
 struct CodeRowView: View {
     let code: USSDCode

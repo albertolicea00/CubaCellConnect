@@ -7,122 +7,65 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		27C69A3C089BE2B8996C97C8 /* ussd_codes.json in Resources */ = {isa = PBXBuildFile; fileRef = 32DE437DB24AE17EA9B805D2 /* ussd_codes.json */; };
-		45D5D04154E1F75844610E9F /* USSDCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F75FD3CD3D04C8CF5AAAB3 /* USSDCode.swift */; };
-		4EEECA1A08818E2E0DC45F3B /* CodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DCB8C71ADE01EFC569272AD /* CodeRowView.swift */; };
-		9B09CFB6372A45BBEBD31B83 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA51FD9E3B0944453952CBEC /* AppTheme.swift */; };
-		9E9337201826A331AEB15F53 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB42009B3862BBB265BD485 /* HomeView.swift */; };
-		A7E89F493388738FC740617F /* CodeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214495122D3728C56309E3A4 /* CodeDetailView.swift */; };
-		BEF203F11DC58AD2403C8637 /* CubaCellConnectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B1CE171340524A29A11A61 /* CubaCellConnectApp.swift */; };
-		D94AFC01CAF5FCE522952301 /* USSDCodeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFDC85BDAF947367B47DCD6 /* USSDCodeStore.swift */; };
-		FE3782F75650524319B76AD5 /* DialService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9507DD7268798377B0749EB0 /* DialService.swift */; };
+		332BC5A8EFD398D7CDA7921A /* CubaCellConnectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B42F76B0A40014FFAE60B01C /* CubaCellConnectApp.swift */; };
+		704E47BDCF79C035358A9689 /* codes.json in Resources */ = {isa = PBXBuildFile; fileRef = DA6B44DA336D0F4122155583 /* codes.json */; };
+		9D6ACCB28223EF356CCB4688 /* UIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */; };
+		B9A6AE80A38BFCD3CBF50167 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCF6546FD849E3569404C90 /* Services.swift */; };
+		C06743242B219BCFD4B334BA /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54355AC0CD3658BC50E3384 /* Views.swift */; };
+		C5A30201A64E84BEE656A407 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767C11CEA2E45E76EA941172 /* Models.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		214495122D3728C56309E3A4 /* CodeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeDetailView.swift; sourceTree = "<group>"; };
-		2DCB8C71ADE01EFC569272AD /* CodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeRowView.swift; sourceTree = "<group>"; };
-		32DE437DB24AE17EA9B805D2 /* ussd_codes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ussd_codes.json; sourceTree = "<group>"; };
-		36B1CE171340524A29A11A61 /* CubaCellConnectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubaCellConnectApp.swift; sourceTree = "<group>"; };
-		7EFDC85BDAF947367B47DCD6 /* USSDCodeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USSDCodeStore.swift; sourceTree = "<group>"; };
-		9507DD7268798377B0749EB0 /* DialService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialService.swift; sourceTree = "<group>"; };
-		9FD942F62B5D8FC889E92704 /* CubaCellConnect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D483C365C889577313968F89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		DBB42009B3862BBB265BD485 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		E3F75FD3CD3D04C8CF5AAAB3 /* USSDCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USSDCode.swift; sourceTree = "<group>"; };
-		EA51FD9E3B0944453952CBEC /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponents.swift; sourceTree = "<group>"; };
+		39C162F860A97892042A87C0 /* CubaCellConnect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		767C11CEA2E45E76EA941172 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		ABCF6546FD849E3569404C90 /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
+		B42F76B0A40014FFAE60B01C /* CubaCellConnectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubaCellConnectApp.swift; sourceTree = "<group>"; };
+		D72E9E4ED4E01DA10E81BCFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DA6B44DA336D0F4122155583 /* codes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = codes.json; sourceTree = "<group>"; };
+		F54355AC0CD3658BC50E3384 /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		06DE3D0C2CC579E30811B61F /* Theme */ = {
+		0AC9244090B0785DE255B3EE = {
 			isa = PBXGroup;
 			children = (
-				EA51FD9E3B0944453952CBEC /* AppTheme.swift */,
-			);
-			path = Theme;
-			sourceTree = "<group>";
-		};
-		0B4322DBCE78E6176D7BDCED /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				32DE437DB24AE17EA9B805D2 /* ussd_codes.json */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		287C6870DBFE0ED78667FC91 = {
-			isa = PBXGroup;
-			children = (
-				B3E7BFE688972402A8E5EDE8 /* CubaCellConnect */,
-				4FCBEC34FABA6678127DBFE0 /* Products */,
+				209415611E53404F1F2B5681 /* CubaCellConnect */,
+				B7D1CD9D62FD37D4EA19C396 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		37076561219EBB2CB49E5319 /* Models */ = {
+		209415611E53404F1F2B5681 /* CubaCellConnect */ = {
 			isa = PBXGroup;
 			children = (
-				E3F75FD3CD3D04C8CF5AAAB3 /* USSDCode.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		3743F19007A618271395A9D9 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				9507DD7268798377B0749EB0 /* DialService.swift */,
-				7EFDC85BDAF947367B47DCD6 /* USSDCodeStore.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		4FCBEC34FABA6678127DBFE0 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9FD942F62B5D8FC889E92704 /* CubaCellConnect.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		863F613859CD68A5DE01E944 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				36B1CE171340524A29A11A61 /* CubaCellConnectApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		B3E7BFE688972402A8E5EDE8 /* CubaCellConnect */ = {
-			isa = PBXGroup;
-			children = (
-				D483C365C889577313968F89 /* Info.plist */,
-				863F613859CD68A5DE01E944 /* App */,
-				37076561219EBB2CB49E5319 /* Models */,
-				0B4322DBCE78E6176D7BDCED /* Resources */,
-				3743F19007A618271395A9D9 /* Services */,
-				06DE3D0C2CC579E30811B61F /* Theme */,
-				B433106664137A743BC73D13 /* Views */,
+				DA6B44DA336D0F4122155583 /* codes.json */,
+				B42F76B0A40014FFAE60B01C /* CubaCellConnectApp.swift */,
+				D72E9E4ED4E01DA10E81BCFA /* Info.plist */,
+				767C11CEA2E45E76EA941172 /* Models.swift */,
+				ABCF6546FD849E3569404C90 /* Services.swift */,
+				2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */,
+				F54355AC0CD3658BC50E3384 /* Views.swift */,
 			);
 			path = CubaCellConnect;
 			sourceTree = "<group>";
 		};
-		B433106664137A743BC73D13 /* Views */ = {
+		B7D1CD9D62FD37D4EA19C396 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				214495122D3728C56309E3A4 /* CodeDetailView.swift */,
-				2DCB8C71ADE01EFC569272AD /* CodeRowView.swift */,
-				DBB42009B3862BBB265BD485 /* HomeView.swift */,
+				39C162F860A97892042A87C0 /* CubaCellConnect.app */,
 			);
-			path = Views;
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		36827856C2473D49C1008493 /* CubaCellConnect */ = {
+		EB8D1B900E1DD4AB439A7712 /* CubaCellConnect */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B4B97244312FE41FD48040C5 /* Build configuration list for PBXNativeTarget "CubaCellConnect" */;
+			buildConfigurationList = 97B7023721A6249217127C5F /* Build configuration list for PBXNativeTarget "CubaCellConnect" */;
 			buildPhases = (
-				082D3EF66A0D4BC99C7C3EFA /* Sources */,
-				FE32DAC9BFAE0B2626C63B0F /* Resources */,
+				FE4356EC1257B6BFFF2A8A02 /* Sources */,
+				EDA6DEA76E46770F39E4CFE3 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -132,13 +75,13 @@
 			packageProductDependencies = (
 			);
 			productName = CubaCellConnect;
-			productReference = 9FD942F62B5D8FC889E92704 /* CubaCellConnect.app */;
+			productReference = 39C162F860A97892042A87C0 /* CubaCellConnect.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		59B95876659769C17E7DFE1B /* Project object */ = {
+		AF807CCAB1C395A92E84DDF1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
@@ -146,56 +89,109 @@
 				TargetAttributes = {
 				};
 			};
-			buildConfigurationList = EA9F8E65F978479129F227B4 /* Build configuration list for PBXProject "CubaCellConnect" */;
+			buildConfigurationList = 2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubaCellConnect" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
 				en,
 			);
-			mainGroup = 287C6870DBFE0ED78667FC91;
+			mainGroup = 0AC9244090B0785DE255B3EE;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 4FCBEC34FABA6678127DBFE0 /* Products */;
+			productRefGroup = B7D1CD9D62FD37D4EA19C396 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				36827856C2473D49C1008493 /* CubaCellConnect */,
+				EB8D1B900E1DD4AB439A7712 /* CubaCellConnect */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		FE32DAC9BFAE0B2626C63B0F /* Resources */ = {
+		EDA6DEA76E46770F39E4CFE3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27C69A3C089BE2B8996C97C8 /* ussd_codes.json in Resources */,
+				704E47BDCF79C035358A9689 /* codes.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		082D3EF66A0D4BC99C7C3EFA /* Sources */ = {
+		FE4356EC1257B6BFFF2A8A02 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B09CFB6372A45BBEBD31B83 /* AppTheme.swift in Sources */,
-				A7E89F493388738FC740617F /* CodeDetailView.swift in Sources */,
-				4EEECA1A08818E2E0DC45F3B /* CodeRowView.swift in Sources */,
-				BEF203F11DC58AD2403C8637 /* CubaCellConnectApp.swift in Sources */,
-				FE3782F75650524319B76AD5 /* DialService.swift in Sources */,
-				9E9337201826A331AEB15F53 /* HomeView.swift in Sources */,
-				45D5D04154E1F75844610E9F /* USSDCode.swift in Sources */,
-				D94AFC01CAF5FCE522952301 /* USSDCodeStore.swift in Sources */,
+				332BC5A8EFD398D7CDA7921A /* CubaCellConnectApp.swift in Sources */,
+				C5A30201A64E84BEE656A407 /* Models.swift in Sources */,
+				B9A6AE80A38BFCD3CBF50167 /* Services.swift in Sources */,
+				9D6ACCB28223EF356CCB4688 /* UIComponents.swift in Sources */,
+				C06743242B219BCFD4B334BA /* Views.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		6AE4301EDDF2F244D1B23E19 /* Debug */ = {
+		4E504E35AD3894435552BE19 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AE575407A92F4E9F1C5F8C7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -207,14 +203,33 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cubaCellconnect.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cubacellconnect.app;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
-		725524C2AE28655B851AAB80 /* Debug */ = {
+		E58AAA608318EA2A8EE7521A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = CubaCellConnect/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cubacellconnect.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		E902A6AA461F49BB27195211 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -277,103 +292,28 @@
 			};
 			name = Debug;
 		};
-		733F0A993FDDDDEA48C217F9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = CubaCellConnect/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cubaCellconnect.app;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
-		C6DC7B5E736BB0639E7BAA15 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B4B97244312FE41FD48040C5 /* Build configuration list for PBXNativeTarget "CubaCellConnect" */ = {
+		2065CB13BB80B43220EDC455 /* Build configuration list for PBXProject "CubaCellConnect" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6AE4301EDDF2F244D1B23E19 /* Debug */,
-				733F0A993FDDDDEA48C217F9 /* Release */,
+				E902A6AA461F49BB27195211 /* Debug */,
+				4E504E35AD3894435552BE19 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		EA9F8E65F978479129F227B4 /* Build configuration list for PBXProject "CubaCellConnect" */ = {
+		97B7023721A6249217127C5F /* Build configuration list for PBXNativeTarget "CubaCellConnect" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				725524C2AE28655B851AAB80 /* Debug */,
-				C6DC7B5E736BB0639E7BAA15 /* Release */,
+				AE575407A92F4E9F1C5F8C7B /* Debug */,
+				E58AAA608318EA2A8EE7521A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 59B95876659769C17E7DFE1B /* Project object */;
+	rootObject = AF807CCAB1C395A92E84DDF1 /* Project object */;
 }
