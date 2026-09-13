@@ -72,6 +72,40 @@ struct USSDCatalog: Codable {
     let categories: [USSDCategory]
 }
 
+// MARK: - Cuban Phone Numbers
+
+/// The one place that knows what a "valid Cuban mobile number" looks like — used by
+/// `ContactsService` (filtering the Contactos tab) and `ContactPickerView` (validating a
+/// contact picked for Transferir), so the rule only needs to change in one spot.
+enum CubanPhoneNumber {
+    /// Leading digit(s) a valid Cuban mobile number starts with, after the country code is
+    /// stripped. Currently "5" or "6" (broad — covers today's ETECSA mobile ranges); narrow
+    /// this to specific prefixes later (e.g. `["60", "61", "64"]` instead of `"6"`) if only
+    /// some ranges under 6 turn out to be mobile — `hasPrefix` matching means any length works.
+    static let validMobilePrefixes = ["5", "6"]
+
+    /// Strips formatting to bare digits, then accepts either the bare 8-digit local form or
+    /// `+53` plus 8 digits — stripping the country code down to those 8 digits (e.g.
+    /// "+53 5 123 4567" → "51234567") — and checks the result starts with an allowed prefix.
+    /// Returns `nil` for anything else (a US `+1`, a Mexican `+52`, a malformed number, a Cuban
+    /// landline prefix, ...).
+    static func normalize(_ rawNumber: String) -> String? {
+        let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
+
+        let localNumber: String
+        if digits.count == 8 {
+            localNumber = digits
+        } else if digits.count == 10, digits.hasPrefix("53") {
+            localNumber = String(digits.dropFirst(2))
+        } else {
+            return nil
+        }
+
+        guard validMobilePrefixes.contains(where: localNumber.hasPrefix) else { return nil }
+        return localNumber
+    }
+}
+
 // MARK: - Brand Palette
 
 extension Color {

@@ -7,7 +7,10 @@ import SwiftUI
 /// to a single number automatically. Runs out-of-process — unlike reading `Contacts` directly,
 /// this needs no `NSContactsUsageDescription` entry and never prompts for permission.
 struct ContactPickerView: UIViewControllerRepresentable {
-    var onPick: (String) -> Void
+    /// Called with the picked number and whether it passed `CubanPhoneNumber.normalize` — when
+    /// `false`, the string is just the raw digits (no country-code stripping applied), so the
+    /// caller can still fill the field but should warn the number doesn't look Cuban.
+    var onPick: (_ number: String, _ isValidCubanNumber: Bool) -> Void
 
     func makeUIViewController(context: Context) -> CNContactPickerViewController {
         let picker = CNContactPickerViewController()
@@ -23,25 +26,20 @@ struct ContactPickerView: UIViewControllerRepresentable {
     }
 
     final class Coordinator: NSObject, CNContactPickerDelegate {
-        let onPick: (String) -> Void
+        let onPick: (String, Bool) -> Void
 
-        init(onPick: @escaping (String) -> Void) {
+        init(onPick: @escaping (String, Bool) -> Void) {
             self.onPick = onPick
         }
 
         func contactPicker(_ picker: CNContactPickerViewController, didSelect contactProperty: CNContactProperty) {
             guard let phoneNumber = contactProperty.value as? CNPhoneNumber else { return }
-            onPick(Self.normalize(phoneNumber.stringValue))
-        }
-
-        /// USSD prompts take bare digits. Strips formatting and the Cuban country code so a
-        /// stored "+53 5 123 4567" becomes the 8-digit "51234567" the transfer menu expects.
-        private static func normalize(_ rawNumber: String) -> String {
-            let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
-            if digits.count == 10, digits.hasPrefix("53") {
-                return String(digits.dropFirst(2))
+            let raw = phoneNumber.stringValue
+            if let normalized = CubanPhoneNumber.normalize(raw) {
+                onPick(normalized, true)
+            } else {
+                onPick(raw.filter { $0.isASCII && $0.isNumber }, false)
             }
-            return digits
         }
     }
 }

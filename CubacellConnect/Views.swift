@@ -93,6 +93,7 @@ struct HomeQuickActionsView: View {
     @State private var amount = ""
     @State private var cardNumber = ""
     @State private var showingContactPicker = false
+    @State private var showsInvalidNumberWarning = false
 
     private var isTransferDisabled: Bool {
         phoneNumber.trimmingCharacters(in: .whitespaces).isEmpty
@@ -250,14 +251,25 @@ struct HomeQuickActionsView: View {
                 .listStyle(.insetGrouped)
                 .tint(.brandCyan)
                 .sheet(isPresented: $showingContactPicker) {
-                    ContactPickerView { number in
+                    ContactPickerView { number, isValidCubanNumber in
                         phoneNumber = number
+                        showsInvalidNumberWarning = !isValidCubanNumber
                     }
                     .ignoresSafeArea()
+                }
+                .alert("Número no parece cubano", isPresented: $showsInvalidNumberWarning) {
+                    Button("Entendido", role: .cancel) {}
+                } message: {
+                    Text("Este contacto no tiene un número con formato de móvil cubano (+53 y 8 dígitos). Revísalo antes de transferir.")
                 }
             }
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .onAppear {
+            if pin.isEmpty, let saved = TransferPinStore.load() {
+                pin = saved
+            }
         }
     }
 
@@ -571,6 +583,11 @@ private struct ContactCallOptionsSheet: View {
         .scrollBounceBehavior(.basedOnSize)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .onAppear {
+            if pin.isEmpty, let saved = TransferPinStore.load() {
+                pin = saved
+            }
+        }
     }
 
     /// Composes `transfer-direct`'s `{phoneNumber}`/`{pin}`/`{amount}` placeholders — same as
@@ -716,6 +733,7 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 ChangeTransferPinSection()
+                SavedTransferPinSection()
 
                 NavigationLink {
                     PreferencesSettingsView()
@@ -742,9 +760,10 @@ struct SettingsView: View {
 }
 
 /// Ajustes top section: change the ETECSA transfer PIN via `transfer-pin-change`
-/// (`*234*2*{current}*{new}#`). `SecureField` + `.password`/`.newPassword` content types so iOS
-/// offers to save the new PIN to Passwords and can later suggest it back into the Transferir
-/// "Clave" field on Home and inside a contact's sheet (both marked `.password`).
+/// (`*234*2*{current}*{new}#`). `.password`/`.newPassword` content types so iOS also offers to
+/// save the new PIN to Passwords. On dial, the new PIN is written to `TransferPinStore` (the
+/// Keychain-backed store `SavedTransferPinSection` below manages directly) so it stays in sync
+/// with what Transferir prefills.
 private struct ChangeTransferPinSection: View {
     @Environment(USSDCodeStore.self) private var store
 
@@ -759,28 +778,43 @@ private struct ChangeTransferPinSection: View {
             || newPin == currentPin
     }
 
+    /// Only flagged once both fields are filled in — an empty field is caught by `isDisabled`
+    /// alone and doesn't need an explicit error.
+    private var showsSamePinError: Bool {
+        !currentPin.isEmpty && !newPin.isEmpty && newPin == currentPin
+    }
+
     var body: some View {
         Section("Cambiar Clave de Transferencia") {
             HStack(spacing: 12) {
-                SecureField("Clave actual", text: $currentPin)
+                TextField("Clave actual", text: $currentPin)
                     .textContentType(.password)
                     .keyboardType(.numberPad)
                 Divider()
-                SecureField("Clave nueva", text: $newPin)
+                TextField("Clave nueva", text: $newPin)
                     .textContentType(.newPassword)
                     .keyboardType(.numberPad)
             }
 
-            Button {
-                dial()
-            } label: {
-                HStack(spacing: 6) {
-                    Spacer()
-                    Text("Cambiar")
-                    Image(systemName: "arrow.right")
+            HStack(spacing: 6) {
+                if showsSamePinError {
+                    Text("La clave nueva es igual a la actual")
+                        .font(.footnote)
+                        .foregroundStyle(.red)
                 }
+
+                Spacer()
+
+                Button {
+                    dial()
+                } label: {
+                    HStack(spacing: 6) {
+                        Text("Cambiar")
+                        Image(systemName: "arrow.right")
+                    }
+                }
+                .disabled(isDisabled)
             }
-            .disabled(isDisabled)
         }
     }
 
@@ -788,6 +822,58 @@ private struct ChangeTransferPinSection: View {
         guard let code = store.code(withId: "transfer-pin-change") else { return }
         let resolved = code.resolvedCode(with: ["current": currentPin, "new": newPin])
         DialService.dial(resolved)
+        // Keep the saved PIN (below, and what Transferir prefills) in sync with the change.
+        TransferPinStore.save(newPin)
+    }
+}
+
+/// Ajustes › Guardar Clave de Transferencia — persists the PIN to the Keychain (see
+/// `TransferPinStore`) so Transferir's "Clave" field prefills itself on Home and inside a
+/// contact's sheet, instead of asking the user to retype it every time.
+private struct SavedTransferPinSection: View {
+    @State private var pin = ""
+    @State private var isSaved = false
+
+    var body: some View {
+        Section {
+            TextField("Clave", text: $pin)
+                .textContentType(.password)
+                .keyboardType(.numberPad)
+
+            HStack(spacing: 12) {
+                if isSaved {
+                    Label("Guardada", systemImage: "checkmark.seal.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.green)
+                }
+
+                Spacer()
+
+                if isSaved {
+                    Button("Olvidar", role: .destructive) {
+                        TransferPinStore.delete()
+                        pin = ""
+                        isSaved = false
+                    }
+                }
+
+                Button("Guardar") {
+                    TransferPinStore.save(pin)
+                    isSaved = true
+                }
+                .disabled(pin.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+        } header: {
+            Text("Guardar Clave de Transferencia")
+        } footer: {
+            Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
+        }
+        .onAppear {
+            if let stored = TransferPinStore.load() {
+                pin = stored
+                isSaved = true
+            }
+        }
     }
 }
 

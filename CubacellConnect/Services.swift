@@ -2,6 +2,7 @@ import CallKit
 import Contacts
 import CoreTelephony
 import Foundation
+import Security
 import UIKit
 
 let AppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
@@ -193,7 +194,7 @@ final class ContactsService {
                 // Skip contacts with no Cuban mobile number at all, even if a different
                 // (foreign) number is listed first — only Cuban numbers matter for USSD.
                 guard let cubanNumber = contact.phoneNumbers.lazy
-                    .compactMap({ Self.normalizeCubanMobile($0.value.stringValue) })
+                    .compactMap({ CubanPhoneNumber.normalize($0.value.stringValue) })
                     .first
                 else { return }
                 let name = CNContactFormatter.string(from: contact, style: .fullName) ?? "Sin nombre"
@@ -225,34 +226,6 @@ final class ContactsService {
         CallerIDStore.write(entries)
         CXCallDirectoryManager.sharedInstance.reloadExtension(withIdentifier: CallerIDStore.extensionBundleID) { _ in }
     }
-
-    /// Leading digit(s) a valid Cuban mobile number starts with, after the country code is
-    /// stripped. Currently "5" or "6" (broad — covers today's ETECSA mobile ranges); narrow
-    /// this to specific prefixes later (e.g. `["60", "61", "64"]` instead of `"6"`) if only
-    /// some ranges under 6 turn out to be mobile — `hasPrefix` matching means any length works.
-    private static let validMobilePrefixes = ["5", "6"]
-
-    /// Only Cuban mobile numbers belong in this list — USSD codes are meaningless for anyone
-    /// else. Accepts either the bare 8-digit local form or `+53` plus 8 digits, strips the
-    /// country code down to those 8 digits (e.g. "+53 5 123 4567" → "51234567"), and checks the
-    /// result starts with an allowed prefix (`validMobilePrefixes`). Anything else (a US `+1`,
-    /// a Mexican `+52`, a malformed number, a Cuban landline prefix, ...) returns `nil` and the
-    /// contact — or that specific number of theirs — is skipped entirely.
-    private static func normalizeCubanMobile(_ rawNumber: String) -> String? {
-        let digits = rawNumber.filter { $0.isASCII && $0.isNumber }
-
-        let localNumber: String
-        if digits.count == 8 {
-            localNumber = digits
-        } else if digits.count == 10, digits.hasPrefix("53") {
-            localNumber = String(digits.dropFirst(2))
-        } else {
-            return nil
-        }
-
-        guard validMobilePrefixes.contains(where: localNumber.hasPrefix) else { return nil }
-        return localNumber
-    }
 }
 
 // MARK: - Dial Service
@@ -277,5 +250,50 @@ enum DialService {
         }
         UIApplication.shared.open(url)
         return true
+    }
+}
+
+// MARK: - Transfer PIN Store
+
+/// Persists the user's transfer PIN in the device Keychain — encrypted at rest by iOS,
+/// `.whenUnlockedThisDeviceOnly` so it never leaves this device (no iCloud sync, no backup) —
+/// so the "Clave" field in Transferir (Home and inside a contact) can prefill itself instead of
+/// asking the user to retype it every time.
+enum TransferPinStore {
+    private static let service = "com.cubacellconnect.transferpin"
+    private static let account = "transferPin"
+
+    private static var query: [String: Any] {
+        [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+        ]
+    }
+
+    /// Replaces (or clears, for an empty string) the stored PIN.
+    static func save(_ pin: String) {
+        SecItemDelete(query as CFDictionary)
+        guard !pin.isEmpty, let data = pin.data(using: .utf8) else { return }
+        var attributes = query
+        attributes[kSecValueData as String] = data
+        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    static func load() -> String? {
+        var attributes = query
+        attributes[kSecReturnData as String] = true
+        attributes[kSecMatchLimit as String] = kSecMatchLimitOne
+
+        var result: AnyObject?
+        guard SecItemCopyMatching(attributes as CFDictionary, &result) == errSecSuccess,
+              let data = result as? Data
+        else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func delete() {
+        SecItemDelete(query as CFDictionary)
     }
 }
