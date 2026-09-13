@@ -660,10 +660,7 @@ enum DirectoryDatabase {
         guard !number.isEmpty || !name.isEmpty else { return [] }
         guard !number.isEmpty || name.count >= 3 else { return [] }
 
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(file.url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else {
-            return []
-        }
+        guard let db = open(file.url) else { return [] }
         defer { sqlite3_close(db) }
 
         var clauses: [String] = []
