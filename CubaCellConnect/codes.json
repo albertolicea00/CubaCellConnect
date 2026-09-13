@@ -119,6 +119,27 @@
           ]
         },
         {
+          "name": "Gestionar Plan Amigo",
+          "codes": [
+            {
+              "id": "friends-plan-toggle",
+              "code": "",
+              "title": "Plan Amigo (Activar/Desactivar)",
+              "details": "Código pendiente de agregar.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "friends-plan-manage-member",
+              "code": "",
+              "title": "Agregar/Eliminar Amigo de mi Plan",
+              "details": "Código pendiente de agregar.",
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
           "name": "SMS Suscripciones",
           "codes": []
         }

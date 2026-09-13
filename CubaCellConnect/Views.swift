@@ -608,6 +608,18 @@ private struct ContactCallOptionsSheet: View {
                 }
                 .disabled(isTransferDisabled)
             }
+
+            if let manageFriendsPlanCode = store.code(withId: "friends-plan-manage-member") {
+                Section {
+                    Button {
+                        dialFriendsPlanManage(manageFriendsPlanCode)
+                    } label: {
+                        Text("Agregar/Eliminar de mi Plan de Amigos")
+                            .foregroundStyle(accentColorStore.color)
+                    }
+                    .disabled(manageFriendsPlanCode.code.isEmpty)
+                }
+            }
         }
         .scrollBounceBehavior(.basedOnSize)
         .presentationDetents([.medium, .large])
@@ -634,6 +646,15 @@ private struct ContactCallOptionsSheet: View {
         guard let code = store.code(withId: "transfer-direct") else { return }
         let resolved = code.resolvedCode(with: ["phoneNumber": contact.phoneNumber, "pin": pin, "amount": amount])
         DialService.dial(resolved)
+        dismiss()
+    }
+
+    /// No-op until `friends-plan-manage-member`'s dial string is filled in in `codes.json` — the
+    /// button stays visible but disabled (see `manageFriendsPlanCode.code.isEmpty` above) so
+    /// there's nothing to actually dial yet.
+    private func dialFriendsPlanManage(_ code: USSDCode) {
+        guard !code.code.isEmpty else { return }
+        DialService.dial(code.resolvedCode(input: contact.phoneNumber))
         dismiss()
     }
 }
@@ -851,6 +872,7 @@ struct SMSSubscriptionsView: View {
 
 /// Settings tab: appearance, list display, connection warning, how USSD works, about and links.
 struct SettingsView: View {
+    @Environment(USSDCodeStore.self) private var store
     @Environment(AccentColorStore.self) private var accentColorStore
 
     @AppStorage("darkModePreference") private var darkMode: Int = 0
@@ -859,6 +881,7 @@ struct SettingsView: View {
 
     @State private var showingChangePin = false
     @State private var showingSavePin = false
+    @State private var manageFriendCode: USSDCode?
 
     var body: some View {
         NavigationStack {
@@ -920,6 +943,24 @@ struct SettingsView: View {
                     }
                 }
 
+                if let friendsPlanGroup = store.group(named: "Gestionar Plan Amigo") {
+                    Section("Gestionar Plan Amigo") {
+                        ForEach(friendsPlanGroup.codes) { code in
+                            Button {
+                                // Needs a target number; unlike "Activar/Desactivar" (your own
+                                // line), so it prompts for one instead of dialing directly.
+                                if code.id == "friends-plan-manage-member" {
+                                    manageFriendCode = code
+                                } else {
+                                    dial(code)
+                                }
+                            } label: {
+                                Text(code.title)
+                            }
+                        }
+                    }
+                }
+
                 Section("Clave de Transferencia") {
                     Button {
                         showingChangePin = true
@@ -973,6 +1014,88 @@ struct SettingsView: View {
             .sheet(isPresented: $showingSavePin) {
                 SavedTransferPinSheet()
             }
+            .sheet(item: $manageFriendCode) { code in
+                ManageFriendsPlanSheet(code: code)
+            }
+            .onAppear {
+                manageFriendCode = store.code(withId: "friends-plan-manage-member") // TEMP DEBUG
+            }
+        }
+    }
+
+    /// No-op for a code whose dial string isn't known yet (see "Gestionar Plan Amigo" in
+    /// `codes.json`) — nothing to dial until it's filled in.
+    private func dial(_ code: USSDCode) {
+        guard !code.code.isEmpty else { return }
+        DialService.dial(code.code)
+    }
+}
+
+/// Prompts for a phone number — typed or picked from Contacts — to run
+/// `friends-plan-manage-member` against, for when it's tapped from Ajustes directly rather than
+/// from inside a contact (where the number's already known; see `ContactCallOptionsSheet`).
+private struct ManageFriendsPlanSheet: View {
+    let code: USSDCode
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AccentColorStore.self) private var accentColorStore
+
+    @State private var phoneNumber = ""
+    @State private var showingContactPicker = false
+    @State private var showsInvalidNumberWarning = false
+
+    private var isDisabled: Bool {
+        phoneNumber.trimmingCharacters(in: .whitespaces).isEmpty || code.code.isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    HStack(spacing: 12) {
+                        Button {
+                            showingContactPicker = true
+                        } label: {
+                            Image(systemName: "person.crop.circle")
+                                .foregroundStyle(.secondary)
+                        }
+
+                        TextField("Número (+53 ...)", text: $phoneNumber)
+                            .keyboardType(.numberPad)
+                    }
+                } footer: {
+                    Text(code.details)
+                }
+            }
+            .navigationTitle(code.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Marcar") {
+                        DialService.dial(code.resolvedCode(input: phoneNumber))
+                        dismiss()
+                    }
+                    .tint(accentColorStore.color)
+                    .disabled(isDisabled)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .sheet(isPresented: $showingContactPicker) {
+            ContactPickerView { number, isValidCubanNumber in
+                phoneNumber = number
+                showsInvalidNumberWarning = !isValidCubanNumber
+            }
+            .ignoresSafeArea()
+        }
+        .alert("Número no parece cubano", isPresented: $showsInvalidNumberWarning) {
+            Button("Entendido", role: .cancel) {}
+        } message: {
+            Text("Este contacto no tiene un número con formato de móvil cubano (+53 y 8 dígitos). Revísalo antes de marcar.")
         }
     }
 }
