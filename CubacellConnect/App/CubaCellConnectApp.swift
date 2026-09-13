@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct CubacelConnectApp: App {
+struct CubaCellConnectApp: App {
     @State private var store = USSDCodeStore()
 
     var body: some Scene {

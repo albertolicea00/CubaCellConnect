@@ -1,10 +1,10 @@
 # Architecture
 
-This document describes how Cubacell Connect is structured and why. For contribution workflow see [CONTRIBUTING.md](CONTRIBUTING.md).
+This document describes how CubaCell Connect is structured and why. For contribution workflow see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Overview
 
-Cubacell Connect is a small, dependency-free SwiftUI app. Its entire job:
+CubaCell Connect is a small, dependency-free SwiftUI app. Its entire job:
 
 1. Load a bundled catalog of ETECSA USSD codes.
 2. Present them grouped by category.

@@ -2,7 +2,7 @@ Guidance for AI coding agents when working in this repository.
 
 ## Project Overview
 
-Cubacell Connect is a SwiftUI iPhone app (iOS 17+) that gives quick access to ETECSA (Cubacel) USSD service codes: balance queries, plan purchases, credit transfers and other utilities. The app hands codes to the system dialer — it performs no networking of its own.
+CubaCell Connect is a SwiftUI iPhone app (iOS 17+) that gives quick access to ETECSA (Cubacel) USSD service codes: balance queries, plan purchases, credit transfers and other utilities. The app hands codes to the system dialer — it performs no networking of its own.
 
 ## Build & Run
 
@@ -10,13 +10,13 @@ The Xcode project is **generated, not committed** (`*.xcodeproj` is gitignored):
 
 ```bash
 xcodegen generate                    # regenerate after changing project.yml or adding files
-open CubacellConnect.xcodeproj
+open CubaCellConnect.xcodeproj
 ```
 
 Verify compilation from the CLI:
 
 ```bash
-xcodebuild -project CubacellConnect.xcodeproj -scheme CubacellConnect \
+xcodebuild -project CubaCellConnect.xcodeproj -scheme CubaCellConnect \
   -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 
@@ -25,8 +25,8 @@ USSD dialing only works on a physical iPhone with a Cubacel SIM; the simulator c
 ## Architecture
 
 ```
-CubacellConnect/
-├── App/          CubacellConnectApp — entry point, injects USSDCodeStore via .environment
+CubaCellConnect/
+├── App/          CubaCellConnectApp — entry point, injects USSDCodeStore via .environment
 ├── Models/       USSDCode, USSDCategory, USSDCatalog (Codable, mirror the JSON schema)
 ├── Services/     USSDCodeStore (@Observable, loads bundled JSON)
 │                 DialService (tel:// bridge; `#` must be encoded as %23)
@@ -39,7 +39,7 @@ Data flow: `ussd_codes.json` → `USSDCodeStore` → views. No persistence, no n
 
 ## USSD Catalog Rules
 
-All codes live in `CubacellConnect/Resources/ussd_codes.json`. When editing:
+All codes live in `CubaCellConnect/Resources/ussd_codes.json`. When editing:
 
 - Keep the schema: `id`, `code`, `title`, `details`, `category`, `type`, `requiresInput`, optional `inputPlaceholder`, `mnemonic`.
 - `{input}` inside `code` marks the user-provided part (card number, phone number). Set `requiresInput: true` and provide `inputPlaceholder`.

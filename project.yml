@@ -1,4 +1,4 @@
-name: CubacellConnect
+name: CubaCellConnect
 options:
   bundleIdPrefix: com.cubacellconnect
   deploymentTarget:
@@ -6,15 +6,15 @@ options:
   createIntermediateGroups: true
 
 targets:
-  CubacellConnect:
+  CubaCellConnect:
     type: application
     platform: iOS
     sources:
-      - CubacellConnect
+      - CubaCellConnect
     info:
-      path: CubacellConnect/Info.plist
+      path: CubaCellConnect/Info.plist
       properties:
-        CFBundleDisplayName: Cubacell Connect
+        CFBundleDisplayName: CubaCell Connect
         CFBundleShortVersionString: 1.0.0
         CFBundleVersion: "1"
         UILaunchScreen: {}
