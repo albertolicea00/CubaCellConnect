@@ -940,7 +940,7 @@ private struct PreferencesSettingsView: View {
         Form {
             Section("Apariencia") {
                 Picker("Tema", selection: $darkMode) {
-                    Text("Predeterminado del sistema").tag(0)
+                    Text("Por Defecto").tag(0)
                     Text("Claro").tag(1)
                     Text("Oscuro").tag(2)
                 }
