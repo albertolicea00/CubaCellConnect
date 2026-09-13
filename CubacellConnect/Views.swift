@@ -69,7 +69,7 @@ enum HomeTab: String, CaseIterable, Identifiable {
         case .contacts: return "Contactos"
         case .home: return "Home"
         case .purchase: return "Compras"
-        // case .settings: return "Ajustes"
+        case .settings: return "Ajustes"
         }
     }
 }
@@ -390,9 +390,10 @@ struct ContactsListView: View {
     }
 }
 
-/// One contact row: name + number, then two call buttons — collect call (`*99`) and hidden
-/// caller ID (`#31#`) — mirroring the old Llamada por Cobrar / Llamada Privada codes, just
-/// applied directly to a picked contact instead of a manually typed number.
+/// One contact row: name + number, then a single round call button offering a choice between
+/// hidden caller ID (`#31#`) and collect call (`*99`) — mirroring the old Llamada Privada /
+/// Llamada por Cobrar codes, just applied directly to a picked contact instead of a manually
+/// typed number.
 private struct ContactCallRowView: View {
     let contact: DeviceContact
 
@@ -409,23 +410,22 @@ private struct ContactCallRowView: View {
 
             Spacer()
 
-            Button {
-                DialService.dial("*99\(contact.phoneNumber)")
-            } label: {
-                Image(systemName: "creditcard.and.123")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(Color.brandCyan)
-            .accessibilityLabel("Llamar por cobrar")
+            Menu {
+                Button("Llamar Anónimo") {
+                    DialService.dial("#31#\(contact.phoneNumber)")
+                }
 
-            Button {
-                DialService.dial("#31#\(contact.phoneNumber)")
+                Button("Llamar con 99") {
+                    DialService.dial("*99\(contact.phoneNumber)")
+                }
             } label: {
-                Image(systemName: "eye.slash.fill")
+                Image(systemName: "phone.connection")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(Color.brandCyan, in: Circle())
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(Color.brandCyan)
-            .accessibilityLabel("Llamar oculto")
+            .accessibilityLabel("Llamar")
         }
         .padding(.vertical, 2)
     }
