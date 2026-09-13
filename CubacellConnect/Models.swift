@@ -19,13 +19,29 @@ struct USSDCode: Identifiable, Codable, Hashable {
     let code: String
     let title: String
     let details: String
+    /// SF Symbol name. When present, the row renders as an icon + title (no description) like
+    /// the Home quick actions; when nil, it renders as the default title + description row.
+    let icon: String?
+    /// Price tag shown trailing in the row, e.g. "$25.00". Nil for codes with no fixed price.
+    let price: String?
+    /// Forces the compact icon-row layout (title only, no description) even with no icon or
+    /// price — for actions whose title alone is self-explanatory.
+    let compact: Bool?
     let type: USSDActionType
     let requiresInput: Bool
     let inputPlaceholder: String?
 
-    /// Code with the user-provided input substituted in.
+    /// Code with the given named placeholders substituted in — each dictionary key `name`
+    /// replaces a `{name}` token in `code`. Used by multi-field actions like the Home transfer card.
+    func resolvedCode(with values: [String: String]) -> String {
+        values.reduce(code) { partial, entry in
+            partial.replacingOccurrences(of: "{\(entry.key)}", with: entry.value)
+        }
+    }
+
+    /// Convenience for the common single-placeholder case (`{input}`).
     func resolvedCode(input: String = "") -> String {
-        code.replacingOccurrences(of: "{input}", with: input)
+        resolvedCode(with: ["input": input])
     }
 }
 
