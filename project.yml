@@ -42,6 +42,8 @@ targets:
     dependencies:
       - target: CallerIDExtension
         embed: true
+    scheme:
+      testTargets: []
 
   CallerIDExtension:
     type: app-extension
