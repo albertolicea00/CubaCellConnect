@@ -877,32 +877,56 @@ struct CategoryListView: View {
 /// services, pulled from the "Servicios por SMS" group in `codes.json` (currently empty; codes
 /// go straight into the JSON once they're in hand, same as every other code in the app — never
 /// hardcoded here).
-/// Ajustes › Utilidades › Servicios por SMS — just the query/subscription groups. "Configuraciones"
-/// (LTE, IMEI/3G-4G check, MMS setup) renders directly as its own rows under Ajustes › Cuenta
-/// instead (see `SettingsView`), not as a sub-screen — those are quick one-off device/line
-/// settings, not something worth another level of navigation.
+/// Ajustes › Utilidades › Servicios por SMS — every SMS-based service except Deportes and
+/// "Configuraciones" (LTE, IMEI/3G-4G check, MMS setup — those render directly as their own rows
+/// under Ajustes › Cuenta instead, see `SettingsView`, since they're quick one-off device/line
+/// settings, not something worth another level of navigation here). Deportes is a single row that
+/// pushes to `DeportesView`, since Fútbol/Béisbol are big enough lists to deserve their own screen
+/// rather than expanding inline in the middle of this one.
 struct SMSServicesView: View {
     var body: some View {
         SMSCodeListView(
             title: "Servicios por SMS",
-            groupNames: [
-                "Consultas", "SMS Suscripciones", "Fútbol", "Frases y Poemas", "Noticias",
-                "Suscripciones de Noticias", "Béisbol", "Horóscopo", "Clima", "Vuelos",
-                "Tarifa Eléctrica", "Recetas",
-            ],
+            leadingGroupNames: ["Consultas", "SMS Suscripciones", "DHL y Vuelos", "Tarifas y Servicios"],
+            trailingGroupNames: ["Noticias", "Recetas, Frases y Horóscopos"],
             emptyStateDescription: "Los códigos de suscripción de SMS se agregarán aquí próximamente."
+        ) {
+            Section {
+                NavigationLink {
+                    DeportesView()
+                } label: {
+                    Label("Deportes", systemImage: "sportscourt.fill")
+                }
+            }
+        }
+    }
+}
+
+/// Servicios por SMS › Deportes — Fútbol (Bundesliga, Champions, Copa del Rey, LaLiga, Premier,
+/// Serie A) and Béisbol (MLB, Pelota Cubana) as two sections on their own screen, reached from the
+/// single "Deportes" row in `SMSServicesView`.
+struct DeportesView: View {
+    var body: some View {
+        SMSCodeListView(
+            title: "Deportes",
+            groupNames: ["Fútbol", "Béisbol"],
+            emptyStateDescription: "Los códigos de deportes se agregarán aquí próximamente."
         )
     }
 }
 
-/// Shared list/compose logic behind `SMSServicesView` — renders the given `codes.json` groups in
-/// the same compact, price-trailing row shape as Compras, and handles composing the SMS itself
-/// (the requires-input alert, the `MFMessageComposeViewController`
-/// sheet, and the "this device can't send texts" guard, e.g. the Simulator).
-private struct SMSCodeListView: View {
+/// Shared list/compose logic behind `SMSServicesView`/`DeportesView` — renders the given
+/// `codes.json` groups in the same compact, price-trailing row shape as Compras, and handles
+/// composing the SMS itself (the requires-input alert, the `MFMessageComposeViewController` sheet,
+/// and the "this device can't send texts" guard, e.g. the Simulator). `extraSection` is a fixed
+/// slot between `leadingGroupNames` and `trailingGroupNames` for a non-code row like the Deportes
+/// nav link — most callers don't need one, see the `EmptyView` convenience init below.
+private struct SMSCodeListView<ExtraSection: View>: View {
     let title: String
-    let groupNames: [String]
+    let leadingGroupNames: [String]
+    var trailingGroupNames: [String] = []
     let emptyStateDescription: String
+    let extraSection: () -> ExtraSection
 
     @Environment(USSDCodeStore.self) private var store
     @Environment(AccentColorStore.self) private var accentColorStore
@@ -912,12 +936,11 @@ private struct SMSCodeListView: View {
     @State private var pendingSMS: PendingSMS?
     @State private var showsCannotSendTextAlert = false
 
-    private var groups: [USSDCodeGroup] {
-        groupNames.compactMap { store.group(named: $0) }
-    }
+    private var leadingGroups: [USSDCodeGroup] { leadingGroupNames.compactMap { store.group(named: $0) } }
+    private var trailingGroups: [USSDCodeGroup] { trailingGroupNames.compactMap { store.group(named: $0) } }
 
     private var hasAnyCodes: Bool {
-        groups.contains { !$0.codes.isEmpty }
+        (leadingGroups + trailingGroups).contains { !$0.codes.isEmpty }
     }
 
     var body: some View {
@@ -930,32 +953,9 @@ private struct SMSCodeListView: View {
                 )
             } else {
                 List {
-                    ForEach(groups) { group in
-                        if !group.codes.isEmpty {
-                            Section(group.name ?? "") {
-                                ForEach(group.codes) { code in
-                                    // Same compact, price-trailing row shape as Compras — set
-                                    // "compact": true on every code here so they all render like
-                                    // it, price or not. A code with `options` (a fixed set of valid
-                                    // message texts, e.g. Frases y Poemas) opens a picker instead of
-                                    // dialing/composing straight away.
-                                    if code.options != nil {
-                                        NavigationLink {
-                                            SMSOptionPickerView(code: code)
-                                        } label: {
-                                            rowLabel(code)
-                                        }
-                                    } else {
-                                        Button {
-                                            select(code)
-                                        } label: {
-                                            rowLabel(code)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    codeSections(leadingGroups)
+                    extraSection()
+                    codeSections(trailingGroups)
                 }
                 .listStyle(.insetGrouped)
                 .tint(accentColorStore.color)
@@ -994,6 +994,35 @@ private struct SMSCodeListView: View {
         }
     }
 
+    @ViewBuilder
+    private func codeSections(_ groups: [USSDCodeGroup]) -> some View {
+        ForEach(groups) { group in
+            if !group.codes.isEmpty {
+                Section(group.name ?? "") {
+                    ForEach(group.codes) { code in
+                        // Same compact, price-trailing row shape as Compras — set
+                        // "compact": true on every code here so they all render like it, price or
+                        // not. A code with `options` (a fixed set of valid message texts, e.g.
+                        // Frases y Poemas) opens a picker instead of dialing/composing straight away.
+                        if code.options != nil {
+                            NavigationLink {
+                                SMSOptionPickerView(code: code)
+                            } label: {
+                                rowLabel(code)
+                            }
+                        } else {
+                            Button {
+                                select(code)
+                            } label: {
+                                rowLabel(code)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private func select(_ code: USSDCode) {
         if code.requiresInput {
             inputText = ""
@@ -1015,6 +1044,14 @@ private struct SMSCodeListView: View {
     private func rowLabel(_ code: USSDCode) -> some View {
         HStack {
             Text(code.title)
+            if code.isSubscription == true {
+                Text("Suscripción")
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.secondary.opacity(0.15), in: Capsule())
+                    .foregroundStyle(.secondary)
+            }
             Spacer()
             if let price = code.price {
                 Text(price)
@@ -1023,6 +1060,18 @@ private struct SMSCodeListView: View {
             }
             Image(systemName: "arrow.right")
         }
+    }
+}
+
+extension SMSCodeListView where ExtraSection == EmptyView {
+    init(title: String, groupNames: [String], emptyStateDescription: String) {
+        self.init(
+            title: title,
+            leadingGroupNames: groupNames,
+            trailingGroupNames: [],
+            emptyStateDescription: emptyStateDescription,
+            extraSection: { EmptyView() }
+        )
     }
 }
 

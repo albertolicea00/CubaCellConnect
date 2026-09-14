@@ -47,9 +47,13 @@ struct USSDCode: Identifiable, Codable, Hashable {
     let smsBody: String?
     /// For `type == .sms` codes with a fixed set of valid message texts (e.g. "Frases y Poemas" —
     /// texting one of ~35 topic words to 8888 gets a phrase back for that topic). When present,
-    /// the row opens a picker listing these instead of dialing/composing directly; picking one
-    /// sends it verbatim as the SMS body, ignoring `smsBody`. Nil for every other code.
+    /// the row opens a picker listing these instead of dialing/composing directly; picking one is
+    /// substituted into `smsBody`'s `{input}` token same as typed input would be (e.g. "Recetas"
+    /// picks "BATIDOS" → sends "RECETA BATIDOS"). Nil for every other code.
     let options: [String]?
+    /// Marks an ongoing subscription (e.g. "Martí" via 8100) as opposed to a one-off query — shown
+    /// as a small "Suscripción" badge next to the title. Nil/false for everything else.
+    let isSubscription: Bool?
 
     /// Code with the given named placeholders substituted in — each dictionary key `name`
     /// replaces a `{name}` token in `code`. Used by multi-field actions like the Home transfer card.
