@@ -115,6 +115,7 @@ The codes were saved from the following sites:
 - https://www.fonoma.com/blog/codigos-ussd-cuba
 - https://www.etecsa.cu/es/taxonomy/term/1445
 - https://www.etecsa.cu/en/rooms-public-spaces
+- https://www.ecured.cu/Entumovil
 - https://www.escambray.cu/2017/etecsa-informa-sobre-nuevos-servicios-de-telefonia-movil-para-clientes-prepago-infografia/
 - https://www.entumovil.cu/#:~:text=Para%20activar%20las%20siguientes%20prestaciones%2C,portal%20el%20de%20su%20preferencia.
 
