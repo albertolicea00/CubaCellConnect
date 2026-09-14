@@ -31,7 +31,9 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 🎙️ **Siri & Voice Shortcuts** — Execute balance checks and collect/anonymous calls via native voice commands using `AppIntents`.
 - 🌗 **Customization & Settings** — Light/Dark theme support, custom accent color picker, and configurable launch tab.
 
-*The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
+### Upcoming
+- **Online Phone Directory Search** — Web scraper backend integration for online phone number lookups. See [#2](https://github.com/albertolicea00/CubaCellConnect/issues/2) for details.
+- **Yellow Pages Integration** — Web scraper backend integration to search ETECSA Yellow Pages by category, number, municipality, and province. See [#3](https://github.com/albertolicea00/CubaCellConnect/issues/3) for details.
 
 ## 🛠️ Requirements
 
@@ -72,6 +74,8 @@ CallerIDExtension/             # CallKit Call Directory Extension (labels *99 co
 Shared/                        # Code shared by the app and CallerIDExtension
 └── CallerIDStore.swift        # App Group–backed caller-ID list (read/write)
 ```
+
+*The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
 ## ☎️ Direct Dial vs. Confirmation
 
