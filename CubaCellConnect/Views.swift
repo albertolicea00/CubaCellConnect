@@ -54,23 +54,44 @@ struct HomeView: View {
                 .tag(HomeTab.settings.rawValue)
         }
         .tint(accentColorStore.color)
-        .onAppear { selectedTab = defaultTab }
+        .onAppear {
+            selectedTab = (HomeTab(rawValue: defaultTab) ?? .home).tabToSelect.rawValue
+        }
     }
 }
 
 /// The 5 tabs, keyed by a stable string so it can be stored in `@AppStorage` (as "Pestaña
 /// inicial" in Ajustes › Preferencias) and used as the `TabView` selection tag.
 enum HomeTab: String, CaseIterable, Identifiable {
-    case helplines, contacts, home, purchase, settings
+    case helplines, contacts, home, purchase, settings, speedTest, directory
 
     var id: String { rawValue }
 
+    /// Every case except the plain `.settings` landing screen itself — used by "Pestaña Inicial"
+    /// in Ajustes, which offers `.speedTest`/`.directory` (nested screens *inside* Ajustes) as
+    /// launch destinations but not the bare Ajustes list.
+    static var launchOptions: [HomeTab] {
+        allCases.filter { $0 != .settings }
+    }
+
     var displayName: String {
         switch self {
-        case .helplines: return "Líneas de Ayuda"
-        case .contacts: return "Contactos"
-        case .home: return "Home"
-        case .purchase: return "Compras"
+            case .helplines: return "Líneas de Ayuda"
+            case .contacts: return "Contactos"
+            case .home: return "Home"
+            case .purchase: return "Compras"
+            case .settings: return "Ajustes"
+            case .speedTest: return "Velocidad de Internet"
+            case .directory: return "Buscar en Directorio"
+        }
+    }
+
+    /// The actual `TabView` tab to select for this launch destination — `.speedTest`/`.directory`
+    /// aren't tabs themselves, they're screens `SettingsView` pushes onto once Ajustes is showing.
+    var tabToSelect: HomeTab {
+        switch self {
+        case .speedTest, .directory: return .settings
+        default: return self
         }
     }
 }
@@ -944,9 +965,19 @@ struct SettingsView: View {
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
     @AppStorage("quickPurchaseNoConfirmDefault") private var quickPurchaseNoConfirmDefault = false
 
+    /// Fires at most once per launch — `defaultTab` is only meant to auto-push
+    /// `.speedTest`/`.directory` the moment Ajustes first appears on a fresh launch, not every
+    /// time the user switches back to this tab after navigating elsewhere.
+    @State private var hasAutoNavigatedToLaunchDestination = false
+    @State private var isShowingSpeedTestOnLaunch = false
+    @State private var isShowingDirectoryOnLaunch = false
+
     var body: some View {
         NavigationStack {
             List {
+                NavigationLink(isActive: $isShowingSpeedTestOnLaunch) { SpeedTestView() } label: { EmptyView() }.hidden()
+                NavigationLink(isActive: $isShowingDirectoryOnLaunch) { DirectorySearchView() } label: { EmptyView() }.hidden()
+
                 Section("Preferencias") {
                     // Inline pickers in a List don't reliably inherit `.tint()` from an ancestor
                     // (e.g. the TabView's) for their selected-value text/chevron — tint each one
@@ -961,7 +992,7 @@ struct SettingsView: View {
                     Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
 
                     Picker("Pestaña Inicial", selection: $defaultTab) {
-                        ForEach(HomeTab.allCases) { tab in
+                        ForEach(HomeTab.launchOptions) { tab in
                             Text(tab.displayName).tag(tab.rawValue)
                         }
                     }
@@ -1071,6 +1102,15 @@ struct SettingsView: View {
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                guard !hasAutoNavigatedToLaunchDestination else { return }
+                hasAutoNavigatedToLaunchDestination = true
+                if defaultTab == HomeTab.speedTest.rawValue {
+                    isShowingSpeedTestOnLaunch = true
+                } else if defaultTab == HomeTab.directory.rawValue {
+                    isShowingDirectoryOnLaunch = true
+                }
+            }
         }
     }
 }
