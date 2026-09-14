@@ -18,7 +18,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - ⌨️ **Input-aware codes** — codes like `*662*{card}#` or `#31#{number}` ask for the missing part before dialing.
 - 🌗 **Light and dark mode** support.
 - 👤 **Contactos tab** — reads the device's real address book (with photos) so you can call, transfer balance to, or dial a collect/hidden call for any contact without leaving the app.
-- 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
+- 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 11](ARCHITECTURE.md#11-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
 - 🛜 **Navigation rooms & public WIFI spaces** — Ajustes › Salas y Zonas WiFi lists every Cuban province; picking one shows ETECSA's own paid navigation rooms (with seat counts) and free public WIFI hotspots by municipality, bundled from [`CubaCellConnect/wifi_navigation_rooms.json`](CubaCellConnect/wifi_navigation_rooms.json). See sources below.
 - ✉️ **Servicios por SMS** — Ajustes › Servicios por SMS is a searchable catalog of ETECSA's text-message services (noticias, suscripciones, deportes, clima, horóscopo, DHL, vuelos, tarifa eléctrica, recetas, ...), each opening the system SMS compose sheet prefilled — never sent silently.
 - 📶 **Internet speed test** — Ajustes › Medir Velocidad de Internet runs a ping/download/upload test against Cloudflare's public speed-test endpoints, live gauge included. No ETECSA-run equivalent exists; this is a generic connectivity check, not Cuba-specific.
@@ -26,6 +26,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 👥 **Plan Amigo & transfer PIN management** — Ajustes › Cuenta has dedicated screens to add/remove Plan Amigo numbers and to view/change/save your transfer PIN (Keychain-backed, never leaves the device) so it can prefill itself in Transferir.
 - 🎨 **Accent color picker** — Ajustes › Preferencias lets you replace the app's default cyan accent with any color; a "Restablecer Color por Defecto" button appears once you've changed it.
 - 🚀 **Configurable launch screen** — Ajustes › Pestaña Inicial picks which tab opens on launch, and also covers several screens nested *inside* Ajustes itself (Medir Velocidad de Internet, Servicios por SMS, and all three directory searches) — picking one of those jumps straight to Ajustes and auto-pushes that screen the moment the app opens, instead of landing on the plain Ajustes list first.
+- 🔔 **Recordatorios** — Ajustes › Utilidades › Recordatorios schedules local notifications (no server, no push) for Comprar Paquete, Hacer Transferencia, or Recargar Saldo. Each template can be reused any number of times (one per phone line), with a title that auto-suggests itself from the number you enter. Recurrence: once, daily, weekly, monthly, or every N days. Tapping "Ejecutar" on a reminder either switches to Compras (paquete, since it's a whole catalog of choices, not one fixed code), asks for the missing card number (recarga), or opens a small confirm sheet with the phone/PIN/amount (transferencia) before dialing. Fully custom, template-less reminders are also supported. Everything starts off — nothing fires until you create a reminder.
 
 *The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
@@ -48,15 +49,15 @@ open CubaCellConnect.xcodeproj
 
 Build and run on a device. **USSD dialing requires a physical iPhone with a Cubacel SIM** 📲 — the simulator cannot place calls.
 
-To get Caller ID working for `*99` collect calls, after installing the app go to **Ajustes (Settings) › Teléfono › Bloqueo e Identificación de Llamadas** on the device and enable **CallerID**. This is a one-time, manual iOS setting — no app can enable it automatically. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for why.
+To get Caller ID working for `*99` collect calls, after installing the app go to **Ajustes (Settings) › Teléfono › Bloqueo e Identificación de Llamadas** on the device and enable **CallerID**. This is a one-time, manual iOS setting — no app can enable it automatically. See [ARCHITECTURE.md § 11](ARCHITECTURE.md#11-caller-id-extension-99-collect-call-identification) for why.
 
 ## 🗂️ Project Structure
 
 ```
 CubaCellConnect/
 ├── CubaCellConnectApp.swift  # App entry point
-├── Models.swift              # USSDCode, USSDCategory, catalog decoding, brand palette
-├── Services.swift            # JSON catalog store, Contacts, system dialer bridge
+├── Models.swift              # USSDCode, USSDCategory, catalog decoding, brand palette, Reminder/ReminderTemplate
+├── Services.swift            # JSON catalog store, Contacts, system dialer bridge, ReminderManager (local notifications)
 ├── UIComponents.swift        # Reusable presentational views (code row)
 ├── Views.swift               # Home, Contactos, category, and settings screens
 ├── codes.json                # Bundled USSD code catalog
@@ -100,7 +101,7 @@ Since this data is bundled (not fetched live), it can drift from ETECSA's site o
 
 ## 🚧 Known Limitations
 
-- **Directory database not integrated with Caller ID (`*99`).** The directory database (see above) is intentionally kept separate from `CallerIDStore`/`CallDirectoryHandler` (see [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification)), which only ever loads from the device's own Contacts. A CallKit Call Directory Extension has a hard cap on how many identification entries it can register (historically on the order of 100k–200k) — the directory dump has millions of rows (v1: ~4.6M; v2: ~4.8M combined), so registering it wholesale would get the extension rejected/disabled by iOS. Feeding it in would need a drastic filter (e.g. only numbers already in the device's own contacts, which is exactly what happens today) to fit under that ceiling.
+- **Directory database not integrated with Caller ID (`*99`).** The directory database (see above) is intentionally kept separate from `CallerIDStore`/`CallDirectoryHandler` (see [ARCHITECTURE.md § 11](ARCHITECTURE.md#11-caller-id-extension-99-collect-call-identification)), which only ever loads from the device's own Contacts. A CallKit Call Directory Extension has a hard cap on how many identification entries it can register (historically on the order of 100k–200k) — the directory dump has millions of rows (v1: ~4.6M; v2: ~4.8M combined), so registering it wholesale would get the extension rejected/disabled by iOS. Feeding it in would need a drastic filter (e.g. only numbers already in the device's own contacts, which is exactly what happens today) to fit under that ceiling.
 
 - **No "call via WhatsApp/Teams" option in Contactos.** The Contactos tab only offers cellular actions (normal call, `*99` collect, `#31#` anonymous) next to each contact — it can't add a "call via WhatsApp" or "call via Teams" option alongside them. Those apps place calls over their own proprietary VoIP/Wi-Fi-calling stack, not the cellular network, and don't expose any public API or URL scheme a third-party app can use to trigger a call through them — that's entirely up to WhatsApp/Teams themselves (they'd need to register their own CallKit provider and/or an app-specific integration), not something CubaCellConnect can add from the outside.
 
