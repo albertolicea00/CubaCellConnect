@@ -879,45 +879,25 @@ struct CategoryListView: View {
 /// services, pulled from the "Servicios por SMS" group in `codes.json` (currently empty; codes
 /// go straight into the JSON once they're in hand, same as every other code in the app — never
 /// hardcoded here).
-/// Ajustes › Utilidades › Servicios por SMS — every SMS-based service except Deportes and
-/// "Configuraciones" (LTE, IMEI/3G-4G check, MMS setup — those render directly as their own rows
-/// under Ajustes › Cuenta instead, see `SettingsView`, since they're quick one-off device/line
-/// settings, not something worth another level of navigation here). Deportes is a single row that
-/// pushes to `DeportesView`, since Fútbol/Béisbol are big enough lists to deserve their own screen
-/// rather than expanding inline in the middle of this one.
+/// Ajustes › Utilidades › Servicios por SMS — every SMS-based service except "Configuraciones"
+/// (LTE, IMEI/3G-4G check, MMS setup — those render directly as their own rows under Ajustes ›
+/// Cuenta instead, see `SettingsView`, since they're quick one-off device/line settings, not
+/// something worth another level of navigation here). Deportes (Pelota Cubana, MLB, and the
+/// football tournaments) sits as its own Section, between DHL y Vuelos and Noticias.
 struct SMSServicesView: View {
     var body: some View {
         SMSCodeListView(
             title: "Servicios por SMS",
-            leadingGroupNames: ["Consultas", "Tarifas y Servicios", "DHL y Vuelos"],
-            trailingGroupNames: ["Noticias", "Recetas, Frases y Horóscopos"],
+            groupNames: [
+                "Consultas", "Tarifas y Servicios", "DHL y Vuelos", "Deportes", "Noticias",
+                "Recetas, Frases y Horóscopos",
+            ],
             emptyStateDescription: "Los códigos de suscripción de SMS se agregarán aquí próximamente."
-        ) {
-            Section {
-                NavigationLink {
-                    DeportesView()
-                } label: {
-                    Label("Deportes", systemImage: "sportscourt.fill")
-                }
-            }
-        }
-    }
-}
-
-/// Servicios por SMS › Deportes — Pelota Cubana and MLB first, then the football tournaments
-/// (Bundesliga, Champions, Copa del Rey, LaLiga, Premier, Serie A), all as one flat list on their
-/// own screen, reached from the single "Deportes" row in `SMSServicesView`.
-struct DeportesView: View {
-    var body: some View {
-        SMSCodeListView(
-            title: "Deportes",
-            groupNames: ["Deportes"],
-            emptyStateDescription: "Los códigos de deportes se agregarán aquí próximamente."
         )
     }
 }
 
-/// Shared list/compose logic behind `SMSServicesView`/`DeportesView` — renders the given
+/// Shared list/compose logic behind `SMSServicesView` — renders the given
 /// `codes.json` groups in the same compact, price-trailing row shape as Compras, and handles
 /// composing the SMS itself (the requires-input alert, the `MFMessageComposeViewController` sheet,
 /// and the "this device can't send texts" guard, e.g. the Simulator). `extraSection` is a fixed
@@ -938,12 +918,24 @@ private struct SMSCodeListView<ExtraSection: View>: View {
     @State private var pendingSMS: PendingSMS?
     @State private var showsCannotSendTextAlert = false
     @State private var variantPickerCode: USSDCode?
+    @State private var searchText = ""
 
     private var leadingGroups: [USSDCodeGroup] { leadingGroupNames.compactMap { store.group(named: $0) } }
     private var trailingGroups: [USSDCodeGroup] { trailingGroupNames.compactMap { store.group(named: $0) } }
 
     private var hasAnyCodes: Bool {
         (leadingGroups + trailingGroups).contains { !$0.codes.isEmpty }
+    }
+
+    /// Groups narrowed to codes whose title matches the search text — empty groups are dropped so
+    /// an unmatched group doesn't leave a bare header behind, same pattern as `CategoryListView`.
+    private func filtered(_ groups: [USSDCodeGroup]) -> [USSDCodeGroup] {
+        guard !searchText.isEmpty else { return groups }
+        return groups.compactMap { group in
+            let matches = group.codes.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+            guard !matches.isEmpty else { return nil }
+            return USSDCodeGroup(name: group.name, codes: matches)
+        }
     }
 
     var body: some View {
@@ -956,12 +948,15 @@ private struct SMSCodeListView<ExtraSection: View>: View {
                 )
             } else {
                 List {
-                    codeSections(leadingGroups)
-                    extraSection()
-                    codeSections(trailingGroups)
+                    codeSections(filtered(leadingGroups))
+                    if searchText.isEmpty {
+                        extraSection()
+                    }
+                    codeSections(filtered(trailingGroups))
                 }
                 .listStyle(.insetGrouped)
                 .tint(accentColorStore.color)
+                .searchable(text: $searchText, prompt: "Buscar")
             }
         }
         .navigationTitle(title)
