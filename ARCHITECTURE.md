@@ -159,7 +159,9 @@ Same trigger mapping as every other `UNNotificationTrigger`-based scheduler: `.n
 
 ## 7. Siri & App Intents
 
-Ajustes › Siri y Atajos de Voz exposes fixed codes and the `*99`/`#31#` calls to Siri, Spotlight, and the Shortcuts app via Apple's **App Intents** framework — not the legacy SiriKit `Intents.framework`. Every type lives directly in `Services.swift`; there is no separate Intents Extension, no `.intentdefinition` file, and no Siri capability/entitlement to add — the system finds `CubaCellShortcuts` by reflection at install time. This needs iOS 16+, which this app already exceeds (deployment target 17.0, §1).
+Ajustes › Ayuda (Manual de Uso) › Siri y Atajos de Voz — the last section of `HelpSettingsView`, not a `SettingsView` section itself; it's documentation with one action button, not settings — describes what exposes fixed codes and the `*99`/`#31#` calls to Siri, Spotlight, and the Shortcuts app via Apple's **App Intents** framework — not the legacy SiriKit `Intents.framework`. Every type lives directly in `Services.swift`; there is no separate Intents Extension, no `.intentdefinition` file, and no Siri capability/entitlement to add — the system finds `CubaCellShortcuts` by reflection at install time. This needs iOS 16+, which this app already exceeds (deployment target 17.0, §1).
+
+Its "Abrir Ajustes de Siri para CubaCell Connect" button opens `UIApplication.openSettingsURLString` — iOS's own per-app settings page, not anything this app controls. It exists because the one thing that can silently disable every phrase here is a device-level toggle this app has no API to read or change: Ajustes (iOS) › Siri y Buscar › CubaCell Connect › "Usar con Preguntar a Siri", on by default but user-togglable. No entitlement, no in-app toggle, and no runtime permission prompt are needed for App Intents themselves — only that one external switch is worth surfacing a shortcut to.
 
 ### 7.1 Two shapes of intent
 
