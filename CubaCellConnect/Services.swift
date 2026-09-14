@@ -650,16 +650,14 @@ struct DirectoryEntry: Identifiable, Hashable {
 /// callers must run `search` off the main thread and keep queries short (it refuses under 3
 /// characters) to bound how bad that scan gets.
 enum DirectoryDatabase {
-    /// Direct-file-download URL for the current (v1) dump, wherever it's currently hosted (GitHub
-    /// Releases, archive.org, ...). Whatever host this points at, it has to serve the raw bytes
-    /// directly — not an HTML landing page, and not a source/archive wrapper (e.g. GitHub's
-    /// `archive/refs/tags/...` gives repo source, never a release asset's actual bytes). The
-    /// downloader in `DirectorySearchView.downloadDatabase` names the saved file after this URL's
-    /// last path component, so it must end in the real filename (e.g. `etecsa.database.v1.db`),
-    /// not just an item/tag identifier. Move this when a new schema version or a new host replaces
-    /// it (see the release notes for `etecsa.database.v2.db`).
+    /// Direct-file-download URL for the current dump, wherever it's currently hosted.
+    /// Whatever host this points at, it has to serve the raw bytes directly — not an HTML
+    /// landing page, and not a source/archive wrapper. The downloader in
+    /// `DirectorySearchView.downloadDatabase` names the saved file after this URL's
+    /// last path component, so it must end in the real filename (e.g. `sqlite.db`),
+    /// not just an item/tag identifier.
     
-    static let downloadURL = URL(string: "https://....")! // todo
+    static let downloadURL = URL(string: "https://archive.org/download/masvnbvdc/sqlite.db")!
 
     private static let transientDestructor = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
