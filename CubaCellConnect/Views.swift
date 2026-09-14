@@ -1097,18 +1097,17 @@ struct SettingsView: View {
                         .listRowBackground(Color.clear)
                 }
             }
-            .background {
-                // Kept out of the List itself — a `NavigationLink` row hidden with `.hidden()`
-                // still reserves its row height there, leaving two empty rows above Preferencias.
-                VStack(spacing: 0) {
-                    NavigationLink(isActive: $isShowingSpeedTestOnLaunch) { SpeedTestView() } label: { EmptyView() }
-                    NavigationLink(isActive: $isShowingDirectoryOnLaunch) { DirectorySearchView() } label: { EmptyView() }
-                }
-                .hidden()
-            }
+            .navigationDestination(isPresented: $isShowingSpeedTestOnLaunch) { SpeedTestView() }
+            .navigationDestination(isPresented: $isShowingDirectoryOnLaunch) { DirectorySearchView() }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                // A stored `defaultTab` of "settings" predates removing the bare Ajustes option
+                // from "Pestaña Inicial" — normalize it so the Picker doesn't show a blank
+                // selection forever for anyone who had it set.
+                if defaultTab == HomeTab.settings.rawValue {
+                    defaultTab = HomeTab.home.rawValue
+                }
                 guard !hasAutoNavigatedToLaunchDestination else { return }
                 hasAutoNavigatedToLaunchDestination = true
                 if defaultTab == HomeTab.speedTest.rawValue {
