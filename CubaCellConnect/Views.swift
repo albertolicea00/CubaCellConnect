@@ -81,10 +81,10 @@ enum HomeTab: String, CaseIterable, Identifiable {
             case .contacts: return "Contactos"
             case .home: return "Home"
             case .purchase: return "Compras"
+            case .smsServices: return "Servicios por SMS"
             case .settings: return "Ajustes"
             case .speedTest: return "Velocidad de Internet"
             case .directory: return "Buscar en Directorio (Local)"
-            case .smsServices: return "Servicios por SMS"
             case .directoryOnline: return "Buscar en Directorio (Online)"
             case .yellowPages: return "Buscar en Páginas Amarillas"
         }
@@ -1290,24 +1290,6 @@ struct SettingsView: View {
 
                 Section("Utilidades") {
                     NavigationLink {
-                        DirectorySearchView()
-                    } label: {
-                        Label("Buscar en Directorio (Local)", systemImage: "magnifyingglass")
-                    }
-
-                    NavigationLink {
-                        DirectoryOnlineSearchView()
-                    } label: {
-                        Label("Buscar en Directorio (Online)", systemImage: "network")
-                    }
-
-                    NavigationLink {
-                        YellowPagesSearchView()
-                    } label: {
-                        Label("Buscar en Páginas Amarillas", systemImage: "book.pages")
-                    }
-
-                    NavigationLink {
                         SMSServicesView()
                     } label: {
                         Label("Servicios por SMS", systemImage: "envelope.badge")
@@ -1324,6 +1306,24 @@ struct SettingsView: View {
                     } label: {
                         Label("Medir Velocidad de Internet", systemImage: "speedometer")
                     }
+
+                    NavigationLink {
+                        YellowPagesSearchView()
+                    } label: {
+                        Label("Buscar en Páginas Amarillas", systemImage: "book.pages")
+                    }
+
+                    NavigationLink {
+                        DirectoryOnlineSearchView()
+                    } label: {
+                        Label("Buscar en Directorio (Online)", systemImage: "network")
+                    }
+                    NavigationLink {
+                        DirectorySearchView()
+                    } label: {
+                        Label("Buscar en Directorio (Local)", systemImage: "magnifyingglass")
+                    }
+
                 }
 
                 Section("Cuenta") {
