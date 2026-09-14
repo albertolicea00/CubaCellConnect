@@ -34,6 +34,8 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
     entitlements:
       path: CubaCellConnect/CubaCellConnect.entitlements
       properties:
