@@ -109,6 +109,8 @@ Since this data is bundled (not fetched live), it can drift from ETECSA's site o
 
 - **No iPad / iPadOS support for USSD.** Even though Cellular iPad models exist (with physical SIM or eSIM slots), Apple completely blocks USSD code execution on iPadOS. iPadOS lacks a full Phone dialer application, which means users cannot dial USSD codes (such as `*222#`, `*133#`, or `*234#`), trigger `tel://*222%23` URLs from third-party apps, or receive USSD network responses.
 
+- **No Apple Watch / watchOS support for USSD.** Similarly, Cellular Apple Watch models do not support USSD code execution or third-party USSD dialing via watchOS.
+
 ## 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
