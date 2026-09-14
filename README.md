@@ -20,7 +20,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 🌗 **Light and dark mode** support.
 - 👤 **Contactos tab** — reads the device's real address book (with photos) so you can call, transfer balance to, or dial a collect/hidden call for any contact without leaving the app.
 - 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
-- 🛜 **Navigation rooms & public WIFI spaces** — Ajustes › Salas y Zonas WiFi lists every Cuban province; picking one shows ETECSA's own paid navigation rooms (with seat counts) and free public WIFI hotspots by municipality, bundled from [`CubaCellConnect/data/wifi_navigation_rooms.json`](CubaCellConnect/data/wifi_navigation_rooms.json). See sources below.
+- 🛜 **Navigation rooms & public WIFI spaces** — Ajustes › Salas y Zonas WiFi lists every Cuban province; picking one shows ETECSA's own paid navigation rooms (with seat counts) and free public WIFI hotspots by municipality, bundled from [`CubaCellConnect/wifi_navigation_rooms.json`](CubaCellConnect/wifi_navigation_rooms.json). See sources below.
 - 🚀 **Configurable launch screen** — Ajustes › Pestaña Inicial picks which tab opens on launch, and also covers two screens nested *inside* Ajustes itself (Medir Velocidad de Internet, Buscar en Directorio) — picking one of those jumps straight to Ajustes and auto-pushes that screen the moment the app opens, instead of landing on the plain Ajustes list first.
 
 *The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
@@ -54,8 +54,7 @@ CubaCellConnect/
 ├── UIComponents.swift        # Reusable presentational views (code row)
 ├── Views.swift               # Home, Contactos, category, and settings screens
 ├── codes.json                # Bundled USSD code catalog
-└── data/
-    └── wifi_navigation_rooms.json  # Bundled ETECSA navigation-room/hotspot directory
+└── wifi_navigation_rooms.json  # Bundled ETECSA navigation-room/hotspot directory
 
 CallerIDExtension/             # CallKit Call Directory Extension (labels *99 collect calls)
 └── CallDirectoryHandler.swift

@@ -9,10 +9,10 @@
 /* Begin PBXBuildFile section */
 		0C99AE6398D61A6FD54A85B1 /* CallerIDStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A4CA82E14E12403B650661 /* CallerIDStore.swift */; };
 		332BC5A8EFD398D7CDA7921A /* CubaCellConnectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B42F76B0A40014FFAE60B01C /* CubaCellConnectApp.swift */; };
+		381D98D01D97C2A4117AB052 /* wifi_navigation_rooms.json in Resources */ = {isa = PBXBuildFile; fileRef = 97E9E63F1B122D15788966CD /* wifi_navigation_rooms.json */; };
 		3DAFD03E99CD919E15BACD2A /* CallerIDExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4720B815C3ABE39F43851DB9 /* CallerIDExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		704E47BDCF79C035358A9689 /* codes.json in Resources */ = {isa = PBXBuildFile; fileRef = DA6B44DA336D0F4122155583 /* codes.json */; };
 		778E95DF987CBCB1B1B9859E /* CallDirectoryHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E431AD3BD2CC9FC72A29867 /* CallDirectoryHandler.swift */; };
-		89383D691DA00C11E79AEDB0 /* wifi_navigation_rooms.json in Resources */ = {isa = PBXBuildFile; fileRef = 5F632F607ADB7D71EC7B4108 /* wifi_navigation_rooms.json */; };
 		927DE9A026A9C4D07E52BA5C /* CallerIDStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A4CA82E14E12403B650661 /* CallerIDStore.swift */; };
 		9D6ACCB28223EF356CCB4688 /* UIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */; };
 		B9A6AE80A38BFCD3CBF50167 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCF6546FD849E3569404C90 /* Services.swift */; };
@@ -50,9 +50,9 @@
 		2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponents.swift; sourceTree = "<group>"; };
 		39C162F860A97892042A87C0 /* CubaCellConnect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CubaCellConnect.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4720B815C3ABE39F43851DB9 /* CallerIDExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CallerIDExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		5F632F607ADB7D71EC7B4108 /* wifi_navigation_rooms.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = wifi_navigation_rooms.json; sourceTree = "<group>"; };
 		767C11CEA2E45E76EA941172 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		8B8933439DF944FED239C2BA /* CallerIDExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CallerIDExtension.entitlements; sourceTree = "<group>"; };
+		97E9E63F1B122D15788966CD /* wifi_navigation_rooms.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = wifi_navigation_rooms.json; sourceTree = "<group>"; };
 		ABCF6546FD849E3569404C90 /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
 		B42F76B0A40014FFAE60B01C /* CubaCellConnectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubaCellConnectApp.swift; sourceTree = "<group>"; };
 		D3A4CA82E14E12403B650661 /* CallerIDStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallerIDStore.swift; sourceTree = "<group>"; };
@@ -84,17 +84,9 @@
 				ABCF6546FD849E3569404C90 /* Services.swift */,
 				2BF9C10AEFF8AF0BACDB3F60 /* UIComponents.swift */,
 				F54355AC0CD3658BC50E3384 /* Views.swift */,
-				21B41B9C2D6A5BB19E821CEF /* data */,
+				97E9E63F1B122D15788966CD /* wifi_navigation_rooms.json */,
 			);
 			path = CubaCellConnect;
-			sourceTree = "<group>";
-		};
-		21B41B9C2D6A5BB19E821CEF /* data */ = {
-			isa = PBXGroup;
-			children = (
-				5F632F607ADB7D71EC7B4108 /* wifi_navigation_rooms.json */,
-			);
-			path = data;
 			sourceTree = "<group>";
 		};
 		3BC846FA7B52C71F979B791A /* CallerIDExtension */ = {
@@ -201,7 +193,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				704E47BDCF79C035358A9689 /* codes.json in Resources */,
-				89383D691DA00C11E79AEDB0 /* wifi_navigation_rooms.json in Resources */,
+				381D98D01D97C2A4117AB052 /* wifi_navigation_rooms.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
