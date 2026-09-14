@@ -240,6 +240,7 @@
               "smsBody": "LTE",
               "title": "Activar Línea 4G (LTE)",
               "details": "Activa tu línea para navegar por 4G/LTE.",
+              "icon": "antenna.radiowaves.left.and.right",
               "type": "sms",
               "requiresInput": false,
               "compact": true
@@ -250,6 +251,7 @@
               "smsBody": "{input}",
               "title": "Comprobar Compatibilidad 3G/4G",
               "details": "Envía los primeros 8 dígitos de tu IMEI para saber si tu teléfono es compatible con 3G o 4G.",
+              "icon": "checkmark.circle.fill",
               "type": "sms",
               "requiresInput": true,
               "inputPlaceholder": "IMEI (8 dígitos)",
@@ -261,6 +263,7 @@
               "smsBody": "{input}",
               "title": "Configurar MMS",
               "details": "Envía los primeros 9 dígitos de tu correo electrónico al 4222 para configurar el MMS.",
+              "icon": "photo.on.rectangle.angled",
               "type": "sms",
               "requiresInput": true,
               "inputPlaceholder": "Primeros 9 dígitos de tu email",

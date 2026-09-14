@@ -1138,7 +1138,11 @@ struct SettingsView: View {
                                 selectSMS(code)
                             } label: {
                                 HStack {
-                                    Text(code.title)
+                                    if let icon = code.icon {
+                                        Label(code.title, systemImage: icon)
+                                    } else {
+                                        Text(code.title)
+                                    }
                                     Spacer()
                                     Image(systemName: "arrow.right")
                                 }
