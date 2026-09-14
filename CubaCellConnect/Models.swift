@@ -197,6 +197,85 @@ enum AppTheme {
     }
 }
 
+// MARK: - Reminders
+
+enum ReminderRecurrenceKind: String, Codable, CaseIterable, Identifiable {
+    case none, daily, weekly, monthly, custom
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .none: return "Una vez"
+        case .daily: return "Cada día"
+        case .weekly: return "Cada semana"
+        case .monthly: return "Cada mes"
+        case .custom: return "Cada N días"
+        }
+    }
+}
+
+/// What happens when the user taps "Ejecutar" on a reminder's detail screen. Kept on the
+/// *template* (re-resolved from `Reminder.templateKey` at execute time) rather than snapshotted
+/// on the reminder itself, since a custom reminder has no direct action at all.
+enum ReminderTemplateAction: String {
+    /// No direct action — just a note (every custom, from-scratch reminder).
+    case none
+    /// Comprar Paquete has no single fixed code (it's a whole category of choices by data/
+    /// duration), so "Ejecutar" just switches to the Compras tab instead of blind-dialing.
+    case openPurchases
+    /// Recargar Saldo (`recharge-card`, `*662*{input}#`) — the card number is scratched off a
+    /// physical card bought at the moment, so it can never be known ahead of time; asked for
+    /// right before dialing instead of stored on the reminder.
+    case dialSingleInput
+    /// Hacer Transferencia (`transfer-direct`, `*234*1*{phoneNumber}*{pin}*{amount}#`) — phone
+    /// number comes from the reminder, PIN is prefilled from `TransferPinStore`, amount is
+    /// always asked fresh right before dialing.
+    case dialTransfer
+}
+
+struct Reminder: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var title: String
+    var message: String
+    var iconName: String
+    /// `USSDCode.id` to resolve via `USSDCodeStore` at execute time. Nil when the template's
+    /// action needs no code (`.none`, `.openPurchases`).
+    var ussdCodeId: String?
+    /// Destination number for a transfer reminder. Unused by every other template.
+    var phoneNumber: String = ""
+    var date: Date
+    var recurrence: ReminderRecurrenceKind = .monthly
+    /// Only meaningful when `recurrence == .custom`.
+    var customIntervalDays: Int = 30
+    var isEnabled: Bool = true
+    /// Which `ReminderTemplate.id` this came from, so its action/fields can be re-resolved later.
+    /// Nil for a custom (from-scratch) reminder.
+    var templateKey: String? = nil
+}
+
+/// A starting point offered in the Recordatorios "+" flow — prefills title/message/icon and,
+/// for templates that need one, a phone-number field.
+struct ReminderTemplate: Identifiable {
+    let id: String
+    let title: String
+    let message: String
+    let iconName: String
+    let ussdCodeId: String?
+    let action: ReminderTemplateAction
+    let needsPhoneNumber: Bool
+    let defaultRecurrence: ReminderRecurrenceKind
+
+    static let quickTemplates: [ReminderTemplate] = [
+        ReminderTemplate(id: "paquete", title: "Comprar Paquete", message: "Recuerda comprar tu paquete de datos, voz o SMS.", iconName: "shippingbox.fill", ussdCodeId: nil, action: .openPurchases, needsPhoneNumber: false, defaultRecurrence: .monthly),
+        ReminderTemplate(id: "transferencia", title: "Hacer Transferencia", message: "Recuerda hacer tu transferencia de saldo.", iconName: "arrow.left.arrow.right", ussdCodeId: "transfer-direct", action: .dialTransfer, needsPhoneNumber: true, defaultRecurrence: .none),
+        ReminderTemplate(id: "recarga", title: "Recargar Saldo", message: "Recuerda recargar tu saldo con una tarjeta.", iconName: "creditcard.fill", ussdCodeId: "recharge-card", action: .dialSingleInput, needsPhoneNumber: false, defaultRecurrence: .none),
+    ]
+
+    /// The "start from scratch" option: no code, no phone number — just title/message/date.
+    static let custom = ReminderTemplate(id: "personalizado", title: "Recordatorio Personalizado", message: "", iconName: "bell.fill", ussdCodeId: nil, action: .none, needsPhoneNumber: false, defaultRecurrence: .none)
+}
+
 // MARK: - Wifi Navigation Rooms & Hotspots
 
 /// One province's data from ETECSA's public "Navigation rooms and public spaces (WIFI)"
