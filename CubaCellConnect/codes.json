@@ -122,18 +122,45 @@
           "name": "Gestionar Plan Amigo",
           "codes": [
             {
-              "id": "friends-plan-toggle",
-              "code": "",
-              "title": "Plan Amigo (Activar/Desactivar)",
-              "details": "Código pendiente de agregar.",
+              "id": "friends-plan-activate",
+              "code": "*133*4*1*1#",
+              "title": "Activar Plan Amigo",
+              "details": "Activa el Plan Amigos por $25.",
+              "price": "$25.00",
               "type": "ussd",
               "requiresInput": false
             },
             {
-              "id": "friends-plan-manage-member",
-              "code": "",
-              "title": "Adicionar/Eliminar Amigo de mi Plan",
-              "details": "Código pendiente de agregar.",
+              "id": "friends-plan-deactivate",
+              "code": "*133*4*1*2#",
+              "title": "Desactivar Plan Amigo",
+              "details": "Desactiva el Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": false
+            },
+            {
+              "id": "friends-plan-add-member",
+              "code": "*133*4*2*1*{input}#",
+              "title": "Agregar Amigo al Plan",
+              "details": "Agrega un número a tu Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": true,
+              "inputPlaceholder": "Número del amigo"
+            },
+            {
+              "id": "friends-plan-remove-member",
+              "code": "*133*4*2*2*{input}#",
+              "title": "Eliminar Amigo del Plan",
+              "details": "Elimina un número de tu Plan Amigos.",
+              "type": "ussd",
+              "requiresInput": true,
+              "inputPlaceholder": "Número del amigo"
+            },
+            {
+              "id": "friends-plan-status-settings",
+              "code": "*133*4*3#",
+              "title": "Consultar Plan Amigo",
+              "details": "Consulta el estado de tu Plan Amigos.",
               "type": "ussd",
               "requiresInput": false
             }
