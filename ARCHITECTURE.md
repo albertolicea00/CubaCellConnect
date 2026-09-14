@@ -78,8 +78,6 @@ USSDCatalog
 
 `USSDCodeStore.load(from:)` reads and decodes this once, synchronously, at `init`. There is **no schema versioning enforcement and no remote fetch** — updating codes requires shipping a new app build. A missing or malformed catalog trips an `assertionFailure` in debug and renders an empty list in release; since the file is bundled, this only happens on developer error.
 
-**External sync guard**: a GitHub Actions workflow (`.github/workflows/ussd-sync-check.yml`, script `.github/scripts/check-ussd-sync.mjs`) compares this file's *dial-string set* against the canonical `MyUSSDCodes-collection` repo (`cuba-cubacel.json`) and opens a tracking issue on drift. This is a CI-side consistency check, not a runtime mechanism — the app itself never talks to that repo.
-
 ---
 
 ## 4. Navigation Model

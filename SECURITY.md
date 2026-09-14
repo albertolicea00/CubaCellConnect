@@ -14,7 +14,6 @@ CubaCell Connect ships as a single, continuously updated iOS app (no parallel ma
 This app has no backend server, no user accounts, and no network layer of its own:
 
 - The USSD catalog (`CubaCellConnect/codes.json`) is a static file bundled at build time.
-- The only "network" interaction is a weekly GitHub Action that diffs `codes.json` against the [MyUSSDCodes-collection](https://github.com/albertolicea00/MyUSSDCodes-collection) repo.
 - The only privileged action the app performs is handing a dial string to iOS via `UIApplication.open` on a `tel:`/USSD URL — it does not place calls itself.
 - No analytics, no ads SDKs, no third-party dependencies (per [CONTRIBUTING.md](CONTRIBUTING.md): "No third-party dependencies unless discussed in an issue first").
 
@@ -22,7 +21,6 @@ Given that, realistic security concerns for this project are narrower than a typ
 
 - **Malicious or malformed USSD codes** in `codes.json` that could dial premium-rate numbers, trigger unintended carrier actions, or crash the app via bad JSON/percent-encoding.
 - **URL/string injection** in the `{input}` placeholder handling (e.g. a card number or phone number field breaking out of the intended dial string).
-- **Supply-chain risk** in the `ussd-sync-check` GitHub Action or the upstream `MyUSSDCodes-collection` repo that could smuggle a malicious code into the catalog.
 - **Build tooling issues** (`project.yml`, XcodeGen config, CI workflows in `.github/`) that could lead to unintended code execution during build/CI.
 
 Out of scope: this app cannot leak account credentials, payment data, or server-side data — it holds none. Reports about ETECSA/Cubacel's own USSD/network security are out of scope for this repo; report those to ETECSA directly.

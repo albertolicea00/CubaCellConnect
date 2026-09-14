@@ -6,8 +6,6 @@
 [![Swift](https://img.shields.io/badge/swift-5.9%2B-orange.svg)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/Xcode-15.0%2B-blue.svg)](https://developer.apple.com/xcode/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![USSD sync](https://github.com/albertolicea00/cubacell-connect/actions/workflows/ussd-sync-check.yml/badge.svg)](https://github.com/albertolicea00/cubacell-connect/actions/workflows/ussd-sync-check.yml)
-[![WiFi rooms sync](https://github.com/albertolicea00/cubacell-connect/actions/workflows/wifi-rooms-sync-check.yml/badge.svg)](https://github.com/albertolicea00/cubacell-connect/actions/workflows/wifi-rooms-sync-check.yml)
 
 An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** : check your balance, buy data/voice/SMS plans, transfer credit and more — all from a clean, organized list that hands the code straight to the system dialer.
 
@@ -62,12 +60,6 @@ CallerIDExtension/             # CallKit Call Directory Extension (labels *99 co
 Shared/                        # Code shared by the app and CallerIDExtension
 └── CallerIDStore.swift        # App Group–backed caller-ID list (read/write)
 ```
-
-## 🔄 Code source of truth
-
-The USSD codes in [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json) mirror the canonical [`cuba-cubacel`](https://github.com/albertolicea00/MyUSSDCodes-collection/blob/main/codes/cuba-cubacel.json) collection in **[MyUSSDCodes-collection](https://github.com/albertolicea00/MyUSSDCodes-collection)** — the single source of truth for USSD codes across all my apps.
-
-A weekly GitHub Action ([`ussd-sync-check`](.github/workflows/ussd-sync-check.yml)) compares the dial strings shipped here against that collection. On drift the run fails and opens a `ussd-sync` issue listing the added/removed codes. **Fix codes upstream in MyUSSDCodes-collection first, then sync this file to match.**
 
 ## ☎️ Direct dial vs. confirmation
 
