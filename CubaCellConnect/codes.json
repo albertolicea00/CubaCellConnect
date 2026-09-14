@@ -207,6 +207,20 @@
           ]
         },
         {
+          "name": "Opciones",
+          "codes": [
+            {
+              "id": "data-pay-per-use",
+              "code": "*133*1*1#",
+              "title": "Tarifa por Consumo (Activar/Desactivar)",
+              "details": "Activa el cobro de datos por consumo, sin plan fijo.",
+              "compact": true,
+              "type": "ussd",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
           "name": "Consultas",
           "codes": [
             {
@@ -995,20 +1009,6 @@
               "type": "ussd",
               "requiresInput": false,
               "noConfirmCode": "*133*3*5*1#"
-            }
-          ]
-        },
-        {
-          "name": "Opciones",
-          "codes": [
-            {
-              "id": "data-pay-per-use",
-              "code": "*133*1*1#",
-              "title": "Tarifa por Consumo (Activar/Desactivar)",
-              "details": "Activa el cobro de datos por consumo, sin plan fijo.",
-              "compact": true,
-              "type": "ussd",
-              "requiresInput": false
             }
           ]
         }
