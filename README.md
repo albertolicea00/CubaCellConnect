@@ -44,6 +44,8 @@ xcodegen generate
 open CubaCellConnect.xcodeproj
 ```
 
+> **Note on XcodeGen:** This project uses **XcodeGen** with a `project.yml` specification to generate `CubaCellConnect.xcodeproj` dynamically and prevent `.pbxproj` merge conflicts.
+
 Build and run on a device. **USSD dialing requires a physical iPhone with a Cubacel SIM** 📲 — the simulator cannot place calls.
 
 To get Caller ID working for `*99` collect calls, after installing the app go to **Ajustes (Settings) › Teléfono › Bloqueo e Identificación de Llamadas** on the device and enable **CallerID**. This is a one-time, manual iOS setting — no app can enable it automatically. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for why.
