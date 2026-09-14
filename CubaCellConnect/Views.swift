@@ -1098,7 +1098,7 @@ private struct SMSCodeListView<ExtraSection: View>: View {
             }
             Spacer()
             // `options` codes push to `SMSOptionPickerView` as a `NavigationLink` — that already
-            // gets its own system disclosure chevron, and the price varies per option shown
+            // gets its own system d#imageLiteral(resourceName: "simulator_screenshot_68190E19-D612-44BD-B6BE-D8DDEF455C7D.png")isclosure chevron, and the price varies per option shown
             // inside there, not here, so this row skips both instead of doubling up.
             if code.options == nil {
                 if let price = code.price {
@@ -2591,19 +2591,39 @@ struct RemindersListView: View {
 
     var body: some View {
         List {
-            Section {
-                ForEach(ReminderTemplate.quickTemplates) { template in
-                    QuickReminderRow(
-                        template: template,
-                        existing: reminderManager.reminder(forTemplate: template.id),
-                        onEnable: { templateForNewReminder = template },
-                        onEdit: { reminderToEdit = $0 }
-                    )
+            // One section per template — each can hold any number of reminders (several phone
+            // lines to recargar/transferir, not just a single on/off switch).
+            ForEach(ReminderTemplate.quickTemplates) { template in
+                Section {
+                    let instances = reminderManager.reminders(forTemplate: template.id)
+                    if instances.isEmpty {
+                        Text("Sin recordatorios de este tipo todavía.")
+                            .foregroundStyle(.secondary)
+                            .font(.subheadline)
+                    } else {
+                        ForEach(instances) { reminder in
+                            ReminderRow(reminder: reminder)
+                                .contentShape(Rectangle())
+                                .onTapGesture { reminderToEdit = reminder }
+                                .swipeActions {
+                                    Button(role: .destructive) {
+                                        reminderToDelete = reminder
+                                        showingDeleteAlert = true
+                                    } label: {
+                                        Label("Eliminar", systemImage: "trash")
+                                    }
+                                }
+                        }
+                    }
+
+                    Button {
+                        templateForNewReminder = template
+                    } label: {
+                        Label("Agregar \(template.title)", systemImage: "plus.circle")
+                    }
+                } header: {
+                    Label(template.title, systemImage: template.iconName)
                 }
-            } header: {
-                Text("Plantillas Rápidas")
-            } footer: {
-                Text("Actívalos para que te avisen antes de comprar/recargar/transferir. Empiezan todos apagados.")
             }
 
             Section("Personalizados") {
@@ -2655,54 +2675,6 @@ struct RemindersListView: View {
     }
 }
 
-/// One row of the "Plantillas Rápidas" section — a toggle that creates the reminder (via
-/// `onEnable`) the first time it's switched on, and a separate pencil button (not the toggle
-/// itself) to review/edit one already configured, so tapping the row never fights the switch.
-private struct QuickReminderRow: View {
-    let template: ReminderTemplate
-    let existing: Reminder?
-    let onEnable: () -> Void
-    let onEdit: (Reminder) -> Void
-
-    @Environment(ReminderManager.self) private var reminderManager
-    @Environment(AccentColorStore.self) private var accentColorStore
-
-    var body: some View {
-        HStack {
-            Label(template.title, systemImage: template.iconName)
-
-            Spacer()
-
-            if let existing {
-                Button {
-                    onEdit(existing)
-                } label: {
-                    Image(systemName: "square.and.pencil")
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-
-            Toggle("", isOn: Binding(
-                get: { existing?.isEnabled ?? false },
-                set: { isOn in
-                    if isOn {
-                        if let existing {
-                            reminderManager.setEnabled(true, for: existing)
-                        } else {
-                            onEnable()
-                        }
-                    } else if let existing {
-                        reminderManager.setEnabled(false, for: existing)
-                    }
-                }
-            ))
-            .labelsHidden()
-            .tint(accentColorStore.color)
-        }
-    }
-}
-
 struct ReminderRow: View {
     let reminder: Reminder
     @Environment(ReminderManager.self) private var reminderManager
@@ -2750,12 +2722,19 @@ struct AddReminderView: View {
     @State private var recurrence: ReminderRecurrenceKind = .none
     @State private var customIntervalDays: Int = 30
     @State private var phoneNumber: String = ""
+    /// True once the user has typed into the title field themselves — until then, typing a phone
+    /// number auto-fills "Hacer Transferencia — 51234567" so several reminders from the same
+    /// template (several lines to recargar/transferir) stay distinguishable at a glance.
+    @State private var isTitleCustomized = false
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Recordatorio") {
-                    TextField("Título", text: $title)
+                    TextField("Título", text: Binding(
+                        get: { title },
+                        set: { title = $0; isTitleCustomized = true }
+                    ))
                     TextField("Mensaje", text: $message)
                 }
 
@@ -2766,6 +2745,10 @@ struct AddReminderView: View {
                     ) {
                         TextField("Ej: 51234567", text: $phoneNumber)
                             .keyboardType(.numberPad)
+                            .onChange(of: phoneNumber) { _, newValue in
+                                guard !isTitleCustomized, reminderToEdit == nil else { return }
+                                title = newValue.isEmpty ? template.title : "\(template.title) — \(newValue)"
+                            }
                     }
                 }
 

@@ -932,10 +932,10 @@ final class ReminderManager: NSObject, UNUserNotificationCenterDelegate {
         update(updated)
     }
 
-    /// The quick-template reminder currently configured for `templateId`, if the user has turned
-    /// that row on. Nil means the template's toggle should read off.
-    func reminder(forTemplate templateId: String) -> Reminder? {
-        reminders.first { $0.templateKey == templateId }
+    /// Every reminder created from `templateId` — plural because the same template can be reused
+    /// any number of times (e.g. several phone lines to top up or transfer from).
+    func reminders(forTemplate templateId: String) -> [Reminder] {
+        reminders.filter { $0.templateKey == templateId }
     }
 
     var customReminders: [Reminder] {
