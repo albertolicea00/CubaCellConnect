@@ -193,7 +193,8 @@ struct CodeRowView: View {
         noConfirmCode: nil,
         smsBody: nil,
         options: nil,
-        isSubscription: nil
+        isSubscription: nil,
+        variants: nil
     ))
     .padding()
     .environment(AccentColorStore())
@@ -255,7 +256,8 @@ struct ContactRowView: View {
             noConfirmCode: nil,
             smsBody: nil,
             options: nil,
-            isSubscription: nil
+            isSubscription: nil,
+            variants: nil
         ),
         onCall: {}
     )

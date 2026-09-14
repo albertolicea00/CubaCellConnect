@@ -54,6 +54,11 @@ struct USSDCode: Identifiable, Codable, Hashable {
     /// Marks an ongoing subscription (e.g. "Martí" via 8100) as opposed to a one-off query — shown
     /// as a small "Suscripción" badge next to the title. Nil/false for everything else.
     let isSubscription: Bool?
+    /// A small, fixed set of named message variants for the same base service (e.g. Bundesliga:
+    /// Resultados/Posiciones/Goleadores) — the row shows one confirmation-dialog-style choice
+    /// instead of `options`' full searchable picker screen, since there are only a couple of
+    /// choices and each already has a natural short label. Nil for every other code.
+    let variants: [SMSVariant]?
 
     /// Code with the given named placeholders substituted in — each dictionary key `name`
     /// replaces a `{name}` token in `code`. Used by multi-field actions like the Home transfer card.
@@ -80,6 +85,12 @@ struct USSDCode: Identifiable, Codable, Hashable {
     func resolvedSMSBody(input: String = "") -> String {
         resolvedSMSBody(with: ["input": input])
     }
+}
+
+/// One named choice in `USSDCode.variants` — e.g. `label: "Posiciones", smsBody: "BUNDESLIGA POS"`.
+struct SMSVariant: Codable, Hashable {
+    let label: String
+    let smsBody: String
 }
 
 /// A named sub-heading of codes within a category's list, e.g. "Datos", "SMS", "Voz" inside

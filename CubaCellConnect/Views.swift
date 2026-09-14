@@ -935,6 +935,7 @@ private struct SMSCodeListView<ExtraSection: View>: View {
     @State private var inputText = ""
     @State private var pendingSMS: PendingSMS?
     @State private var showsCannotSendTextAlert = false
+    @State private var variantPickerCode: USSDCode?
 
     private var leadingGroups: [USSDCodeGroup] { leadingGroupNames.compactMap { store.group(named: $0) } }
     private var trailingGroups: [USSDCodeGroup] { trailingGroupNames.compactMap { store.group(named: $0) } }
@@ -988,6 +989,20 @@ private struct SMSCodeListView<ExtraSection: View>: View {
         } message: {
             Text("Este dispositivo no puede enviar mensajes de texto (por ejemplo, el Simulador de Xcode no soporta SMS).")
         }
+        .confirmationDialog(
+            variantPickerCode?.title ?? "",
+            isPresented: Binding(
+                get: { variantPickerCode != nil },
+                set: { if !$0 { variantPickerCode = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: variantPickerCode
+        ) { code in
+            ForEach(code.variants ?? [], id: \.label) { variant in
+                Button(variant.label) { composeVariant(code, variant) }
+            }
+            Button("Cancelar", role: .cancel) {}
+        }
         .sheet(item: $pendingSMS) { pending in
             MessageComposeView(recipient: pending.recipient, body: pending.body)
                 .ignoresSafeArea()
@@ -1002,9 +1017,17 @@ private struct SMSCodeListView<ExtraSection: View>: View {
                     ForEach(group.codes) { code in
                         // Same compact, price-trailing row shape as Compras — set
                         // "compact": true on every code here so they all render like it, price or
-                        // not. A code with `options` (a fixed set of valid message texts, e.g.
-                        // Frases y Poemas) opens a picker instead of dialing/composing straight away.
-                        if code.options != nil {
+                        // not. `variants` (a couple of named choices, e.g. Bundesliga's
+                        // Resultados/Posiciones/Goleadores) opens a confirmation dialog; `options`
+                        // (a bigger, searchable set, e.g. Frases y Poemas' ~35 topics) opens a full
+                        // picker screen instead.
+                        if code.variants != nil {
+                            Button {
+                                variantPickerCode = code
+                            } label: {
+                                rowLabel(code)
+                            }
+                        } else if code.options != nil {
                             NavigationLink {
                                 SMSOptionPickerView(code: code)
                             } label: {
@@ -1038,6 +1061,14 @@ private struct SMSCodeListView<ExtraSection: View>: View {
             return
         }
         pendingSMS = PendingSMS(recipient: code.code, body: code.resolvedSMSBody(input: input))
+    }
+
+    private func composeVariant(_ code: USSDCode, _ variant: SMSVariant) {
+        guard MFMessageComposeViewController.canSendText() else {
+            showsCannotSendTextAlert = true
+            return
+        }
+        pendingSMS = PendingSMS(recipient: code.code, body: variant.smsBody)
     }
 
     @ViewBuilder
