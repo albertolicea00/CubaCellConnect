@@ -1828,6 +1828,7 @@ struct DirectorySearchView: View {
                         }
                         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .padding(.horizontal, 20)
+                        .padding(.vertical, 20)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
