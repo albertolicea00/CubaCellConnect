@@ -64,7 +64,7 @@ struct HomeView: View {
 /// The 5 tabs, keyed by a stable string so it can be stored in `@AppStorage` (as "Pestaña
 /// inicial" in Ajustes › Preferencias) and used as the `TabView` selection tag.
 enum HomeTab: String, CaseIterable, Identifiable {
-    case helplines, contacts, home, purchase, settings, speedTest, directory
+    case helplines, contacts, home, purchase, settings, speedTest, directory, smsServices
 
     var id: String { rawValue }
 
@@ -84,14 +84,16 @@ enum HomeTab: String, CaseIterable, Identifiable {
             case .settings: return "Ajustes"
             case .speedTest: return "Velocidad de Internet"
             case .directory: return "Buscar en Directorio"
+            case .smsServices: return "Servicios por SMS"
         }
     }
 
-    /// The actual `TabView` tab to select for this launch destination — `.speedTest`/`.directory`
-    /// aren't tabs themselves, they're screens `SettingsView` pushes onto once Ajustes is showing.
+    /// The actual `TabView` tab to select for this launch destination — `.speedTest`/`.directory`/
+    /// `.smsServices` aren't tabs themselves, they're screens `SettingsView` pushes onto once
+    /// Ajustes is showing.
     var tabToSelect: HomeTab {
         switch self {
-        case .speedTest, .directory: return .settings
+        case .speedTest, .directory, .smsServices: return .settings
         default: return self
         }
     }
@@ -1222,6 +1224,7 @@ struct SettingsView: View {
     @State private var hasAutoNavigatedToLaunchDestination = false
     @State private var isShowingSpeedTestOnLaunch = false
     @State private var isShowingDirectoryOnLaunch = false
+    @State private var isShowingSMSServicesOnLaunch = false
 
     /// Backs the three "Configuraciones" SMS rows (LTE, 3G/4G check, MMS) in Cuenta — these dial
     /// straight from the row, no sub-screen, so `SettingsView` needs its own compose-SMS state
@@ -1377,6 +1380,7 @@ struct SettingsView: View {
             }
             .navigationDestination(isPresented: $isShowingSpeedTestOnLaunch) { SpeedTestView() }
             .navigationDestination(isPresented: $isShowingDirectoryOnLaunch) { DirectorySearchView() }
+            .navigationDestination(isPresented: $isShowingSMSServicesOnLaunch) { SMSServicesView() }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
@@ -1392,6 +1396,8 @@ struct SettingsView: View {
                     isShowingSpeedTestOnLaunch = true
                 } else if defaultTab == HomeTab.directory.rawValue {
                     isShowingDirectoryOnLaunch = true
+                } else if defaultTab == HomeTab.smsServices.rawValue {
+                    isShowingSMSServicesOnLaunch = true
                 }
             }
             .alert(
