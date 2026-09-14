@@ -11,6 +11,11 @@
 
 An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** : check your balance, buy data/voice/SMS plans, transfer credit and more — all from a clean, organized list that hands the code straight to the system dialer.
 
+## ⚠️ Disclaimer
+
+> [!WARNING]
+> This is an independent, community-made app. It is **not affiliated with, endorsed by, or sponsored by ETECSA**.  
+> Codes may change at any time at the carrier's discretion.
 
 ## ✨ Features
 
