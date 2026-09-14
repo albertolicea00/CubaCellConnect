@@ -342,17 +342,6 @@
               "inputPlaceholder": "Moneda y monto (opcional)",
               "price": "$4.00",
               "compact": true
-            },
-            {
-              "id": "sms-8100-marti",
-              "code": "8100",
-              "smsBody": "MARTI",
-              "title": "Martí",
-              "details": "Suscríbete al servicio Martí por SMS.",
-              "type": "sms",
-              "requiresInput": false,
-              "price": "$4.00",
-              "compact": true
             }
           ]
         },
@@ -565,6 +554,7 @@
             {
               "id": "sms-8888-frases",
               "code": "8888",
+              "smsBody": "{input}",
               "title": "Frases y Poemas",
               "details": "Elige un tema y recibe una frase o poema por SMS.",
               "type": "sms",
@@ -577,6 +567,259 @@
                 "POEMAS", "REFRAN", "SUERTE", "TRABAJO", "AMOR", "CHISTE", "CUMPLENO", "ENAMORAR",
                 "MADRE", "NEGOCIO", "SALUD", "PIROPO", "BOLIBAR", "MARTI", "CERVANTES", "COHELO",
                 "NERUDA", "CHE", "PITAGORAS"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Noticias",
+          "codes": [
+            {
+              "id": "sms-8888-noticias",
+              "code": "8888",
+              "smsBody": "NOTICIAS",
+              "title": "Noticias",
+              "details": "Consulta las últimas noticias por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-titulares",
+              "code": "8888",
+              "smsBody": "TITULARES",
+              "title": "Titulares",
+              "details": "Consulta los titulares por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-pl",
+              "code": "8888",
+              "smsBody": "PL",
+              "title": "Prensa Latina",
+              "details": "Consulta noticias de Prensa Latina por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Suscripciones de Noticias",
+          "codes": [
+            {
+              "id": "sms-8100-marti",
+              "code": "8100",
+              "smsBody": "MARTI",
+              "title": "Martí",
+              "details": "Suscríbete al servicio Martí por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8100-cubadebate",
+              "code": "8100",
+              "smsBody": "CUBADEBATE",
+              "title": "Cubadebate",
+              "details": "Suscríbete a Cubadebate por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8100-cdeportes",
+              "code": "8100",
+              "smsBody": "CDEPORTES",
+              "title": "Cubadeportes",
+              "details": "Suscríbete a Cubadeportes por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8100-granma",
+              "code": "8100",
+              "smsBody": "GRAMNA",
+              "title": "Granma",
+              "details": "Suscríbete al periódico Granma por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8100-pl",
+              "code": "8100",
+              "smsBody": "PL",
+              "title": "Prensa Latina",
+              "details": "Suscríbete a Prensa Latina por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Béisbol",
+          "codes": [
+            {
+              "id": "sms-8888-mlb",
+              "code": "8888",
+              "smsBody": "MLB",
+              "title": "MLB (Grandes Ligas)",
+              "details": "Consulta resultados de las Grandes Ligas por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-mlb-pos",
+              "code": "8888",
+              "smsBody": "MLB POS",
+              "title": "MLB — Posiciones",
+              "details": "Consulta la tabla de posiciones de las Grandes Ligas por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-pelota-pos",
+              "code": "8888",
+              "smsBody": "PELOTA POS",
+              "title": "Pelota Cubana — Posiciones",
+              "details": "Consulta la tabla de posiciones de la pelota cubana por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Horóscopo",
+          "codes": [
+            {
+              "id": "sms-8888-horoscopo",
+              "code": "8888",
+              "smsBody": "{input}",
+              "title": "Horóscopo",
+              "details": "Elige tu signo y recibe tu horóscopo por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true,
+              "options": [
+                "ARIES", "TAURO", "GEMINIS", "CANCER", "LEO", "VIRGO", "LIBRA", "ESCORPION",
+                "SAGITARIO", "CAPRICORNIO", "ACUARIO", "PISCIS"
+              ]
+            },
+            {
+              "id": "sms-8888-horoscopo-chino",
+              "code": "8888",
+              "smsBody": "{input}",
+              "title": "Horóscopo Chino",
+              "details": "Elige tu signo del zodíaco chino y recibe tu horóscopo por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true,
+              "options": [
+                "BBUEY", "TIGRE", "CONEJO", "DRAGON", "SERPIENTE", "CABALLO", "CABRA", "MONO",
+                "GALLO", "PERRO", "RATA", "CERDO"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Clima",
+          "codes": [
+            {
+              "id": "sms-8888-tiempo",
+              "code": "8888",
+              "smsBody": "TIEMPO",
+              "title": "Tiempo (General)",
+              "details": "Consulta el pronóstico del tiempo por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-tiempo-zona",
+              "code": "8888",
+              "smsBody": "TIEMPO {input}",
+              "title": "Tiempo por Zona",
+              "details": "Consulta el pronóstico del tiempo de una zona específica por SMS — p. ej. OCC, CEN, ORI, o una provincia como Camagüey, Holguín, Santiago de Cuba, Cayo Coco...",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Zona (OCC, CEN, ORI, Camagüey...)",
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Vuelos",
+          "codes": [
+            {
+              "id": "sms-8888-vuelo",
+              "code": "8888",
+              "smsBody": "VUELO {input}",
+              "title": "Información de Vuelo",
+              "details": "Envía el número de vuelo por SMS para consultar su información.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de vuelo",
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Tarifa Eléctrica",
+          "codes": [
+            {
+              "id": "sms-8888-telectrica",
+              "code": "8888",
+              "smsBody": "TELECTRICA {input}",
+              "title": "Tarifa Eléctrica",
+              "details": "Envía el rate de consumo por SMS para calcular la tarifa eléctrica.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Rate de consumo",
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Recetas",
+          "codes": [
+            {
+              "id": "sms-8888-receta",
+              "code": "8888",
+              "smsBody": "RECETA {input}",
+              "title": "Recetas",
+              "details": "Elige una categoría y recibe una receta por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true,
+              "options": [
+                "BATIDOS", "CARNES", "DULCES", "EMPANADAS", "LANGOSTA", "LOMO", "MANZAANAS",
+                "MERLUZA", "PAVO", "POSTRE", "REPOSTERIA", "SALMON", "SALSAS"
               ]
             }
           ]

@@ -885,7 +885,11 @@ struct SMSServicesView: View {
     var body: some View {
         SMSCodeListView(
             title: "Servicios por SMS",
-            groupNames: ["Consultas", "SMS Suscripciones", "Fútbol", "Frases y Poemas"],
+            groupNames: [
+                "Consultas", "SMS Suscripciones", "Fútbol", "Frases y Poemas", "Noticias",
+                "Suscripciones de Noticias", "Béisbol", "Horóscopo", "Clima", "Vuelos",
+                "Tarifa Eléctrica", "Recetas",
+            ],
             emptyStateDescription: "Los códigos de suscripción de SMS se agregarán aquí próximamente."
         )
     }
@@ -1100,7 +1104,7 @@ private struct SMSOptionPickerView: View {
             showsCannotSendTextAlert = true
             return
         }
-        pendingSMS = PendingSMS(recipient: code.code, body: option)
+        pendingSMS = PendingSMS(recipient: code.code, body: code.resolvedSMSBody(input: option))
     }
 }
 
