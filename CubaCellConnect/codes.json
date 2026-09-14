@@ -272,6 +272,17 @@
           "name": "SMS Suscripciones",
           "codes": [
             {
+              "id": "sms-8000-follow",
+              "code": "8000",
+              "smsBody": "follow",
+              "title": "Boletín (Newsletter)",
+              "details": "Suscríbete al boletín informativo por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$0.00",
+              "compact": true
+            },
+            {
               "id": "sms-8000-onat",
               "code": "8000",
               "smsBody": "onat",
@@ -288,17 +299,6 @@
               "smsBody": "turismo",
               "title": "Servicio de Turismo",
               "details": "Suscríbete al servicio de turismo por SMS.",
-              "type": "sms",
-              "requiresInput": false,
-              "price": "$0.00",
-              "compact": true
-            },
-            {
-              "id": "sms-8000-follow",
-              "code": "8000",
-              "smsBody": "follow",
-              "title": "Boletín (Newsletter)",
-              "details": "Suscríbete al boletín informativo por SMS.",
               "type": "sms",
               "requiresInput": false,
               "price": "$0.00",

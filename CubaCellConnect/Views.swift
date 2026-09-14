@@ -877,7 +877,40 @@ struct CategoryListView: View {
 /// services, pulled from the "Servicios por SMS" group in `codes.json` (currently empty; codes
 /// go straight into the JSON once they're in hand, same as every other code in the app — never
 /// hardcoded here).
+/// Ajustes › Utilidades › Servicios por SMS — just the query/subscription groups. Configuraciones
+/// (LTE, IMEI/3G-4G check, MMS setup) lives separately under Ajustes › Cuenta instead, since it's
+/// about the line/device itself, not a service you send a query or subscribe to.
 struct SMSServicesView: View {
+    var body: some View {
+        SMSCodeListView(
+            title: "Servicios por SMS",
+            groupNames: ["Consultas", "SMS Suscripciones"],
+            emptyStateDescription: "Los códigos de suscripción de SMS se agregarán aquí próximamente."
+        )
+    }
+}
+
+/// Ajustes › Cuenta › Configuraciones SMS — LTE activation, 3G/4G IMEI check, MMS setup. Split out
+/// of `SMSServicesView` since these configure the line/device, not a query or subscription.
+struct SMSConfigurationsView: View {
+    var body: some View {
+        SMSCodeListView(
+            title: "Configuraciones SMS",
+            groupNames: ["Configuraciones"],
+            emptyStateDescription: "Los códigos de configuración se agregarán aquí próximamente."
+        )
+    }
+}
+
+/// Shared list/compose logic behind both `SMSServicesView` and `SMSConfigurationsView` — renders
+/// the given `codes.json` groups in the same compact, price-trailing row shape as Compras, and
+/// handles composing the SMS itself (the requires-input alert, the `MFMessageComposeViewController`
+/// sheet, and the "this device can't send texts" guard, e.g. the Simulator).
+private struct SMSCodeListView: View {
+    let title: String
+    let groupNames: [String]
+    let emptyStateDescription: String
+
     @Environment(USSDCodeStore.self) private var store
     @Environment(AccentColorStore.self) private var accentColorStore
 
@@ -886,13 +919,8 @@ struct SMSServicesView: View {
     @State private var pendingSMS: PendingSMS?
     @State private var showsCannotSendTextAlert = false
 
-    /// Fixed, known group names — "Consultas" (2266, free), "Configuraciones" (2266/4222 — LTE,
-    /// IMEI/3G-4G check, MMS setup, all grouped together), "SMS Suscripciones" (8000, the actual
-    /// ongoing subscriptions, priced $0.00 since only *those* are true subscriptions — the other
-    /// two groups are one-off queries/config, not something you're "subscribed" to). Paid
-    /// subscriptions land in their own group(s) here too once their codes are in hand.
     private var groups: [USSDCodeGroup] {
-        ["Consultas", "Configuraciones", "SMS Suscripciones"].compactMap { store.group(named: $0) }
+        groupNames.compactMap { store.group(named: $0) }
     }
 
     private var hasAnyCodes: Bool {
@@ -905,7 +933,7 @@ struct SMSServicesView: View {
                 ContentUnavailableView(
                     "Sin Códigos Todavía",
                     systemImage: "envelope.badge",
-                    description: Text("Los códigos de suscripción de SMS se agregarán aquí próximamente.")
+                    description: Text(emptyStateDescription)
                 )
             } else {
                 List {
@@ -939,7 +967,7 @@ struct SMSServicesView: View {
                 .tint(accentColorStore.color)
             }
         }
-        .navigationTitle("Servicios por SMS")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .alert(
             pendingInputCode?.title ?? "",
@@ -1116,6 +1144,12 @@ struct SettingsView: View {
                         TransferPinSettingsView()
                     } label: {
                         Label("Gestionar PIN de Transferencia", systemImage: "key.fill")
+                    }
+
+                    NavigationLink {
+                        SMSConfigurationsView()
+                    } label: {
+                        Label("Configuraciones SMS", systemImage: "antenna.radiowaves.left.and.right")
                     }
                 }
 
