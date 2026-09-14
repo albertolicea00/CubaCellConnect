@@ -7,6 +7,7 @@
 [![Xcode](https://img.shields.io/badge/Xcode-15.0%2B-blue.svg)](https://developer.apple.com/xcode/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![USSD sync](https://github.com/albertolicea00/cubacell-connect/actions/workflows/ussd-sync-check.yml/badge.svg)](https://github.com/albertolicea00/cubacell-connect/actions/workflows/ussd-sync-check.yml)
+[![WiFi rooms sync](https://github.com/albertolicea00/cubacell-connect/actions/workflows/wifi-rooms-sync-check.yml/badge.svg)](https://github.com/albertolicea00/cubacell-connect/actions/workflows/wifi-rooms-sync-check.yml)
 
 An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** : check your balance, buy data/voice/SMS plans, transfer credit and more — all from a clean, organized list that hands the code straight to the system dialer.
 
@@ -16,8 +17,6 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 📋 **Full USSD catalog** grouped by category: Balance & Plans, Purchases & Top-Up, Transfers, and Other Utilities.
 - 📞 **One-tap dialing** — the app opens the system dialer with the code prefilled (`#` correctly percent-encoded).
 - ⌨️ **Input-aware codes** — codes like `*662*{card}#` or `#31#{number}` ask for the missing part before dialing.
-- 📎 **Copy to clipboard** for any code.
-- 💡 **Mnemonics** — e.g. `328 = DAT`, `266 = BON`, `869 = VOZ` — the keypad letters spell the service name.
 - 🌗 **Light and dark mode** support.
 - 👤 **Contactos tab** — reads the device's real address book (with photos) so you can call, transfer balance to, or dial a collect/hidden call for any contact without leaving the app.
 - 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
@@ -84,28 +83,9 @@ See [Known Limitations](#-known-limitations) below for why this isn't wired into
 
 Ajustes › Salas y Zonas WiFi is a bundled, read-only copy of ETECSA's own public "Navigation rooms and public spaces (WIFI)" directory — unlike the reverse-lookup directory above, this is official public service-location data (room/hotspot names and addresses), not customer data, so it ships inside the app like `codes.json` does.
 
-Scraped once (2026-09) from ETECSA's public site, one page per province:
+> Scraped once (2026-09) from ETECSA's public site, one page per province
 
-| Province | Source |
-|---|---|
-| Pinar del Río | https://www.etecsa.cu/en/rooms-public-spaces?provincia=49 |
-| Artemisa | https://www.etecsa.cu/en/rooms-public-spaces?provincia=33 |
-| La Habana | https://www.etecsa.cu/en/rooms-public-spaces?provincia=27 |
-| Isla de la Juventud | https://www.etecsa.cu/en/rooms-public-spaces?provincia=29 |
-| Mayabeque | https://www.etecsa.cu/en/rooms-public-spaces?provincia=200 |
-| Matanzas | https://www.etecsa.cu/en/rooms-public-spaces?provincia=212 |
-| Cienfuegos | https://www.etecsa.cu/en/rooms-public-spaces?provincia=226 |
-| Villa Clara | https://www.etecsa.cu/en/rooms-public-spaces?provincia=235 |
-| Sancti Spíritus | https://www.etecsa.cu/en/rooms-public-spaces?provincia=249 |
-| Ciego de Ávila | https://www.etecsa.cu/en/rooms-public-spaces?provincia=258 |
-| Camagüey | https://www.etecsa.cu/en/rooms-public-spaces?provincia=269 |
-| Las Tunas | https://www.etecsa.cu/en/rooms-public-spaces?provincia=283 |
-| Granma | https://www.etecsa.cu/en/rooms-public-spaces?provincia=292 |
-| Holguín | https://www.etecsa.cu/en/rooms-public-spaces?provincia=306 |
-| Santiago de Cuba | https://www.etecsa.cu/en/rooms-public-spaces?provincia=321 |
-| Guantánamo | https://www.etecsa.cu/en/rooms-public-spaces?provincia=331 |
-
-Since this data is bundled (not fetched live), it can drift from ETECSA's site over time — there is no sync check for it yet, unlike `codes.json`.
+Since this data is bundled (not fetched live), it can drift from ETECSA's site over time. A weekly GitHub Action ([`wifi-rooms-sync-check`](.github/workflows/wifi-rooms-sync-check.yml)) re-scrapes each province page and diffs it against the bundled JSON, opening a `wifi-rooms-sync` issue on real drift. It checks whether ETECSA's site is even reachable *once*, up front, before touching any province page — GitHub-hosted runners run outside Cuba and some sites block cloud/datacenter IP ranges even though they're open to regular visitors, so if that first check fails the run stops immediately (no failure, no wasted Actions minutes retrying 16 pages that would all fail the same way).
 
 ## 🚧 Known Limitations
 
@@ -128,6 +108,7 @@ The codes were saved from the following sites:
 - https://galixpay.com/recargas-a-cuba/
 - https://www.fonoma.com/blog/codigos-ussd-cuba
 - https://www.etecsa.cu/es/taxonomy/term/1445
+- https://www.etecsa.cu/en/rooms-public-spaces
 
 ## License
 
