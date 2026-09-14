@@ -1081,12 +1081,17 @@ private struct SMSCodeListView<ExtraSection: View>: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if let price = code.price {
-                Text(price)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
+            // `options` codes push to `SMSOptionPickerView` as a `NavigationLink` — that already
+            // gets its own system disclosure chevron, and the price varies per option shown
+            // inside there, not here, so this row skips both instead of doubling up.
+            if code.options == nil {
+                if let price = code.price {
+                    Text(price)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                Image(systemName: "arrow.right")
             }
-            Image(systemName: "arrow.right")
         }
     }
 }
@@ -1142,6 +1147,11 @@ private struct SMSOptionPickerView: View {
                         HStack {
                             Text("Enviar \"\(trimmedSearch)\"")
                             Spacer()
+                            if let price = code.price {
+                                Text(price)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
                             Image(systemName: "arrow.right")
                         }
                     }
@@ -1157,6 +1167,11 @@ private struct SMSOptionPickerView: View {
                     HStack {
                         Text(option.capitalized)
                         Spacer()
+                        if let price = code.price {
+                            Text(price)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
                         Image(systemName: "arrow.right")
                     }
                 }
