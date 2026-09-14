@@ -987,7 +987,7 @@ struct SettingsView: View {
                             DialService.dial(payPerUseCode.code)
                         } label: {
                             HStack {
-                                Label("Tarifa por Consumo (Activar/Desactivar)", systemImage: "dollarsign.circle.fill")
+                                Label("Tarifa por Consumo (Datos)", systemImage: "dollarsign.circle.fill")
                                 Spacer()
                                 Image(systemName: "arrow.right")
                             }
