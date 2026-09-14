@@ -27,6 +27,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 🎨 **Accent color picker** — Ajustes › Preferencias lets you replace the app's default cyan accent with any color; a "Restablecer Color por Defecto" button appears once you've changed it.
 - 🚀 **Configurable launch screen** — Ajustes › Pestaña Inicial picks which tab opens on launch, and also covers several screens nested *inside* Ajustes itself (Medir Velocidad de Internet, Servicios por SMS, and all three directory searches) — picking one of those jumps straight to Ajustes and auto-pushes that screen the moment the app opens, instead of landing on the plain Ajustes list first.
 - 🔔 **Recordatorios** — Ajustes › Utilidades › Recordatorios schedules local notifications (no server, no push) for Comprar Paquete, Hacer Transferencia, or Recargar Saldo. Each template can be reused any number of times (one per phone line), with a title that auto-suggests itself from the number you enter. Recurrence: once, daily, weekly, monthly, or every N days. Tapping "Ejecutar" on a reminder either switches to Compras (paquete, since it's a whole catalog of choices, not one fixed code), asks for the missing card number (recarga), or opens a small confirm sheet with the phone/PIN/amount (transferencia) before dialing. Fully custom, template-less reminders are also supported. Everything starts off — nothing fires until you create a reminder.
+- 🎙️ **Siri & Shortcuts** — Ajustes › Siri y Atajos de Voz. Built on Apple's `AppIntents` framework, no extra setup: "Hey Siri, consulta mi saldo en CubaCell Connect" (or Bonos y Planes, Plan de Datos, Saldo Pospago, Estado del Plan Amigo) dials the matching fixed code; "Hey Siri, llama por cobrar con CubaCell Connect" / "llama oculto con CubaCell Connect" marks `*99`/`#31#` to whichever number you say. Each phrase opens the app and dials exactly like tapping would, system dial confirmation included.
 
 *The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
@@ -57,7 +58,7 @@ To get Caller ID working for `*99` collect calls, after installing the app go to
 CubaCellConnect/
 ├── CubaCellConnectApp.swift  # App entry point
 ├── Models.swift              # USSDCode, USSDCategory, catalog decoding, brand palette, Reminder/ReminderTemplate
-├── Services.swift            # JSON catalog store, Contacts, system dialer bridge, ReminderManager (local notifications)
+├── Services.swift            # JSON catalog store, Contacts, system dialer bridge, ReminderManager (local notifications), Siri/Shortcuts intents
 ├── UIComponents.swift        # Reusable presentational views (code row)
 ├── Views.swift               # Home, Contactos, category, and settings screens
 ├── codes.json                # Bundled USSD code catalog
