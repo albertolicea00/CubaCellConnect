@@ -980,6 +980,21 @@ struct SettingsView: View {
                 }
 
                 Section("Cuenta") {
+
+                    if let payPerUseCode = store.code(withId: "data-pay-per-use") {
+                        Button {
+                            guard !payPerUseCode.code.isEmpty else { return }
+                            DialService.dial(payPerUseCode.code)
+                        } label: {
+                            HStack {
+                                Label("Tarifa por Consumo (Activar/Desactivar)", systemImage: "dollarsign.circle.fill")
+                                Spacer()
+                                Image(systemName: "arrow.right")
+                            }
+                        }
+                        .disabled(payPerUseCode.code.isEmpty)
+                    }
+                    
                     NavigationLink {
                         FriendsPlanManageView()
                     } label: {
