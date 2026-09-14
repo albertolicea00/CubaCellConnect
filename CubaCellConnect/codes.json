@@ -306,11 +306,58 @@
               "requiresInput": false,
               "price": "$0.00",
               "compact": true
+            },
+            {
+              "id": "sms-8888-dhl",
+              "code": "8888",
+              "smsBody": "DHL {input}",
+              "title": "Rastreo DHL",
+              "details": "Envía tu número de guía DHL por SMS para rastrear tu envío.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de guía",
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-embajada",
+              "code": "8888",
+              "smsBody": "EMBAJADA {input}",
+              "title": "Información de Embajada",
+              "details": "Envía tu consulta para recibir información de la embajada por SMS.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Texto de la consulta",
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-cambio",
+              "code": "8888",
+              "smsBody": "CAMBIO {input}",
+              "title": "Cambio de Moneda",
+              "details": "Consulta la tasa de cambio por SMS — indica una moneda y, opcionalmente, un monto (ej. \"EUR 120\"), o déjalo vacío para el cambio general.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Moneda y monto (opcional)",
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8100-marti",
+              "code": "8100",
+              "smsBody": "MARTI",
+              "title": "Martí",
+              "details": "Suscríbete al servicio Martí por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
             }
           ]
         },
         {
-          "name": "Bundesliga",
+          "name": "Fútbol",
           "codes": [
             {
               "id": "sms-8888-bundesliga",
@@ -344,12 +391,7 @@
               "requiresInput": false,
               "price": "$4.00",
               "compact": true
-            }
-          ]
-        },
-        {
-          "name": "Champions League",
-          "codes": [
+            },
             {
               "id": "sms-8888-chanpion",
               "code": "8888",
@@ -382,12 +424,7 @@
               "requiresInput": false,
               "price": "$4.00",
               "compact": true
-            }
-          ]
-        },
-        {
-          "name": "Copa del Rey",
-          "codes": [
+            },
             {
               "id": "sms-8888-rey",
               "code": "8888",
@@ -420,53 +457,101 @@
               "requiresInput": false,
               "price": "$4.00",
               "compact": true
-            }
-          ]
-        },
-        {
-          "name": "Servicios de Pago",
-          "codes": [
-            {
-              "id": "sms-8888-dhl",
-              "code": "8888",
-              "smsBody": "DHL {input}",
-              "title": "Rastreo DHL",
-              "details": "Envía tu número de guía DHL por SMS para rastrear tu envío.",
-              "type": "sms",
-              "requiresInput": true,
-              "inputPlaceholder": "Número de guía",
-              "price": "$4.00",
-              "compact": true
             },
             {
-              "id": "sms-8888-embajada",
+              "id": "sms-8888-liga1",
               "code": "8888",
-              "smsBody": "EMBAJADA {input}",
-              "title": "Información de Embajada",
-              "details": "Envía tu consulta para recibir información de la embajada por SMS.",
-              "type": "sms",
-              "requiresInput": true,
-              "inputPlaceholder": "Texto de la consulta",
-              "price": "$4.00",
-              "compact": true
-            },
-            {
-              "id": "sms-8888-cambio",
-              "code": "8888",
-              "smsBody": "CAMBIO",
-              "title": "Cambio de Moneda",
-              "details": "Consulta la tasa de cambio por SMS — indica una moneda y, opcionalmente, un monto.",
+              "smsBody": "LIGA1",
+              "title": "LaLiga",
+              "details": "Suscríbete a los resultados de LaLiga por SMS.",
               "type": "sms",
               "requiresInput": false,
               "price": "$4.00",
               "compact": true
             },
             {
-              "id": "sms-8100-marti",
-              "code": "8100",
-              "smsBody": "MARTI",
-              "title": "Martí",
-              "details": "Suscríbete al servicio Martí por SMS.",
+              "id": "sms-8888-liga1-pos",
+              "code": "8888",
+              "smsBody": "LIGA1 POS",
+              "title": "LaLiga — Posiciones",
+              "details": "Consulta la tabla de posiciones de LaLiga por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-liga1-gol",
+              "code": "8888",
+              "smsBody": "LIGA1 GOL",
+              "title": "LaLiga — Goleadores",
+              "details": "Consulta la tabla de goleadores de LaLiga por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-premier",
+              "code": "8888",
+              "smsBody": "PREMIER",
+              "title": "Premier League",
+              "details": "Suscríbete a los resultados de la Premier League por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-premier-pos",
+              "code": "8888",
+              "smsBody": "PREMIER POS",
+              "title": "Premier League — Posiciones",
+              "details": "Consulta la tabla de posiciones de la Premier League por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-premier-gol",
+              "code": "8888",
+              "smsBody": "PREMIER GOL",
+              "title": "Premier League — Goleadores",
+              "details": "Consulta la tabla de goleadores de la Premier League por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-seriea",
+              "code": "8888",
+              "smsBody": "SerieA",
+              "title": "Serie A",
+              "details": "Suscríbete a los resultados de la Serie A por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-seriea-pos",
+              "code": "8888",
+              "smsBody": "SerieA POS",
+              "title": "Serie A — Posiciones",
+              "details": "Consulta la tabla de posiciones de la Serie A por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-seriea-gol",
+              "code": "8888",
+              "smsBody": "SerieA GOL",
+              "title": "Serie A — Goleadores",
+              "details": "Consulta la tabla de goleadores de la Serie A por SMS.",
               "type": "sms",
               "requiresInput": false,
               "price": "$4.00",
