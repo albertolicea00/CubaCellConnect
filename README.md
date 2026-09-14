@@ -78,7 +78,7 @@ Ajustes › Buscar en Directorio lets you query a phone directory (Truecaller-st
 
 Results show a mobile/landline icon in place of a real contact photo (the dump carries no photos, only line type) and a **copy-to-clipboard** button instead of a call button — also intentional: these are numbers from a scraped third-party dump, not something the user typed in or picked from their own address book, so this app doesn't offer one-tap dialing straight out of a directory search.
 
-**Known limitation — not integrated with Caller ID (`*99`):** the directory database is intentionally kept separate from `CallerIDStore`/`CallDirectoryHandler` (see [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification)), which only ever loads from the device's own Contacts. A CallKit Call Directory Extension has a hard cap on how many identification entries it can register (historically on the order of 100k–200k) — the directory dump has millions of rows (v1: ~4.6M; v2: ~4.8M combined), so registering it wholesale would get the extension rejected/disabled by iOS. Feeding it in would need a drastic filter (e.g. only numbers already in the device's own contacts, which is exactly what happens today) to fit under that ceiling.
+See [Known Limitations](#-known-limitations) below for why this isn't wired into Caller ID (`*99`).
 
 ## 🛜 Navigation Rooms & Public WIFI Spaces
 
@@ -108,6 +108,10 @@ Scraped once (2026-09) from ETECSA's public site, one page per province:
 Since this data is bundled (not fetched live), it can drift from ETECSA's site over time — there is no sync check for it yet, unlike `codes.json`.
 
 ## 🚧 Known Limitations
+
+- **Directory database not integrated with Caller ID (`*99`).** The directory database (see above) is intentionally kept separate from `CallerIDStore`/`CallDirectoryHandler` (see [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification)), which only ever loads from the device's own Contacts. A CallKit Call Directory Extension has a hard cap on how many identification entries it can register (historically on the order of 100k–200k) — the directory dump has millions of rows (v1: ~4.6M; v2: ~4.8M combined), so registering it wholesale would get the extension rejected/disabled by iOS. Feeding it in would need a drastic filter (e.g. only numbers already in the device's own contacts, which is exactly what happens today) to fit under that ceiling.
+
+- **No "call via WhatsApp/Teams" option in Contactos.** The Contactos tab only offers cellular actions (normal call, `*99` collect, `#31#` anonymous) next to each contact — it can't add a "call via WhatsApp" or "call via Teams" option alongside them. Those apps place calls over their own proprietary VoIP/Wi-Fi-calling stack, not the cellular network, and don't expose any public API or URL scheme a third-party app can use to trigger a call through them — that's entirely up to WhatsApp/Teams themselves (they'd need to register their own CallKit provider and/or an app-specific integration), not something CubaCellConnect can add from the outside.
 
 - **Physical dual-SIM (two nano-SIM) devices.** iPhone models sold in mainland China, Hong Kong, and Macao support two physical nano-SIMs, instead of the nano-SIM + eSIM combo sold everywhere else. This app has no line-selection UI and no way to force a dial through one SIM specifically — iOS gives apps no public API to pick which line places a `tel://`/USSD call; it always goes out through whichever line the device's own Phone settings mark as default. Acknowledged, not implemented.
 
