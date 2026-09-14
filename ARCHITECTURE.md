@@ -13,24 +13,28 @@ It is a dependency-free SwiftUI app with no backend and no network calls. Almost
 ```
 ┌─────────────────────────────────────────────────┐
 │                CubaCellConnectApp                │
-│    (App entry point · injects store · theme)     │
+│    (App entry point · injects stores · theme)    │
 └───────────────────────────┬───────────────────────┘
                             │
                             ▼
                         HomeView
-                (TabView, one tab per category)
+              (TabView, 5 tabs: Líneas de Ayuda,
+               Contactos, Home, Compras, Ajustes)
         ┌──────────┬──────────┬──────────┬──────────┐
         ▼          ▼          ▼          ▼          ▼
-   CategoryListView (×N, one per USSDCategory)   SettingsView
-   (per-category code list · selects a code)   (theme, about, links)
+   CategoryListView (×2, helplines/purchase)   SettingsView
+   (per-category code list · dials/prompts)    (NavigationStack, List)
+        │                                              │
+        ▼                                              ▼
+   dial/alert/SMS-compose,             pushes: Servicios por SMS, Salas y
+   depending on USSDCode.type          Zonas WiFi, Medir Velocidad, Buscar en
+                                        Directorio (Local/Online), Páginas
+                                        Amarillas, Gestionar Plan Amigo,
+                                        Gestionar PIN de Transferencia, Ayuda
         │
         ▼
-   CodeDetailView (sheet)
-   (input, copy to clipboard, dial)
-        │                │
-        ▼                ▼
-   DialService      UIPasteboard
-(opens tel:// URL)
+   DialService / MessageComposeView
+   (tel:// URL, or system SMS compose sheet)
 
 
           USSDCodeStore ── decodes ──▶ USSDCatalog
@@ -38,7 +42,7 @@ It is a dependency-free SwiftUI app with no backend and no network calls. Almost
                   └── loads CubaCellConnect/codes.json (bundled, read-only)
 ```
 
-There is no MVVM view-model layer, no cross-tab navigation state machine, and no singleton services beyond the one `@Observable` catalog store injected at the app root. State flows one way — store (read-only) → views — and the only mutable state anywhere in the app is `selectedCode` (one per `CategoryListView` instance), `input`/`copied` in `CodeDetailView`, and the `darkModePreference` `@AppStorage` flag read by both `SettingsView` and `CubaCellConnectApp`. This keeps the codebase intentionally small (≈380 lines of Swift across 5 files).
+There is no MVVM view-model layer and no cross-tab navigation state machine, but there is now more than one `@Observable` store injected at the app root: `USSDCodeStore` (the catalog) and `AccentColorStore` (the user's chosen accent color) are both handed down via `.environment`; `WifiRoomsStore` and `ContactsService`/`SpeedTestRunner` are created where they're used instead. State flows one way — stores (read-only or self-contained) → views. There is no unified "code detail sheet" anymore — each `USSDCode.type` (`.ussd`, `.call`, `.sms`) drives a different tap behavior directly (dial, alert-for-input-then-dial, or open the SMS compose sheet). Persisted state includes `@AppStorage` flags (`darkModePreference`, `defaultTab`, `showNetworkStatus`, `quickPurchaseNoConfirmDefault`, the accent color hex) and the transfer PIN in the Keychain (`TransferPinStore`, §11). This is a working app with real scope now, not the ≈380-line starting point described in earlier drafts of this document — see `git log` for the actual history instead of a stale line count here.
 
 ---
 
@@ -46,13 +50,14 @@ There is no MVVM view-model layer, no cross-tab navigation state machine, and no
 
 | File | Responsibility |
 |---|---|
-| `CubaCellConnect/CubaCellConnectApp.swift` | `@main` entry point. Creates the single `USSDCodeStore` and injects it into `HomeView` via `.environment`. |
-| `CubaCellConnect/Models.swift` | `Codable` catalog models (`USSDCatalog`, `USSDCategory`, `USSDCode`, `USSDActionType`) plus the brand palette (`Color.brandNavy`, `.brandCyan`, `.appBackground`, `.appForeground`) and `AppTheme.codeFont`. |
-| `CubaCellConnect/Services.swift` | `USSDCodeStore` (`@Observable`, loads and decodes `codes.json` from the bundle), `ContactsService` (`@Observable`, reads the device address book via `CNContactStore`, rebuilds the CallerID list on every fetch — §10), `CellularMonitor`, and `DialService` (stateless enum that builds and opens `tel://` URLs). |
-| `CubaCellConnect/UIComponents.swift` | Reusable, presentation-only views: `CodeRowView`, `ContactRowView`, a pure function of a `USSDCode`. |
-| `CubaCellConnect/Views.swift` | `HomeView` (the root `TabView`), `CategoryListView` (one instance per category), `ContactsListView`/`ContactCallRowView`/`ContactCallOptionsSheet` (Contactos tab: list, swipe-to-call, transfer sheet), and `SettingsView` and its sub-screens. |
-| `CubaCellConnect/codes.json` | Static, bundled dataset: version, carrier, categories, and every service code with its dial string and presentation metadata. |
-| `CubaCellConnect.xcassets/` | `AccentColor` (brand cyan, `#09C`) and `AppIcon`. |
+| `CubaCellConnect/CubaCellConnectApp.swift` | `@main` entry point. Creates `USSDCodeStore` and `AccentColorStore` and injects both into `HomeView` via `.environment`. |
+| `CubaCellConnect/Models.swift` | `Codable` catalog models (`USSDCatalog`, `USSDCategory`, `USSDCodeGroup`, `USSDCode`, `USSDActionType`, `SMSVariant`), `CubanPhoneNumber` (the one place that validates a Cuban mobile number), the brand palette (`Color.brandNavy`, `.brandCyan`, `.appBackground`, `.appForeground`, hex round-tripping for the user's accent color), `AppTheme.codeFont`, and the WiFi navigation-room models (`WifiProvince`, `WifiRoom`, `WifiHotspotGroup`). |
+| `CubaCellConnect/Services.swift` | `USSDCodeStore` (loads/decodes `codes.json`), `AccentColorStore` (user's accent color, `UserDefaults`-backed), `WifiRoomsStore` (loads `wifi_navigation_rooms.json`), `ContactsService` (reads the device address book, rebuilds the CallerID list on every fetch — §10), `CellularMonitor`, `DialService` (builds/opens `tel://` URLs), `MapsService` (opens Apple/Google Maps as a place search), `TransferPinStore` (Keychain-backed transfer PIN, §11), `DirectoryDatabase` (SQLite reverse-lookup over a user-supplied dump, §12), and `SpeedTestRunner` (ping/download/upload test against Cloudflare's public endpoints). |
+| `CubaCellConnect/UIComponents.swift` | Reusable, presentation-only views: `CodeRowView`, `ContactRowView`, plus `ContactPickerView` and `MessageComposeView` (thin `UIViewControllerRepresentable` wrappers around the system contact picker and SMS compose sheet). |
+| `CubaCellConnect/Views.swift` | `HomeView` (the root `TabView`), `HomeQuickActionsView` (Home tab), `CategoryListView` (Líneas de Ayuda / Compras tabs), `ContactsListView` and friends (Contactos tab), `SMSServicesView`/`SMSCodeListView`/`SMSOptionPickerView` (Servicios por SMS), `SettingsView` and everything it pushes: `WifiRoomsProvinceListView`/`WifiRoomsDetailView`, `SpeedTestView`/`SpeedGaugeView`, `DirectorySearchView` (offline), `DirectoryOnlineSearchView`, `YellowPagesSearchView`, `FriendsPlanManageView`, `TransferPinSettingsView`, and `HelpSettingsView`. This is the largest file in the project by a wide margin — check it directly rather than trusting a stale summary here as new screens get added. |
+| `CubaCellConnect/codes.json` | Static, bundled dataset: version, carrier, categories → groups → codes, each with its dial string and presentation metadata (§3). |
+| `CubaCellConnect/wifi_navigation_rooms.json` | Static, bundled dataset: one entry per province with its navigation rooms and free WIFI hotspots (§ Navigation Rooms in the README). |
+| `CubaCellConnect.xcassets/` | `AccentColor` (brand cyan, `#09C` — the *default*; the user can override it at runtime via `AccentColorStore`, unlike the asset catalog value itself) and `AppIcon`. |
 | `Shared/CallerIDStore.swift` | `CallerIDEntry` model plus read/write helpers for the App Group file both `CubaCellConnect` and `CallerIDExtension` touch — the only file compiled into *both* targets (§10). |
 | `CallerIDExtension/CallDirectoryHandler.swift` | The `CXCallDirectoryProvider` subclass — the entire CallerIDExtension target (§10). |
 
@@ -62,19 +67,28 @@ No separate persistence layer, networking layer, or dependency-injection contain
 
 ## 3. Configuration Data: `codes.json`
 
-`codes.json` is the single source of truth for **what USSD codes exist** and is treated as read-only, bundled data. It decodes into:
+`codes.json` is the single source of truth for **what USSD/call/SMS codes exist** and is treated as read-only, bundled data. It decodes into:
 
 ```
 USSDCatalog
  ├─ version, carrier
- ├─ categories: [USSDCategory]
- │   └─ id, name, icon (SF Symbol)
- └─ codes: [USSDCode]
-     ├─ id, code, title, details, category, mnemonic?
-     ├─ type: USSDActionType        (.ussd or .call — drives badge icon and button label)
-     ├─ requiresInput: Bool
-     └─ inputPlaceholder: String?
+ └─ categories: [USSDCategory]
+     ├─ id, name, icon (SF Symbol)
+     └─ groups: [USSDCodeGroup]        (a named sub-heading, or nil-named for no header)
+         ├─ name: String?
+         └─ codes: [USSDCode]
+             ├─ id, code, title, details
+             ├─ icon, price, compact, showsNumber   (all optional — presentation hints, see Models.swift)
+             ├─ type: USSDActionType   (.ussd / .call / .sms — drives dial-vs-alert-vs-compose behavior)
+             ├─ requiresInput: Bool, inputPlaceholder: String?
+             ├─ noConfirmCode: String?             (Quick-Purchase-without-confirmation variant of `code`)
+             ├─ smsBody: String?                   (for `.sms` codes: the message text sent to `code`)
+             ├─ options: [String]?                 (for `.sms` codes with a fixed picker of message bodies)
+             ├─ isSubscription: Bool?
+             └─ variants: [SMSVariant]?             (label + smsBody pairs, for a small fixed choice set)
 ```
+
+A code carries no `category` field of its own — its category and group are entirely implied by where it sits in the nested JSON (see the doc comment on `USSDCode` in `Models.swift`). There is no `mnemonic` field.
 
 `USSDCodeStore.load(from:)` reads and decodes this once, synchronously, at `init`. There is **no schema versioning enforcement and no remote fetch** — updating codes requires shipping a new app build. A missing or malformed catalog trips an `assertionFailure` in debug and renders an empty list in release; since the file is bundled, this only happens on developer error.
 
@@ -82,28 +96,31 @@ USSDCatalog
 
 ## 4. Navigation Model
 
-`HomeView` is a bottom `TabView` built by iterating `store.categories` — one tab per catalog category (SF Symbol from `USSDCategory.icon`), plus a fixed final "Settings" tab. Nothing hardcodes the category count or order beyond `codes.json` itself: adding a category there adds a tab automatically.
+`HomeView` is a bottom `TabView` with 5 explicit tabs — Líneas de Ayuda, Contactos, Home, Compras, Ajustes — not a generic loop over every catalog category (the tab order is hardcoded on purpose: Home must sit in the middle). Líneas de Ayuda and Compras each host a `CategoryListView` bound to the matching `USSDCategory` (`helplines`/`purchase`) from `store.tabCategories`; adding a *code or group* to either category in `codes.json` updates that tab automatically, but adding a whole new top-level category does **not** grow the `TabView` — the tab set itself is fixed.
 
-Each category tab hosts its own `CategoryListView`, a `NavigationStack` wrapping a plain `List` of that category's codes. Tapping a row sets that instance's own `selectedCode`, driving a `.sheet(item:)` that presents `CodeDetailView` at `.medium`/`.large` detents. Because `selectedCode` is local `@State` per `CategoryListView`, each tab's sheet state is independent — switching tabs mid-sheet is not a state collision, SwiftUI just tears down and recreates each tab's own view identity as needed.
+Each `CategoryListView` is a `NavigationStack` wrapping a `List` of that category's groups/codes. Tapping a row dials/prompts/composes directly depending on `USSDCode.type` and `requiresInput` — there is no shared "code detail" sheet type; see §5.
 
-`SettingsView` is its own `NavigationStack` with a `Form`, entirely separate from the category tabs — no shared navigation state, no back-stack, no deep linking, and nothing survives relaunch except the one `@AppStorage("darkModePreference")` flag.
+`SettingsView` is its own `NavigationStack` wrapping a `List` (not a `Form`), entirely separate from the category tabs. Unlike the original single-screen design, it now has real navigation depth — `NavigationLink`s push `SMSServicesView`, `WifiRoomsProvinceListView`, `SpeedTestView`, `DirectorySearchView`/`DirectoryOnlineSearchView`/`YellowPagesSearchView`, `FriendsPlanManageView`, `TransferPinSettingsView`, and `HelpSettingsView`. "Pestaña Inicial" (`@AppStorage("defaultTab")`) can point at one of those nested screens instead of a bare tab; `SettingsView.onAppear` auto-pushes the matching one exactly once per launch via a dedicated `isShowing*OnLaunch` flag per destination (see `HomeTab.launchOptions`/`.tabToSelect`). Persisted `@AppStorage` state now includes `darkModePreference`, `defaultTab`, `showNetworkStatus`, and `quickPurchaseNoConfirmDefault`, plus the accent color hex (`AccentColorStore`) and the transfer PIN (Keychain, not `UserDefaults` — §11).
 
 ---
 
-## 5. USSD Execution Path
+## 5. Code Execution Path
 
-1. `CodeRowView` tap → `HomeView` sets `selectedCode`, presenting `CodeDetailView`.
-2. If the code requires input (`requiresInput == true`), the sheet shows a `TextField` and disables the dial button until it is non-empty; `USSDCode.resolvedCode(input:)` substitutes the `{input}` placeholder.
-3. **Copy** writes `resolvedCode` to `UIPasteboard.general` directly — no expiry, no local-only flag, since nothing copied here is a secret (it is a dial string, not a PIN or card number).
-4. **Dial** calls `DialService.dial(_:)`, which percent-encodes `#` as `%23` (iOS rejects a raw `#` in a `tel://` URL), builds the URL, and calls `UIApplication.shared.open`. Returns `false` when the device cannot place calls (iPad, simulator, Wi-Fi-only) instead of failing silently; the sheet dismisses either way since iOS itself will show its own confirmation prompt or simply do nothing.
+There is no single "code detail" sheet — what a tap does depends on `USSDCode.type`:
 
-There is no prefill/resolver indirection here (unlike apps that inject saved user data before dialing) — a code either needs typed input or it doesn't, and that is the entire decision tree.
+1. **Row tap, no input required** (`requiresInput == false`): dials/composes immediately — see step 3/4 below for what "dials" means per type.
+2. **Row tap, input required** (`requiresInput == true`): an alert (in `CategoryListView`/`SettingsView`, depending on where the code lives) shows a `TextField` and disables the confirm button until it is non-empty; `USSDCode.resolvedCode(input:)` (or `resolvedSMSBody(input:)` for `.sms`) substitutes the `{input}` placeholder.
+3. **`.ussd`/`.call`**: `DialService.dial(_:)` percent-encodes `#` as `%23` (iOS rejects a raw `#` in a `tel://` URL), builds the `tel://` URL, and calls `UIApplication.shared.open`. Returns `false` when the device cannot place calls (iPad, simulator, Wi-Fi-only) instead of failing silently.
+4. **`.sms`**: opens `MessageComposeView` (wraps `MFMessageComposeViewController`) prefilled with `code` as the recipient and the resolved `smsBody` as the message — never sent silently, same one-more-tap-to-confirm shape as a `tel://` dial. Codes with `options` show a picker of valid message bodies first (`SMSOptionPickerView`); codes with `variants` show a small fixed choice instead.
+5. **Quick Purchase, no confirmation** (opt-in, Compras only): when the "Acción Rápida sin Confirmación" toggle is on and the code has a `noConfirmCode`, that string is dialed instead of `code` — it auto-selects ETECSA's own "¿Confirma su compra? 1. Sí" step in one dial instead of stopping there. See README § Direct dial vs. confirmation.
+
+There is no prefill/resolver indirection beyond the `{input}`/named-placeholder substitution above (unlike apps that inject saved user data before dialing) — separately, the Home Transferir card and the offline Directory search *do* prefill a "Clave" field from `TransferPinStore` (§11), but that's local to those specific screens, not a general mechanism.
 
 ---
 
 ## 6. Theming
 
-- **Brand palette**: `Color.brandNavy` (`rgb(0,0,102)`) and `Color.brandCyan` (`#09C`) are fixed static properties on `Color`, defined in `Models.swift` — not user-configurable, unlike apps that expose a `ColorPicker` for the accent. `AccentColor` in the asset catalog is set to the same cyan so system controls (nav bar tint, `.tint(.brandCyan)`) match without restating the value.
+- **Brand palette**: `Color.brandNavy` (`rgb(0,0,102)`) and `Color.brandCyan` (`#09C`) are fixed static properties on `Color`, defined in `Models.swift`. `brandCyan` is only the *default* accent now — `AccentColorStore` (`Services.swift`) holds the user's actual choice, made via a `ColorPicker` in Ajustes › Preferencias, persisted as a hex string in `UserDefaults` (`Color` itself isn't storable there — `Color.hexString`/`init?(hex:)` in `Models.swift` do the round-trip). Every view that used to hardcode `.brandCyan`/`Color.brandCyan` for its accent now reads `accentColorStore.color` via `@Environment(AccentColorStore.self)` instead — `AccentColor` in the asset catalog still matches the *default* cyan, but the live tint can differ from it once the user picks something else. Inline `Picker`s inside a `List` don't reliably inherit `.tint()` from an ancestor for their selected-value text/chevron, so those are tinted directly rather than relying on inheritance.
 - **Adaptive colors**: `Color.appBackground`/`.appForeground` wrap `UIColor.systemBackground`/`.label` so light/dark mode "just works" by default.
 - **Dark mode override**: `SettingsView` exposes a "Theme" picker (System Default / Light / Dark) backed by `@AppStorage("darkModePreference")` (`Int`, 0/1/2). `CubaCellConnectApp` reads the same key and applies `.preferredColorScheme(nil/.light/.dark)` to the root `WindowGroup` content — the one piece of state in the app that is both user-configurable and persisted across launches.
 - **Typography**: `AppTheme.codeFont(size:)` is the one shared style — a semibold monospaced font — used everywhere a dial string is displayed, so codes always read as "code" rather than prose.
@@ -116,7 +133,7 @@ There is no prefill/resolver indirection here (unlike apps that inject saved use
 These shape the UX and are not fixable in code:
 
 - iOS shows a confirmation prompt before dialing any `tel://` URL — the app cannot dial silently (by design, and good).
-- Interactive multi-step USSD menus (`*133#`, `*234#`) may not render session responses the way Android does; the copy action exists as the fallback.
+- Interactive multi-step USSD menus (`*133#`, `*234#`) may not render session responses the way Android does — there is no in-app fallback for that beyond dialing again.
 - `*#06#` (IMEI) is parsed by the dialer only when typed manually; via `tel://` it generally does nothing.
 - Simulator and Wi-Fi-only devices cannot place calls; `DialService.dial` returns `false` there.
 
@@ -124,20 +141,20 @@ These shape the UX and are not fixable in code:
 
 ## 8. Notable Constraints & Trade-offs (for future contributors)
 
-- **No dependency injection / testability seams**: `USSDCodeStore` is created once in `CubaCellConnectApp` and passed via `.environment` — there is no protocol/mock seam, but the app is small enough that this has not mattered.
-- **Silent failure on decode errors**: a malformed `codes.json` trips `assertionFailure` in debug and silently renders an empty list in release, rather than surfacing an error — acceptable only because the file is bundled and never user-supplied.
+- **No dependency injection / testability seams**: stores (`USSDCodeStore`, `AccentColorStore`, `WifiRoomsStore`) are created once and passed via `.environment` or plain `init` — there is no protocol/mock seam. Still not a real problem given the app's size, but there's now meaningfully more surface (six-plus `@Observable`/enum services) than when this was first written.
+- **Silent failure on decode errors**: a malformed `codes.json` or `wifi_navigation_rooms.json` trips `assertionFailure` in debug and silently renders an empty list in release, rather than surfacing an error — acceptable only because both files are bundled and never user-supplied.
 - **No data migrations**: `codes.json` has a `version` field that nothing currently reads; adding a new field to `USSDCode` is safe (optional fields decode fine), but renaming/retyping an existing field will break decoding for the exact build that ships it.
-- **`codes.json` is compiled-in**: adding a new code or category requires a new app build and App Store review — there is no remote-config or in-app update path, unlike apps whose `version` field exists specifically to unlock that later (see Extension Points below).
+- **`codes.json`/`wifi_navigation_rooms.json` are compiled-in**: adding a new code, category, or WiFi room requires a new app build and App Store review — there is no remote-config or in-app update path, unlike apps whose `version` field exists specifically to unlock that later (see Extension Points below). Contrast this with the offline Directory search (§12), which deliberately reads a file the user supplies at runtime instead.
 
 ---
 
 ## 9. Extension Points
 
-- **New code or category** → edit `codes.json` only; UI adapts automatically.
-- **Search** → filter `store.codes(in:)` inside `CategoryListView`; no structural change needed.
-- **Favorites / recents** → first real persistence; add a small `UserDefaults`-backed store beside `USSDCodeStore`, keep the catalog itself read-only.
+- **New code, group, or category** → edit `codes.json` only; UI adapts automatically for a new code/group. A whole new top-level category needs a matching tab wired into `HomeView` (see §4 — the tab set is no longer a generic loop).
+- **Search** → `CategoryListView`/`SMSServicesView` already filter locally as-you-type; no `USSDCodeStore` API exists for this (`code(withId:)` and `group(named:)` are point lookups, not search).
+- **Favorites / recents** → `TransferPinStore` (§11) is already a precedent for small Keychain-backed state beside the read-only catalog; a `UserDefaults`-backed store would work the same way for something non-secret.
 - **Remote catalog updates** → replace `USSDCodeStore.load(from:)` with a cached-remote strategy; the `version` field in the JSON exists for this.
-- **Localization** — UI copy is English; catalog `title`/`details` would move to localized variants keyed by the same `id`.
+- **Localization** — UI copy is Spanish (not English); catalog `title`/`details` would move to localized variants keyed by the same `id`.
 
 ---
 
@@ -189,3 +206,26 @@ CXCallDirectoryManager.reloadExtension  ──▶  CallDirectoryHandler.beginReq
 - **Requires the App Groups capability to be signed correctly** (`group.com.cubacellconnect.shared`, declared in both targets' entitlements in `project.yml`). With automatic signing this is normally provisioned by Xcode the first time you build with a real Team ID; if identification silently doesn't show up, check that the App Group actually got created under that team in the Apple Developer portal.
 - **Only testable on a physical iPhone.** The simulator has no real telephony stack, so this cannot be verified with `xcrun simctl` screenshots the way the rest of the UI in this repo is — it needs an actual incoming `*99` call on a device with the extension enabled.
 - **A truly anonymous call (`#31#`) can never be identified this way** — see §7 platform constraints; the network never transmits the number at all in that case, so there is nothing for `CallerIDStore` to wrap or unwrap.
+
+---
+
+## 11. Transfer PIN Store
+
+`TransferPinStore` (`Services.swift`) persists the user's ETECSA transfer PIN in the device Keychain (`kSecClassGenericPassword`), not `UserDefaults` — it's the one piece of user-entered state in the app sensitive enough to warrant that. `.save(_:)`/`.load()`/`.delete()` wrap `SecItemAdd`/`SecItemCopyMatching`/`SecItemDelete` directly (no third-party Keychain wrapper). The stored item's accessibility is `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` — it never syncs via iCloud Keychain and is excluded from device backups, so reinstalling the app or restoring from backup loses it (by design: it's read back into a plaintext `TextField`, unlike a password, so it shouldn't survive a device transfer silently).
+
+Consumers: the Home Transferir card and the offline Directory search's "Clave" field both call `TransferPinStore.load()` to prefill themselves instead of asking the user to retype the PIN every time; `TransferPinSettingsView` (Ajustes › Cuenta › Gestionar PIN de Transferencia) is the only place that writes to it.
+
+---
+
+## 12. Directory Database (offline reverse lookup)
+
+`DirectoryDatabase` (`Services.swift`) is a raw SQLite reader (`import SQLite3`, no wrapper library) over a Truecaller-style phone-directory dump the *user* supplies — the app neither bundles nor downloads it. It looks for any `.db` file in the app's Documents directory (reachable via Finder's "On My iPhone" file sharing, enabled via `UIFileSharingEnabled`/`LSSupportsOpeningDocumentsInPlace` in `project.yml`) and identifies its schema by querying `sqlite_master` for table names rather than trusting the filename:
+
+- **v1**: a single `contacts(number, name, is_mobile)` table.
+- **v2**: split into `movil(number, name)` and `fix(number, name)` tables — no `is_mobile` column, since which table a row came from *is* the line type.
+
+Two non-obvious implementation details worth knowing before touching this code:
+
+- **Opens via `file:...?immutable=1` URI, not a plain path.** Plain `SQLITE_OPEN_READONLY` still makes SQLite take a shared lock and probe for a hot journal on first real access; inside the iOS sandbox that first access can fail with `SQLITE_CANTOPEN` ("unable to open database file") even though the exact same file opens and reads fine at the raw POSIX level. `immutable=1` tells SQLite the file will never change while open, skipping locking and the journal probe entirely — this was found and fixed after reproducing the failure with a raw `FileHandle` read succeeding where `sqlite3_prepare_v2` didn't.
+- **Only `number` is index-backed** (`v1.contacts`'s primary key, `v2.movil`'s primary key, an explicit index on `v2.fix.number`); `name` has an index too, but `LIKE '%x%'` can't use any B-tree index regardless — a name-only search is a genuine full-table scan over dumps with millions of rows. `DirectoryDatabase.minimumNumberQueryLength`/`.minimumNameQueryLength` (3 and 5) exist to bound how bad that gets, and callers must run `search` off the main thread.
+- Name search is currently **disabled in the UI** for privacy/security reasons (see README § Directory) even though `DirectoryDatabase.search` itself still supports a `nameQuery`.
