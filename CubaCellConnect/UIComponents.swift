@@ -1,4 +1,5 @@
 import ContactsUI
+import MessageUI
 import SwiftUI
 import UIKit
 
@@ -41,6 +42,47 @@ struct ContactPickerView: UIViewControllerRepresentable {
             } else {
                 onPick(raw.filter { $0.isASCII && $0.isNumber }, false)
             }
+        }
+    }
+}
+
+// MARK: - SMS Compose
+
+/// Wraps the system SMS compose sheet, prefilled with a recipient and message body — used for
+/// every "Servicios por SMS" code (`type == .sms`), like texting "ayuda" to 2266. The message is
+/// never sent silently: this only opens the native compose UI with the text already typed in, the
+/// same one-more-tap-to-confirm shape as every `tel://` dial in this app.
+struct MessageComposeView: UIViewControllerRepresentable {
+    let recipient: String
+    let body: String
+    var onFinish: () -> Void = {}
+
+    func makeUIViewController(context: Context) -> MFMessageComposeViewController {
+        let controller = MFMessageComposeViewController()
+        controller.recipients = [recipient]
+        controller.body = body
+        controller.messageComposeDelegate = context.coordinator
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: MFMessageComposeViewController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onFinish: onFinish)
+    }
+
+    final class Coordinator: NSObject, MFMessageComposeViewControllerDelegate {
+        let onFinish: () -> Void
+
+        init(onFinish: @escaping () -> Void) {
+            self.onFinish = onFinish
+        }
+
+        func messageComposeViewController(
+            _ controller: MFMessageComposeViewController,
+            didFinishWith result: MessageComposeResult
+        ) {
+            controller.dismiss(animated: true, completion: onFinish)
         }
     }
 }
@@ -117,13 +159,21 @@ struct CodeRowView: View {
                     .foregroundStyle(Color.brandNavy)
             }
 
-            Image(systemName: code.type == .call ? "phone.fill" : "number")
+            Image(systemName: rowIcon)
                 .font(.callout)
                 .foregroundStyle(.white)
                 .frame(width: 32, height: 32)
                 .background(accentColorStore.color, in: Circle())
         }
         .padding(.vertical, 8)
+    }
+
+    private var rowIcon: String {
+        switch code.type {
+        case .call: return "phone.fill"
+        case .sms: return "message.fill"
+        case .ussd: return "number"
+        }
     }
 }
 
@@ -140,7 +190,8 @@ struct CodeRowView: View {
         type: .ussd,
         requiresInput: false,
         inputPlaceholder: nil,
-        noConfirmCode: nil
+        noConfirmCode: nil,
+        smsBody: nil
     ))
     .padding()
     .environment(AccentColorStore())
@@ -199,7 +250,8 @@ struct ContactRowView: View {
             type: .call,
             requiresInput: false,
             inputPlaceholder: nil,
-            noConfirmCode: nil
+            noConfirmCode: nil,
+            smsBody: nil
         ),
         onCall: {}
     )

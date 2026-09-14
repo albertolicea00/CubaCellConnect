@@ -9,6 +9,9 @@ enum USSDActionType: String, Codable {
     case ussd
     /// A regular phone call (e.g. *2266).
     case call
+    /// Sent as an SMS — `code` is the destination number, `smsBody` the message text (e.g.
+    /// "ayuda" to *2266) — opens the system SMS compose sheet prefilled, it isn't sent silently.
+    case sms
 }
 
 /// A single ETECSA (Cubacel) service code. Its category and group are implied by where it sits
@@ -38,6 +41,10 @@ struct USSDCode: Identifiable, Codable, Hashable {
     /// su compra? 1. Sí" USSD reply menu. Nil for codes with no confirmation step to skip — dialing
     /// always falls back to `code` when this is nil.
     let noConfirmCode: String?
+    /// For `type == .sms`: the message text to send to `code` (the destination number). May
+    /// contain the `{input}` placeholder, same convention as `code` itself (e.g. an SMS that
+    /// texts back the phone's IMEI, or a MMS-config text made of the first 9 digits of an email).
+    let smsBody: String?
 
     /// Code with the given named placeholders substituted in — each dictionary key `name`
     /// replaces a `{name}` token in `code`. Used by multi-field actions like the Home transfer card.
@@ -50,6 +57,19 @@ struct USSDCode: Identifiable, Codable, Hashable {
     /// Convenience for the common single-placeholder case (`{input}`).
     func resolvedCode(input: String = "") -> String {
         resolvedCode(with: ["input": input])
+    }
+
+    /// `smsBody` with the given named placeholders substituted in — mirrors `resolvedCode(with:)`
+    /// but for the SMS message text instead of the dial string.
+    func resolvedSMSBody(with values: [String: String]) -> String {
+        values.reduce(smsBody ?? "") { partial, entry in
+            partial.replacingOccurrences(of: "{\(entry.key)}", with: entry.value)
+        }
+    }
+
+    /// Convenience for the common single-placeholder case (`{input}`).
+    func resolvedSMSBody(input: String = "") -> String {
+        resolvedSMSBody(with: ["input": input])
     }
 }
 

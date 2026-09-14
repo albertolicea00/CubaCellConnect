@@ -167,8 +167,129 @@
           ]
         },
         {
-          "name": "SMS Suscripciones",
-          "codes": []
+          "name": "Consultas",
+          "codes": [
+            {
+              "id": "sms-2266-ayuda",
+              "code": "2266",
+              "smsBody": "ayuda",
+              "title": "Ayuda",
+              "details": "Envía \"ayuda\" al 2266 para ver los comandos SMS disponibles.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-2266-tarifa",
+              "code": "2266",
+              "smsBody": "tarifa",
+              "title": "Tarifa Actual",
+              "details": "Consulta tu tarifa actual por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-2266-oferta",
+              "code": "2266",
+              "smsBody": "oferta",
+              "title": "Ofertas de ETECSA",
+              "details": "Consulta las ofertas vigentes de ETECSA por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-2266-resumen",
+              "code": "2266",
+              "smsBody": "resumen",
+              "title": "Resumen de Crédito",
+              "details": "Consulta el resumen de tu crédito por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-2266-planes",
+              "code": "2266",
+              "smsBody": "planes",
+              "title": "Planes",
+              "details": "Consulta los planes disponibles por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-2266-amigo",
+              "code": "2266",
+              "smsBody": "amigo",
+              "title": "Plan Amigo",
+              "details": "Consulta el estado de tu Plan Amigo por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            }
+          ]
+        },
+        {
+          "name": "Configuraciones",
+          "codes": [
+              {
+              "id": "sms-2266-lte",
+              "code": "2266",
+              "smsBody": "LTE",
+              "title": "Activar Línea 4G (LTE)",
+              "details": "Activa tu línea para navegar por 4G/LTE.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-2266-imei",
+              "code": "2266",
+              "smsBody": "{input}",
+              "title": "Comprobar Compatibilidad 3G/4G",
+              "details": "Envía los primeros 8 dígitos de tu IMEI para saber si tu teléfono es compatible con 3G o 4G.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "IMEI (8 dígitos)"
+            },
+            {
+              "id": "sms-4222-mms-config",
+              "code": "4222",
+              "smsBody": "{input}",
+              "title": "Configurar MMS",
+              "details": "Envía los primeros 9 dígitos de tu correo electrónico al 4222 para configurar el MMS.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Primeros 9 dígitos de tu email"
+            }
+          ]
+        },
+        {
+          "name": "SMS Services",
+          "codes": [
+            {
+              "id": "sms-8000-onat",
+              "code": "8000",
+              "smsBody": "onat",
+              "title": "Servicio ONAT",
+              "details": "Suscríbete al servicio de la ONAT por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-8000-turismo",
+              "code": "8000",
+              "smsBody": "turismo",
+              "title": "Servicio de Turismo",
+              "details": "Suscríbete al servicio de turismo por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            },
+            {
+              "id": "sms-8000-follow",
+              "code": "8000",
+              "smsBody": "follow",
+              "title": "Boletín (Newsletter)",
+              "details": "Suscríbete al boletín informativo por SMS.",
+              "type": "sms",
+              "requiresInput": false
+            }
+          ]
         }
       ]
     },

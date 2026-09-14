@@ -1,3 +1,4 @@
+import MessageUI
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -872,8 +873,8 @@ struct CategoryListView: View {
 
 // MARK: - SMS Subscriptions
 
-/// Ajustes › SMS Suscripciones — subscribe/unsubscribe USSD codes for ETECSA's SMS info
-/// services, pulled from the "SMS Suscripciones" group in `codes.json` (currently empty; codes
+/// Ajustes › Servicios por SMS — subscribe/unsubscribe USSD codes for ETECSA's SMS info
+/// services, pulled from the "Servicios por SMS" group in `codes.json` (currently empty; codes
 /// go straight into the JSON once they're in hand, same as every other code in the app — never
 /// hardcoded here).
 struct SMSSubscriptionsView: View {
@@ -882,14 +883,22 @@ struct SMSSubscriptionsView: View {
 
     @State private var pendingInputCode: USSDCode?
     @State private var inputText = ""
+    @State private var pendingSMS: PendingSMS?
+    @State private var showsCannotSendTextAlert = false
 
-    private var codes: [USSDCode] {
-        store.group(named: "SMS Suscripciones")?.codes ?? []
+    /// Fixed, known group names — each maps to one SMS destination number (2266, 4222, 8000).
+    /// Paid subscriptions land in their own group(s) here too once their codes are in hand.
+    private var groups: [USSDCodeGroup] {
+        ["SMS al 2266", "Configurar MMS", "SMS Services"].compactMap { store.group(named: $0) }
+    }
+
+    private var hasAnyCodes: Bool {
+        groups.contains { !$0.codes.isEmpty }
     }
 
     var body: some View {
         Group {
-            if codes.isEmpty {
+            if !hasAnyCodes {
                 ContentUnavailableView(
                     "Sin Códigos Todavía",
                     systemImage: "envelope.badge",
@@ -897,17 +906,23 @@ struct SMSSubscriptionsView: View {
                 )
             } else {
                 List {
-                    ForEach(codes) { code in
-                        CodeRowView(code: code)
-                            .contentShape(Rectangle())
-                            .onTapGesture { select(code) }
+                    ForEach(groups) { group in
+                        if !group.codes.isEmpty {
+                            Section(group.name ?? "") {
+                                ForEach(group.codes) { code in
+                                    CodeRowView(code: code)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { select(code) }
+                                }
+                            }
+                        }
                     }
                 }
                 .listStyle(.insetGrouped)
                 .tint(accentColorStore.color)
             }
         }
-        .navigationTitle("SMS Suscripciones")
+        .navigationTitle("Servicios por SMS")
         .navigationBarTitleDisplayMode(.inline)
         .alert(
             pendingInputCode?.title ?? "",
@@ -924,10 +939,19 @@ struct SMSSubscriptionsView: View {
         ) { code in
             TextField(code.inputPlaceholder ?? "Dato", text: $inputText)
                 .keyboardType(.phonePad)
-            Button("Marcar") { dial(code, input: inputText) }
+            Button("Continuar") { composeSMS(code, input: inputText) }
             Button("Cancelar", role: .cancel) {}
         } message: { code in
             Text(code.details)
+        }
+        .alert("No se Puede Enviar SMS", isPresented: $showsCannotSendTextAlert) {
+            Button("Entendido", role: .cancel) {}
+        } message: {
+            Text("Este dispositivo no puede enviar mensajes de texto (por ejemplo, el Simulador de Xcode no soporta SMS).")
+        }
+        .sheet(item: $pendingSMS) { pending in
+            MessageComposeView(recipient: pending.recipient, body: pending.body)
+                .ignoresSafeArea()
         }
     }
 
@@ -936,13 +960,25 @@ struct SMSSubscriptionsView: View {
             inputText = ""
             pendingInputCode = code
         } else {
-            DialService.dial(code.code)
+            composeSMS(code, input: "")
         }
     }
 
-    private func dial(_ code: USSDCode, input: String) {
-        DialService.dial(code.resolvedCode(input: input))
+    private func composeSMS(_ code: USSDCode, input: String) {
+        guard MFMessageComposeViewController.canSendText() else {
+            showsCannotSendTextAlert = true
+            return
+        }
+        pendingSMS = PendingSMS(recipient: code.code, body: code.resolvedSMSBody(input: input))
     }
+}
+
+/// `MessageComposeView`'s `.sheet(item:)` payload — recipient + body resolved once, right before
+/// presenting, so the sheet doesn't need its own access back into `USSDCode`/placeholder logic.
+private struct PendingSMS: Identifiable {
+    let id = UUID()
+    let recipient: String
+    let body: String
 }
 
 #Preview {
@@ -1021,7 +1057,7 @@ struct SettingsView: View {
                     NavigationLink {
                         SMSSubscriptionsView()
                     } label: {
-                        Label("SMS Suscripciones", systemImage: "envelope.badge")
+                        Label("Servicios por SMS", systemImage: "envelope.badge")
                     }
 
                     NavigationLink {
