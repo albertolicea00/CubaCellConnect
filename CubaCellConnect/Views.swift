@@ -885,7 +885,10 @@ struct SMSServicesView: View {
     var body: some View {
         SMSCodeListView(
             title: "Servicios por SMS",
-            groupNames: ["Consultas", "SMS Suscripciones"],
+            groupNames: [
+                "Consultas", "SMS Suscripciones", "Bundesliga", "Champions League", "Copa del Rey",
+                "Servicios de Pago", "Frases y Poemas",
+            ],
             emptyStateDescription: "Los códigos de suscripción de SMS se agregarán aquí próximamente."
         )
     }
@@ -932,19 +935,27 @@ private struct SMSCodeListView: View {
                                 ForEach(group.codes) { code in
                                     // Same compact, price-trailing row shape as Compras — set
                                     // "compact": true on every code here so they all render like
-                                    // it, price or not.
-                                    Button {
-                                        select(code)
-                                    } label: {
-                                        HStack {
-                                            Text(code.title)
-                                            Spacer()
-                                            if let price = code.price {
-                                                Text(price)
-                                                    .font(.subheadline.weight(.semibold))
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                            Image(systemName: "arrow.right")
+                                    // it, price or not. A code with `options` (a fixed set of valid
+                                    // message texts, e.g. Frases y Poemas) opens a picker instead of
+                                    // dialing/composing straight away; "Cambio de Moneda" needs two
+                                    // optional fields, so it gets its own small form.
+                                    if code.options != nil {
+                                        NavigationLink {
+                                            SMSOptionPickerView(code: code)
+                                        } label: {
+                                            rowLabel(code)
+                                        }
+                                    } else if code.id == "sms-8888-cambio" {
+                                        NavigationLink {
+                                            CambioMonedaView(code: code)
+                                        } label: {
+                                            rowLabel(code)
+                                        }
+                                    } else {
+                                        Button {
+                                            select(code)
+                                        } label: {
+                                            rowLabel(code)
                                         }
                                     }
                                 }
@@ -1004,6 +1015,122 @@ private struct SMSCodeListView: View {
             return
         }
         pendingSMS = PendingSMS(recipient: code.code, body: code.resolvedSMSBody(input: input))
+    }
+
+    @ViewBuilder
+    private func rowLabel(_ code: USSDCode) -> some View {
+        HStack {
+            Text(code.title)
+            Spacer()
+            if let price = code.price {
+                Text(price)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            Image(systemName: "arrow.right")
+        }
+    }
+}
+
+/// Picker for an SMS code with a fixed set of valid message texts (`code.options`, e.g. "Frases y
+/// Poemas" — texting one of ~35 topic words to 8888 gets a phrase back for that topic). Picking a
+/// row sends it verbatim as the SMS body.
+private struct SMSOptionPickerView: View {
+    let code: USSDCode
+
+    @State private var pendingSMS: PendingSMS?
+    @State private var showsCannotSendTextAlert = false
+
+    var body: some View {
+        List(code.options ?? [], id: \.self) { option in
+            Button {
+                send(option)
+            } label: {
+                HStack {
+                    Text(option.capitalized)
+                    Spacer()
+                    Image(systemName: "arrow.right")
+                }
+            }
+        }
+        .navigationTitle(code.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("No se Puede Enviar SMS", isPresented: $showsCannotSendTextAlert) {
+            Button("Entendido", role: .cancel) {}
+        } message: {
+            Text("Este dispositivo no puede enviar mensajes de texto (por ejemplo, el Simulador de Xcode no soporta SMS).")
+        }
+        .sheet(item: $pendingSMS) { pending in
+            MessageComposeView(recipient: pending.recipient, body: pending.body)
+                .ignoresSafeArea()
+        }
+    }
+
+    private func send(_ option: String) {
+        guard MFMessageComposeViewController.canSendText() else {
+            showsCannotSendTextAlert = true
+            return
+        }
+        pendingSMS = PendingSMS(recipient: code.code, body: option)
+    }
+}
+
+/// "Cambio de Moneda" needs two independent, both-optional fields (moneda, monto) — the generic
+/// single-`{input}` alert used by every other SMS code doesn't fit, so this gets its own small
+/// form instead. Leaving both blank sends plain "CAMBIO"; filling either appends it.
+private struct CambioMonedaView: View {
+    let code: USSDCode
+
+    @State private var moneda = ""
+    @State private var monto = ""
+    @State private var pendingSMS: PendingSMS?
+    @State private var showsCannotSendTextAlert = false
+
+    var body: some View {
+        Form {
+            Section {
+                TextField("Moneda (EUR, USD, CAD...)", text: $moneda)
+                    .textInputAutocapitalization(.characters)
+                TextField("Monto (opcional)", text: $monto)
+                    .keyboardType(.numberPad)
+            } footer: {
+                Text("Déjalos vacíos para consultar el cambio general, o indica una moneda (y opcionalmente un monto) para un cambio puntual.")
+            }
+
+            Button {
+                send()
+            } label: {
+                HStack {
+                    Spacer()
+                    Text("Enviar SMS")
+                    Image(systemName: "arrow.right")
+                }
+            }
+        }
+        .navigationTitle(code.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("No se Puede Enviar SMS", isPresented: $showsCannotSendTextAlert) {
+            Button("Entendido", role: .cancel) {}
+        } message: {
+            Text("Este dispositivo no puede enviar mensajes de texto (por ejemplo, el Simulador de Xcode no soporta SMS).")
+        }
+        .sheet(item: $pendingSMS) { pending in
+            MessageComposeView(recipient: pending.recipient, body: pending.body)
+                .ignoresSafeArea()
+        }
+    }
+
+    private func send() {
+        guard MFMessageComposeViewController.canSendText() else {
+            showsCannotSendTextAlert = true
+            return
+        }
+        var body = "CAMBIO"
+        let trimmedMoneda = moneda.trimmingCharacters(in: .whitespaces).uppercased()
+        let trimmedMonto = monto.trimmingCharacters(in: .whitespaces)
+        if !trimmedMoneda.isEmpty { body += " \(trimmedMoneda)" }
+        if !trimmedMonto.isEmpty { body += " \(trimmedMonto)" }
+        pendingSMS = PendingSMS(recipient: code.code, body: body)
     }
 }
 

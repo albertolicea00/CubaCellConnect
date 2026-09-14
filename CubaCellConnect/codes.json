@@ -308,6 +308,193 @@
               "compact": true
             }
           ]
+        },
+        {
+          "name": "Bundesliga",
+          "codes": [
+            {
+              "id": "sms-8888-bundesliga",
+              "code": "8888",
+              "smsBody": "BUNDESLIGA",
+              "title": "Bundesliga",
+              "details": "Suscríbete a los resultados de la Bundesliga por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-bundesliga-pos",
+              "code": "8888",
+              "smsBody": "BUNDESLIGA POS",
+              "title": "Bundesliga — Posiciones",
+              "details": "Consulta la tabla de posiciones de la Bundesliga por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-bundesliga-gol",
+              "code": "8888",
+              "smsBody": "BUNDESLIGA GOL",
+              "title": "Bundesliga — Goleadores",
+              "details": "Consulta la tabla de goleadores de la Bundesliga por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Champions League",
+          "codes": [
+            {
+              "id": "sms-8888-chanpion",
+              "code": "8888",
+              "smsBody": "CHANPION",
+              "title": "Champions League",
+              "details": "Suscríbete a los resultados de la Champions League por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-chanpion-pos",
+              "code": "8888",
+              "smsBody": "CHANPION POS",
+              "title": "Champions League — Posiciones",
+              "details": "Consulta la tabla de posiciones de la Champions League por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-chanpion-gol",
+              "code": "8888",
+              "smsBody": "CHANPION GOL",
+              "title": "Champions League — Goleadores",
+              "details": "Consulta la tabla de goleadores de la Champions League por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Copa del Rey",
+          "codes": [
+            {
+              "id": "sms-8888-rey",
+              "code": "8888",
+              "smsBody": "REY",
+              "title": "Copa del Rey",
+              "details": "Suscríbete a los resultados de la Copa del Rey por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-rey-pos",
+              "code": "8888",
+              "smsBody": "REY POS",
+              "title": "Copa del Rey — Posiciones",
+              "details": "Consulta la tabla de posiciones de la Copa del Rey por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-rey-gol",
+              "code": "8888",
+              "smsBody": "REY GOL",
+              "title": "Copa del Rey — Goleadores",
+              "details": "Consulta la tabla de goleadores de la Copa del Rey por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Servicios de Pago",
+          "codes": [
+            {
+              "id": "sms-8888-dhl",
+              "code": "8888",
+              "smsBody": "DHL {input}",
+              "title": "Rastreo DHL",
+              "details": "Envía tu número de guía DHL por SMS para rastrear tu envío.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de guía",
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-embajada",
+              "code": "8888",
+              "smsBody": "EMBAJADA {input}",
+              "title": "Información de Embajada",
+              "details": "Envía tu consulta para recibir información de la embajada por SMS.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Texto de la consulta",
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-cambio",
+              "code": "8888",
+              "smsBody": "CAMBIO",
+              "title": "Cambio de Moneda",
+              "details": "Consulta la tasa de cambio por SMS — indica una moneda y, opcionalmente, un monto.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8100-marti",
+              "code": "8100",
+              "smsBody": "MARTI",
+              "title": "Martí",
+              "details": "Suscríbete al servicio Martí por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Frases y Poemas",
+          "codes": [
+            {
+              "id": "sms-8888-frases",
+              "code": "8888",
+              "title": "Frases y Poemas",
+              "details": "Elige un tema y recibe una frase o poema por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true,
+              "options": [
+                "ALEGRIA", "AMISTAD", "ARMONIA", "BELLEZA", "CITA", "CONSEJO", "DINERO", "EXITO",
+                "FELICITACION", "HOMBRE", "HUMOR", "INFIEL", "LETRA", "MUJER", "NAVIDAD", "PADRE",
+                "POEMAS", "REFRAN", "SUERTE", "TRABAJO", "AMOR", "CHISTE", "CUMPLENO", "ENAMORAR",
+                "MADRE", "NEGOCIO", "SALUD", "PIROPO", "BOLIBAR", "MARTI", "CERVANTES", "COHELO",
+                "NERUDA", "CHE", "PITAGORAS"
+              ]
+            }
+          ]
         }
       ]
     },

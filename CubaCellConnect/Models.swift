@@ -45,6 +45,11 @@ struct USSDCode: Identifiable, Codable, Hashable {
     /// contain the `{input}` placeholder, same convention as `code` itself (e.g. an SMS that
     /// texts back the phone's IMEI, or a MMS-config text made of the first 9 digits of an email).
     let smsBody: String?
+    /// For `type == .sms` codes with a fixed set of valid message texts (e.g. "Frases y Poemas" —
+    /// texting one of ~35 topic words to 8888 gets a phrase back for that topic). When present,
+    /// the row opens a picker listing these instead of dialing/composing directly; picking one
+    /// sends it verbatim as the SMS body, ignoring `smsBody`. Nil for every other code.
+    let options: [String]?
 
     /// Code with the given named placeholders substituted in — each dictionary key `name`
     /// replaces a `{name}` token in `code`. Used by multi-field actions like the Home transfer card.

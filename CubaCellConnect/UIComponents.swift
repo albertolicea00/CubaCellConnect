@@ -191,7 +191,8 @@ struct CodeRowView: View {
         requiresInput: false,
         inputPlaceholder: nil,
         noConfirmCode: nil,
-        smsBody: nil
+        smsBody: nil,
+        options: nil
     ))
     .padding()
     .environment(AccentColorStore())
@@ -251,7 +252,8 @@ struct ContactRowView: View {
             requiresInput: false,
             inputPlaceholder: nil,
             noConfirmCode: nil,
-            smsBody: nil
+            smsBody: nil,
+            options: nil
         ),
         onCall: {}
     )
