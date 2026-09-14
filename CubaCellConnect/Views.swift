@@ -71,7 +71,6 @@ enum HomeTab: String, CaseIterable, Identifiable {
         case .contacts: return "Contactos"
         case .home: return "Home"
         case .purchase: return "Compras"
-        case .settings: return "Ajustes"
         }
     }
 }
@@ -652,7 +651,7 @@ private struct ContactCallOptionsSheet: View {
             }
         }
         .scrollBounceBehavior(.basedOnSize)
-        .presentationDetents([.large])
+        .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
         .onAppear {
             if pin.isEmpty, let saved = TransferPinStore.load() {
@@ -960,12 +959,6 @@ struct SettingsView: View {
                     .tint(accentColorStore.color)
 
                     Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
-
-                    Toggle("Activar por Defecto la Acción de Marcado Directo sin Confirmación", isOn: $quickPurchaseNoConfirmDefault)
-
-                    Text("Hace que \"Acción Rápida sin Confirmación\" en Compras empiece activada cada vez que abres la app. Si lo dejas apagado, esa opción siempre vuelve a estar apagada al reabrir la app.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
 
                     Picker("Pestaña Inicial", selection: $defaultTab) {
                         ForEach(HomeTab.allCases) { tab in
