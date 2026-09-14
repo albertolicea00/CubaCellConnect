@@ -764,7 +764,7 @@
               "details": "Consulta el pronóstico del tiempo de una zona específica por SMS — p. ej. OCC, CEN, ORI, o una provincia como Camagüey, Holguín, Santiago de Cuba, Cayo Coco...",
               "type": "sms",
               "requiresInput": true,
-              "inputPlaceholder": "Zona (OCC, CEN, ORI, Camagüey...)",
+              "inputPlaceholder": "OCC, CEN, ORI, Camagüey...)",
               "price": "$4.00",
               "compact": true
             }
