@@ -975,9 +975,6 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink(isActive: $isShowingSpeedTestOnLaunch) { SpeedTestView() } label: { EmptyView() }.hidden()
-                NavigationLink(isActive: $isShowingDirectoryOnLaunch) { DirectorySearchView() } label: { EmptyView() }.hidden()
-
                 Section("Preferencias") {
                     // Inline pickers in a List don't reliably inherit `.tint()` from an ancestor
                     // (e.g. the TabView's) for their selected-value text/chevron — tint each one
@@ -1099,6 +1096,15 @@ struct SettingsView: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                         .listRowBackground(Color.clear)
                 }
+            }
+            .background {
+                // Kept out of the List itself — a `NavigationLink` row hidden with `.hidden()`
+                // still reserves its row height there, leaving two empty rows above Preferencias.
+                VStack(spacing: 0) {
+                    NavigationLink(isActive: $isShowingSpeedTestOnLaunch) { SpeedTestView() } label: { EmptyView() }
+                    NavigationLink(isActive: $isShowingDirectoryOnLaunch) { DirectorySearchView() } label: { EmptyView() }
+                }
+                .hidden()
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
