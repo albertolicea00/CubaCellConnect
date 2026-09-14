@@ -108,6 +108,10 @@ Since this data is bundled (not fetched live), it can drift from ETECSA's site o
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+> ⚠️ **Issues, PR descriptions, and commit messages must be written in English.**
+> The app UI is intentionally in Spanish — it targets Cuban users. All technical communication follows English conventions.
+
+
 ## ⚠️ Disclaimer
 
 This is an independent, community-made app. It is **not affiliated with, endorsed by, or sponsored by ETECSA**. Codes may change at any time at the carrier's discretion.
