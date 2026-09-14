@@ -1974,30 +1974,19 @@ struct DirectorySearchView: View {
 /// to a real source yet — the form exists so the field it will use is fixed, but "Buscar" stays
 /// disabled until there's an actual endpoint to call.
 struct DirectoryOnlineSearchView: View {
-    @State private var telefono = ""
-    // Kept but intentionally not rendered — same privacy/security reasoning as name search in
-    // Buscar en Directorio (Local): a name-search UI turns this into a reverse people-search tool.
-    @State private var nombre = ""
+    // Fields this will use once wired up (see GitHub issue #2) — kept here so the planned shape
+    // is fixed, but not rendered while this stays a placeholder. `nombre` stays commented for the
+    // same privacy/security reasoning as name search in Buscar en Directorio (Local): a
+    // name-search UI turns this into a reverse people-search tool.
+    // @State private var telefono = ""
+    // @State private var nombre = ""
 
     var body: some View {
-        Form {
-            Section {
-                TextField("Teléfono", text: $telefono)
-                    .keyboardType(.phonePad)
-                // TextField("Nombre", text: $nombre)
-
-                Button {} label: {
-                    HStack {
-                        Spacer()
-                        Text("Buscar")
-                        Image(systemName: "arrow.right")
-                    }
-                }
-                .disabled(true)
-            } footer: {
-                Text("Búsqueda en línea — próximamente.")
-            }
-        }
+        ContentUnavailableView(
+            "En Construcción",
+            systemImage: "hammer.fill",
+            description: Text("Buscar en Directorio (Online) todavía no está disponible.")
+        )
         .navigationTitle("Buscar en Directorio (Online)")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -2007,41 +1996,22 @@ struct DirectoryOnlineSearchView: View {
 /// Pages–style lookup. Not wired to a real source yet — the form exists so the fields it will use
 /// are fixed, but "Buscar" stays disabled until there's an actual endpoint to call.
 struct YellowPagesSearchView: View {
-    @State private var nombre = ""
-    @State private var categoria = ""
-    @State private var telefono = ""
-    // Kept but intentionally not rendered — too specific/identifying a field to expose as a
-    // search criterion.
-    @State private var calle = ""
-    @State private var municipio = ""
-    @State private var provincia = ""
+    // Fields this will use once wired up (see GitHub issue #3) — kept here so the planned shape
+    // is fixed, but not rendered while this stays a placeholder. `nombre` and `calle` stay
+    // commented since they're too identifying/specific to expose as search criteria.
+    // @State private var nombre = ""
+    // @State private var categoria = ""
+    // @State private var telefono = ""
+    // @State private var calle = ""
+    // @State private var municipio = ""
+    // @State private var provincia = ""
 
     var body: some View {
-        Form {
-            Section {
-                // Kept but intentionally not rendered — same privacy/security reasoning as name
-                // search in Buscar en Directorio: a name-search UI turns this into a reverse
-                // people-search tool.
-                // TextField("Nombre", text: $nombre)
-                TextField("Categoría", text: $categoria)
-                TextField("Teléfono", text: $telefono)
-                    .keyboardType(.phonePad)
-                // TextField("Calle", text: $calle)
-                TextField("Municipio", text: $municipio)
-                TextField("Provincia", text: $provincia)
-
-                Button {} label: {
-                    HStack {
-                        Spacer()
-                        Text("Buscar")
-                        Image(systemName: "arrow.right")
-                    }
-                }
-                .disabled(true)
-            } footer: {
-                Text("Búsqueda en Páginas Amarillas — próximamente.")
-            }
-        }
+        ContentUnavailableView(
+            "En Construcción",
+            systemImage: "hammer.fill",
+            description: Text("Buscar en Páginas Amarillas todavía no está disponible.")
+        )
         .navigationTitle("Buscar en Páginas Amarillas")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -2102,6 +2072,59 @@ private struct HelpSettingsView: View {
                 SettingsInfoRow(
                     title: "Cómo activarlo",
                     text: "Ve a Ajustes del sistema › Teléfono › Bloqueo e Identificación de Llamadas y activa \"CallerID\". Es un paso manual de iOS — la app no puede activarlo sola. Solo identifica a quienes ya tienes en Contactos; una llamada anónima (#31#) nunca se puede identificar, porque el número real nunca llega al teléfono."
+                )
+            }
+
+            Section("Compras: Acción Rápida sin Confirmación") {
+                SettingsInfoRow(
+                    title: "¿Qué hace?",
+                    text: "En la pestaña Compras hay un interruptor \"Acción Rápida sin Confirmación\". Actívalo y los códigos que lo soportan marcan directo el paso de confirmación de ETECSA, ahorrándote un paso — solo actívalo si ya confías en lo que vas a comprar."
+                )
+            }
+
+            Section("Plan Amigo") {
+                SettingsInfoRow(
+                    title: "Gestionar Plan Amigo",
+                    text: "En Ajustes › Cuenta › Gestionar Plan Amigo puedes activarlo, desactivarlo, agregar o eliminar un amigo (con su número o eligiéndolo de Contactos), y consultar su estado. Activar el Plan Amigos tiene un costo de $25.00."
+                )
+            }
+
+            Section("PIN de Transferencia") {
+                SettingsInfoRow(
+                    title: "Cambiar y guardar tu PIN",
+                    text: "En Ajustes › Cuenta › Gestionar PIN de Transferencia puedes cambiar el PIN que usas para transferir saldo, o guardarlo en este dispositivo para que se rellene solo cada vez que transfieras (desde Home o desde un contacto). Se guarda cifrado en este iPhone y nunca sale de él."
+                )
+            }
+
+            Section("Servicios por SMS") {
+                SettingsInfoRow(
+                    title: "¿Qué es esto?",
+                    text: "Son servicios de ETECSA que se usan enviando un SMS, no marcando un código — tarifas, DHL y vuelos, deportes, noticias, frases y horóscopos. Algunos son suscripciones (se marcan con la etiqueta \"Suscripción\") y pueden tener un costo recurrente. Necesitas un dispositivo que pueda enviar SMS (el Simulador de Xcode, por ejemplo, no puede)."
+                )
+            }
+
+            Section("Salas y Zonas WiFi") {
+                SettingsInfoRow(
+                    title: "¿Qué muestra?",
+                    text: "Para cada provincia cubana, lista las salas de navegación pagas de ETECSA (con su cantidad de puestos) y las zonas de WIFI público gratis, agrupadas por municipio. Es información pública de ETECSA, incluida en la app — no necesita conexión para verse."
+                )
+            }
+
+            Section("Medir Velocidad de Internet") {
+                SettingsInfoRow(
+                    title: "¿Cómo funciona?",
+                    text: "Mide ping, velocidad de descarga y de subida de tu conexión actual (datos móviles o WiFi). La prueba consume los datos que uses durante ella — ten cuidado si tienes un plan de datos limitado."
+                )
+            }
+
+            Section("Buscar en Directorio") {
+                SettingsInfoRow(
+                    title: "¿De dónde salen los datos?",
+                    text: "La app no trae ningún directorio incluido ni lo descarga por su cuenta — tienes que traer tú mismo el archivo de base de datos (copiándolo con Finder o con el botón \"Importar\" dentro de la pantalla) para poder buscar."
+                )
+                SettingsInfoRow(
+                    title: "Solo por número",
+                    text: "La búsqueda por nombre está desactivada a propósito, por privacidad — solo se puede buscar por número de teléfono."
                 )
             }
         }
