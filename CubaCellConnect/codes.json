@@ -375,8 +375,50 @@
           ]
         },
         {
-          "name": "Fútbol",
+          "name": "Deportes",
           "codes": [
+            {
+              "id": "sms-8888-pelota",
+              "code": "8888",
+              "smsBody": "PELOTA",
+              "title": "Pelota Cubana",
+              "details": "Elige qué consultar de la pelota cubana por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true,
+              "variants": [
+                {
+                  "label": "Resultados",
+                  "smsBody": "PELOTA"
+                },
+                {
+                  "label": "Posiciones",
+                  "smsBody": "PELOTA POS"
+                }
+              ]
+            },
+            {
+              "id": "sms-8888-mlb",
+              "code": "8888",
+              "smsBody": "MLB",
+              "title": "MLB (Grandes Ligas)",
+              "details": "Elige qué consultar de las Grandes Ligas por SMS.",
+              "type": "sms",
+              "requiresInput": false,
+              "price": "$4.00",
+              "compact": true,
+              "variants": [
+                {
+                  "label": "Resultados",
+                  "smsBody": "MLB"
+                },
+                {
+                  "label": "Posiciones",
+                  "smsBody": "MLB POS"
+                }
+              ]
+            },
             {
               "id": "sms-8888-bundesliga",
               "code": "8888",
@@ -525,47 +567,6 @@
                   "label": "Goleadores",
                   "smsBody": "SerieA GOL"
                 }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Béisbol",
-          "codes": [
-            {
-              "id": "sms-8888-mlb",
-              "code": "8888",
-              "smsBody": "MLB",
-              "title": "MLB (Grandes Ligas)",
-              "details": "Elige qué consultar de las Grandes Ligas por SMS.",
-              "type": "sms",
-              "requiresInput": false,
-              "price": "$4.00",
-              "compact": true,
-              "variants": [
-                {
-                  "label": "Resultados",
-                  "smsBody": "MLB"
-                },
-                {
-                  "label": "Posiciones",
-                  "smsBody": "MLB POS"
-                }
-              ]
-            },
-            {
-              "id": "sms-8888-pelota",
-              "code": "8888",
-              "smsBody": "PELOTA",
-              "title": "Pelota Cubana",
-              "details": "Elige qué consultar de la pelota cubana por SMS.",
-              "type": "sms",
-              "requiresInput": false,
-              "price": "$4.00",
-              "compact": true,
-              "variants": [
-                { "label": "Resultados", "smsBody": "PELOTA" },
-                { "label": "Posiciones", "smsBody": "PELOTA POS" }
               ]
             }
           ]

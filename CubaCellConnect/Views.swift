@@ -902,14 +902,14 @@ struct SMSServicesView: View {
     }
 }
 
-/// Servicios por SMS › Deportes — Fútbol (Bundesliga, Champions, Copa del Rey, LaLiga, Premier,
-/// Serie A) and Béisbol (MLB, Pelota Cubana) as two sections on their own screen, reached from the
-/// single "Deportes" row in `SMSServicesView`.
+/// Servicios por SMS › Deportes — Pelota Cubana and MLB first, then the football tournaments
+/// (Bundesliga, Champions, Copa del Rey, LaLiga, Premier, Serie A), all as one flat list on their
+/// own screen, reached from the single "Deportes" row in `SMSServicesView`.
 struct DeportesView: View {
     var body: some View {
         SMSCodeListView(
             title: "Deportes",
-            groupNames: ["Fútbol", "Béisbol"],
+            groupNames: ["Deportes"],
             emptyStateDescription: "Los códigos de deportes se agregarán aquí próximamente."
         )
     }
