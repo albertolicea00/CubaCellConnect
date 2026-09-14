@@ -2110,6 +2110,21 @@ private struct HelpSettingsView: View {
                 )
             }
 
+            Section("Recordatorios") {
+                SettingsInfoRow(
+                    title: "¿Qué hace?",
+                    text: "En Ajustes › Utilidades › Recordatorios puedes crear notificaciones locales (sin servidor, sin internet) para que te avisen cuando toca comprar un paquete, recargar saldo o hacer una transferencia. Hay una sección por plantilla, y puedes agregar tantos recordatorios de cada una como necesites — uno por cada línea que manejes."
+                )
+                SettingsInfoRow(
+                    title: "Ejecutar desde el recordatorio",
+                    text: "Comprar Paquete te lleva directo a la pestaña Compras (no tiene un solo código fijo, es todo un catálogo). Recargar Saldo te pide el número de la tarjeta justo antes de marcar (nunca se guarda). Transferencia recuerda el número de destino y te pide el monto, con tu Clave de Transferencia ya rellenada si la tienes guardada."
+                )
+                SettingsInfoRow(
+                    title: "Recurrencia y notificación",
+                    text: "Elige avisarte una sola vez, todos los días, cada semana, cada mes o cada ciertos días. Desde la notificación misma puedes \"Marcar como hecho\" o \"Posponer 1 día\" sin abrir la app; tocarla abre el detalle del recordatorio. También puedes crear un recordatorio totalmente personalizado, sin plantilla. Todos empiezan sin ningún recordatorio activo — los creas tú, a tu medida."
+                )
+            }
+
             Section("Plan Amigo") {
                 SettingsInfoRow(
                     title: "Gestionar Plan Amigo",
