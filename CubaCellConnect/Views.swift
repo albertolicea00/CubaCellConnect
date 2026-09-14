@@ -920,11 +920,15 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 Section("Preferencias") {
+                    // Inline pickers in a List don't reliably inherit `.tint()` from an ancestor
+                    // (e.g. the TabView's) for their selected-value text/chevron — tint each one
+                    // directly so it actually follows the user's accent color choice.
                     Picker("Tema", selection: $darkMode) {
                         Text("Por Defecto").tag(0)
                         Text("Claro").tag(1)
                         Text("Oscuro").tag(2)
                     }
+                    .tint(accentColorStore.color)
 
                     Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
 
@@ -933,6 +937,7 @@ struct SettingsView: View {
                             Text(tab.displayName).tag(tab.rawValue)
                         }
                     }
+                    .tint(accentColorStore.color)
 
                     ColorPicker(
                         "Color de Acento",
