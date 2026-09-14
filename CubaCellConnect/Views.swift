@@ -64,7 +64,7 @@ struct HomeView: View {
 /// The 5 tabs, keyed by a stable string so it can be stored in `@AppStorage` (as "Pestaña
 /// inicial" in Ajustes › Preferencias) and used as the `TabView` selection tag.
 enum HomeTab: String, CaseIterable, Identifiable {
-    case helplines, contacts, home, purchase, settings, speedTest, directory, smsServices
+    case helplines, contacts, home, purchase, settings, speedTest, directory, smsServices, directoryOnline, yellowPages
 
     var id: String { rawValue }
 
@@ -83,17 +83,19 @@ enum HomeTab: String, CaseIterable, Identifiable {
             case .purchase: return "Compras"
             case .settings: return "Ajustes"
             case .speedTest: return "Velocidad de Internet"
-            case .directory: return "Buscar en Directorio"
+            case .directory: return "Buscar en Directorio (Local)"
             case .smsServices: return "Servicios por SMS"
+            case .directoryOnline: return "Buscar en Directorio (Online)"
+            case .yellowPages: return "Buscar en Páginas Amarillas"
         }
     }
 
-    /// The actual `TabView` tab to select for this launch destination — `.speedTest`/`.directory`/
-    /// `.smsServices` aren't tabs themselves, they're screens `SettingsView` pushes onto once
+    /// The actual `TabView` tab to select for this launch destination — none of these nested
+    /// Ajustes screens are tabs themselves, they're screens `SettingsView` pushes onto once
     /// Ajustes is showing.
     var tabToSelect: HomeTab {
         switch self {
-        case .speedTest, .directory, .smsServices: return .settings
+        case .speedTest, .directory, .smsServices, .directoryOnline, .yellowPages: return .settings
         default: return self
         }
     }
@@ -1235,6 +1237,8 @@ struct SettingsView: View {
     @State private var isShowingSpeedTestOnLaunch = false
     @State private var isShowingDirectoryOnLaunch = false
     @State private var isShowingSMSServicesOnLaunch = false
+    @State private var isShowingDirectoryOnlineOnLaunch = false
+    @State private var isShowingYellowPagesOnLaunch = false
 
     /// Backs the three "Configuraciones" SMS rows (LTE, 3G/4G check, MMS) in Cuenta — these dial
     /// straight from the row, no sub-screen, so `SettingsView` needs its own compose-SMS state
@@ -1288,7 +1292,19 @@ struct SettingsView: View {
                     NavigationLink {
                         DirectorySearchView()
                     } label: {
-                        Label("Buscar en Directorio", systemImage: "magnifyingglass")
+                        Label("Buscar en Directorio (Local)", systemImage: "magnifyingglass")
+                    }
+
+                    NavigationLink {
+                        DirectoryOnlineSearchView()
+                    } label: {
+                        Label("Buscar en Directorio (Online)", systemImage: "network")
+                    }
+
+                    NavigationLink {
+                        YellowPagesSearchView()
+                    } label: {
+                        Label("Buscar en Páginas Amarillas", systemImage: "book.pages")
                     }
 
                     NavigationLink {
@@ -1375,6 +1391,9 @@ struct SettingsView: View {
                     Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect")!) {
                         Label("Código fuente en GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
+                    Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect/blob/main/CubaCellConnect/codes.json")!) {
+                        Label("Descargar Todos los Códigos", systemImage: "arrow.down.doc")
+                    }
                     Link(destination: URL(string: "https://www.linkedin.com/in/albertolicea00")!) {
                         Label("Alberto Licea (Desarrollador)", systemImage: "person.circle")
                     }
@@ -1391,6 +1410,8 @@ struct SettingsView: View {
             .navigationDestination(isPresented: $isShowingSpeedTestOnLaunch) { SpeedTestView() }
             .navigationDestination(isPresented: $isShowingDirectoryOnLaunch) { DirectorySearchView() }
             .navigationDestination(isPresented: $isShowingSMSServicesOnLaunch) { SMSServicesView() }
+            .navigationDestination(isPresented: $isShowingDirectoryOnlineOnLaunch) { DirectoryOnlineSearchView() }
+            .navigationDestination(isPresented: $isShowingYellowPagesOnLaunch) { YellowPagesSearchView() }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
@@ -1408,6 +1429,10 @@ struct SettingsView: View {
                     isShowingDirectoryOnLaunch = true
                 } else if defaultTab == HomeTab.smsServices.rawValue {
                     isShowingSMSServicesOnLaunch = true
+                } else if defaultTab == HomeTab.directoryOnline.rawValue {
+                    isShowingDirectoryOnlineOnLaunch = true
+                } else if defaultTab == HomeTab.yellowPages.rawValue {
+                    isShowingYellowPagesOnLaunch = true
                 }
             }
             .alert(
@@ -1844,7 +1869,7 @@ struct DirectorySearchView: View {
                 .listStyle(.insetGrouped)
             }
         }
-        .navigationTitle("Buscar en Directorio")
+        .navigationTitle("Buscar en Directorio (Local)")
         .navigationBarTitleDisplayMode(.inline)
         // Name search stays disabled for privacy and security — see README. `nameQuery` stays ""
         // forever; the rest of the code (DirectoryDatabase.search, hasSearchableInput) already
@@ -1940,6 +1965,84 @@ struct DirectorySearchView: View {
                 }
             }
         }
+    }
+}
+
+/// Ajustes › Buscar en Directorio (Online) — same reverse phone lookup as "Buscar en Directorio
+/// (Local)", but meant to query a live online source instead of a bundled/imported file. Not wired
+/// to a real source yet — the form exists so the field it will use is fixed, but "Buscar" stays
+/// disabled until there's an actual endpoint to call.
+struct DirectoryOnlineSearchView: View {
+    @State private var telefono = ""
+    // Kept but intentionally not rendered — same privacy/security reasoning as name search in
+    // Buscar en Directorio (Local): a name-search UI turns this into a reverse people-search tool.
+    @State private var nombre = ""
+
+    var body: some View {
+        Form {
+            Section {
+                TextField("Teléfono", text: $telefono)
+                    .keyboardType(.phonePad)
+                // TextField("Nombre", text: $nombre)
+
+                Button {} label: {
+                    HStack {
+                        Spacer()
+                        Text("Buscar")
+                        Image(systemName: "arrow.right")
+                    }
+                }
+                .disabled(true)
+            } footer: {
+                Text("Búsqueda en línea — próximamente.")
+            }
+        }
+        .navigationTitle("Buscar en Directorio (Online)")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// Ajustes › Buscar en Páginas Amarillas — placeholder search screen for an online Cuban Yellow
+/// Pages–style lookup. Not wired to a real source yet — the form exists so the fields it will use
+/// are fixed, but "Buscar" stays disabled until there's an actual endpoint to call.
+struct YellowPagesSearchView: View {
+    @State private var nombre = ""
+    @State private var categoria = ""
+    @State private var telefono = ""
+    // Kept but intentionally not rendered — too specific/identifying a field to expose as a
+    // search criterion.
+    @State private var calle = ""
+    @State private var municipio = ""
+    @State private var provincia = ""
+
+    var body: some View {
+        Form {
+            Section {
+                // Kept but intentionally not rendered — same privacy/security reasoning as name
+                // search in Buscar en Directorio: a name-search UI turns this into a reverse
+                // people-search tool.
+                // TextField("Nombre", text: $nombre)
+                TextField("Categoría", text: $categoria)
+                TextField("Teléfono", text: $telefono)
+                    .keyboardType(.phonePad)
+                // TextField("Calle", text: $calle)
+                TextField("Municipio", text: $municipio)
+                TextField("Provincia", text: $provincia)
+
+                Button {} label: {
+                    HStack {
+                        Spacer()
+                        Text("Buscar")
+                        Image(systemName: "arrow.right")
+                    }
+                }
+                .disabled(true)
+            } footer: {
+                Text("Búsqueda en Páginas Amarillas — próximamente.")
+            }
+        }
+        .navigationTitle("Buscar en Páginas Amarillas")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -2043,18 +2146,26 @@ struct WifiRoomsProvinceListView: View {
     @Environment(WifiRoomsStore.self) private var store
 
     var body: some View {
-        List(store.provinces) { province in
-            NavigationLink {
-                WifiRoomsDetailView(province: province)
-            } label: {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(province.province)
-                        .font(.body.weight(.medium))
-                    Text("\(province.rooms.count) salas de navegación · \(province.hotspots.reduce(0) { $0 + $1.spots.count }) zonas wifi")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+        List {
+            ForEach(store.provinces) { province in
+                NavigationLink {
+                    WifiRoomsDetailView(province: province)
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(province.province)
+                            .font(.body.weight(.medium))
+                        Text("\(province.rooms.count) salas de navegación · \(province.hotspots.reduce(0) { $0 + $1.spots.count }) zonas wifi")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 2)
                 }
-                .padding(.vertical, 2)
+            }
+
+            Section {
+                Link(destination: URL(string: "https://github.com/albertolicea00/cubacell-connect/blob/main/CubaCellConnect/wifi_navigation_rooms.json")!) {
+                    Label("Descargar JSON de Salas y Zonas WiFi", systemImage: "arrow.down.doc")
+                }
             }
         }
         .navigationTitle("Salas y Zonas WiFi")
