@@ -1302,27 +1302,6 @@ struct SettingsView: View {
                     }
                 }
 
-                Section(
-                    header: Text("Siri y Atajos de Voz"),
-                    footer: Text("Compatible con \"Oye Siri\" y con la app Atajos — no requiere configuración adicional, funciona apenas instalas la app. Cada frase abre CubaCell Connect y marca exactamente igual que si tocaras el código o botón de llamada.")
-                ) {
-                    Label("Marca códigos y llamadas por *99/#31# con tu voz, sin tener que abrir la app primero.", systemImage: "mic.fill")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("FRASES DE EJEMPLO")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        Label("«Oye Siri, consulta mi saldo en CubaCell Connect»", systemImage: "waveform")
-                        Label("«Oye Siri, marca Bonos y Planes en USD en CubaCell Connect»", systemImage: "waveform")
-                        Label("«Oye Siri, llama por cobrar con CubaCell Connect»", systemImage: "waveform")
-                        Label("«Oye Siri, llama oculto con CubaCell Connect»", systemImage: "waveform")
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                }
-
                 Section("Utilidades") {
                     NavigationLink {
                         RemindersListView()
@@ -2153,21 +2132,6 @@ private struct HelpSettingsView: View {
                 )
             }
 
-            Section("Siri y Atajos de Voz") {
-                SettingsInfoRow(
-                    title: "¿Qué hace?",
-                    text: "En Ajustes › Siri y Atajos de Voz puedes ver las frases disponibles. No hay que configurar nada: apenas instalas la app, Siri y la app Atajos ya la reconocen."
-                )
-                SettingsInfoRow(
-                    title: "Ejemplos",
-                    text: "«Oye Siri, consulta mi saldo en CubaCell Connect», «Oye Siri, marca Bonos y Planes en USD en CubaCell Connect», «Oye Siri, llama por cobrar con CubaCell Connect», «Oye Siri, llama oculto con CubaCell Connect»."
-                )
-                SettingsInfoRow(
-                    title: "Cómo funciona por dentro",
-                    text: "Cada frase abre CubaCell Connect y marca exactamente igual que si tocaras el código o el botón de llamada — el sistema pide confirmar la llamada igual que siempre. Llamar por cobrar u oculto te pregunta el número si no lo dijiste en la frase. Requiere iOS 17 o superior."
-                )
-            }
-
             Section("PIN de Transferencia") {
                 SettingsInfoRow(
                     title: "Cambiar y guardar tu PIN",
@@ -2205,6 +2169,28 @@ private struct HelpSettingsView: View {
                     title: "Solo por número",
                     text: "La búsqueda por nombre está desactivada a propósito, por privacidad — solo se puede buscar por número de teléfono."
                 )
+            }
+
+            Section("Siri y Atajos de Voz") {
+                SettingsInfoRow(
+                    title: "¿Qué hace?",
+                    text: "No hay que configurar nada: apenas instalas la app, Siri y la app Atajos ya la reconocen."
+                )
+                SettingsInfoRow(
+                    title: "Ejemplos",
+                    text: "«Oye Siri, consulta mi saldo en CubaCell Connect», «Oye Siri, marca Bonos y Planes en USD en CubaCell Connect», «Oye Siri, llama por cobrar con CubaCell Connect», «Oye Siri, llama oculto con CubaCell Connect»."
+                )
+                SettingsInfoRow(
+                    title: "Cómo funciona por dentro",
+                    text: "Cada frase abre CubaCell Connect y marca exactamente igual que si tocaras el código o el botón de llamada — el sistema pide confirmar la llamada igual que siempre. Llamar por cobrar u oculto te pregunta el número si no lo dijiste en la frase. Requiere iOS 17 o superior."
+                )
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Label("Abrir Ajustes de Siri para CubaCell Connect", systemImage: "gear")
+                }
             }
         }
         .navigationTitle("Ayuda")
