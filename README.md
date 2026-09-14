@@ -21,6 +21,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 👤 **Contactos tab** — reads the device's real address book (with photos) so you can call, transfer balance to, or dial a collect/hidden call for any contact without leaving the app.
 - 🆔 **Caller ID for `*99` collect calls** — a CallKit Call Directory Extension labels incoming collect calls with the real contact's name instead of the raw wrapped number ETECSA's `*99` service shows. See [ARCHITECTURE.md § 10](ARCHITECTURE.md#10-caller-id-extension-99-collect-call-identification) for how it works and how to enable it.
 - 🛜 **Navigation rooms & public WIFI spaces** — Ajustes › Salas y Zonas WiFi lists every Cuban province; picking one shows ETECSA's own paid navigation rooms (with seat counts) and free public WIFI hotspots by municipality, bundled from [`CubaCellConnect/data/wifi_navigation_rooms.json`](CubaCellConnect/data/wifi_navigation_rooms.json). See sources below.
+- 🚀 **Configurable launch screen** — Ajustes › Pestaña Inicial picks which tab opens on launch, and also covers two screens nested *inside* Ajustes itself (Medir Velocidad de Internet, Buscar en Directorio) — picking one of those jumps straight to Ajustes and auto-pushes that screen the moment the app opens, instead of landing on the plain Ajustes list first.
 
 *The full USSD code catalog is dynamically loaded from our JSON configuration file [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json), keeping the app lightweight and easy to update.* 📁
 
@@ -68,6 +69,12 @@ Shared/                        # Code shared by the app and CallerIDExtension
 The USSD codes in [`CubaCellConnect/codes.json`](CubaCellConnect/codes.json) mirror the canonical [`cuba-cubacel`](https://github.com/albertolicea00/MyUSSDCodes-collection/blob/main/codes/cuba-cubacel.json) collection in **[MyUSSDCodes-collection](https://github.com/albertolicea00/MyUSSDCodes-collection)** — the single source of truth for USSD codes across all my apps.
 
 A weekly GitHub Action ([`ussd-sync-check`](.github/workflows/ussd-sync-check.yml)) compares the dial strings shipped here against that collection. On drift the run fails and opens a `ussd-sync` issue listing the added/removed codes. **Fix codes upstream in MyUSSDCodes-collection first, then sync this file to match.**
+
+## ☎️ Direct dial vs. confirmation
+
+Query codes (balance, plan status, Plan Amigo status, etc.) dial **immediately** on tap, no extra confirmation step — they're read-only and free, so there's nothing at risk in firing them off right away.
+
+Purchase codes are different: they spend money, so by default they dial straight into ETECSA's own USSD confirmation menu ("¿Confirma su compra? 1. Sí") and stop there, same as any other USSD session. Compras has an opt-in **Acción Rápida sin Confirmación** toggle (off by default, with an "Activar por Defecto..." master switch in Ajustes) that instead dials a `noConfirmCode` variant which auto-selects that confirmation step in the same dial string — a warning banner stays visible at the top of Compras the whole time it's on, since it's the one mode where a tap alone completes a paid purchase.
 
 ## 🔍 Directory (reverse lookup)
 
