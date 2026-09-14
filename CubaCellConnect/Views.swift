@@ -696,9 +696,14 @@ struct CategoryListView: View {
 
     @Environment(AccentColorStore.self) private var accentColorStore
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
+    @AppStorage("quickPurchaseNoConfirmDefault") private var quickPurchaseNoConfirmDefault = false
     @State private var pendingInputCode: USSDCode?
     @State private var inputText = ""
     @State private var searchText = ""
+    /// Compras-only, and never persisted itself — it just starts out matching
+    /// `quickPurchaseNoConfirmDefault` each time this view is (re)created, i.e. on every fresh app
+    /// launch, per "Activar por Defecto..." in Ajustes.
+    @State private var isQuickActionEnabled = false
 
     /// `category.groups`, narrowed to codes whose title or number matches the search text —
     /// empty groups are dropped so an unmatched group doesn't leave a bare header behind.
@@ -720,8 +725,19 @@ struct CategoryListView: View {
                 if showNetworkStatus {
                     ConnectionBannerView()
                 }
+                if category.id == "purchase" && isQuickActionEnabled {
+                    QuickPurchaseWarningBannerView()
+                }
 
                 List {
+                    if category.id == "purchase" {
+                        Section {
+                            Toggle("Acción Rápida sin Confirmación", isOn: $isQuickActionEnabled)
+                        } footer: {
+                            Text("Marca el código saltando el paso de confirmación de ETECSA, por si acaso confías en la selección y quieres ahorrarte un paso.")
+                        }
+                    }
+
                     ForEach(filteredGroups) { group in
                         Section {
                             ForEach(group.codes) { code in
@@ -804,6 +820,20 @@ struct CategoryListView: View {
                 Text(code.details)
             }
         }
+        .onAppear {
+            if category.id == "purchase" {
+                isQuickActionEnabled = quickPurchaseNoConfirmDefault
+            }
+        }
+    }
+
+    /// The code actually dialed — `noConfirmCode` (which auto-selects ETECSA's confirmation step)
+    /// only when Acción Rápida sin Confirmación is on for this code, otherwise the normal `code`.
+    private func dialCode(for code: USSDCode) -> String {
+        guard category.id == "purchase", isQuickActionEnabled, let noConfirmCode = code.noConfirmCode else {
+            return code.code
+        }
+        return noConfirmCode
     }
 
     private func select(_ code: USSDCode) {
@@ -811,7 +841,7 @@ struct CategoryListView: View {
             inputText = ""
             pendingInputCode = code
         } else {
-            DialService.dial(code.code)
+            DialService.dial(dialCode(for: code))
         }
     }
 
@@ -913,6 +943,7 @@ struct SettingsView: View {
     @AppStorage("darkModePreference") private var darkMode: Int = 0
     @AppStorage("showNetworkStatus") private var showNetworkStatus = false
     @AppStorage("defaultTab") private var defaultTab = HomeTab.home.rawValue
+    @AppStorage("quickPurchaseNoConfirmDefault") private var quickPurchaseNoConfirmDefault = false
 
     var body: some View {
         NavigationStack {
@@ -929,6 +960,12 @@ struct SettingsView: View {
                     .tint(accentColorStore.color)
 
                     Toggle("Aviso de señal celular", isOn: $showNetworkStatus)
+
+                    Toggle("Activar por Defecto la Acción de Marcado Directo sin Confirmación", isOn: $quickPurchaseNoConfirmDefault)
+
+                    Text("Hace que \"Acción Rápida sin Confirmación\" en Compras empiece activada cada vez que abres la app. Si lo dejas apagado, esa opción siempre vuelve a estar apagada al reabrir la app.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
 
                     Picker("Pestaña Inicial", selection: $defaultTab) {
                         ForEach(HomeTab.allCases) { tab in

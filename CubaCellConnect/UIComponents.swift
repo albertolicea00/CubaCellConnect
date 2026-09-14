@@ -139,7 +139,8 @@ struct CodeRowView: View {
         showsNumber: nil,
         type: .ussd,
         requiresInput: false,
-        inputPlaceholder: nil
+        inputPlaceholder: nil,
+        noConfirmCode: nil
     ))
     .padding()
     .environment(AccentColorStore())
@@ -197,7 +198,8 @@ struct ContactRowView: View {
             showsNumber: true,
             type: .call,
             requiresInput: false,
-            inputPlaceholder: nil
+            inputPlaceholder: nil,
+            noConfirmCode: nil
         ),
         onCall: {}
     )
@@ -317,4 +319,30 @@ struct ConnectionBannerView: View {
 #Preview {
     ConnectionBannerView()
         .environment(AccentColorStore())
+}
+
+// MARK: - Quick Purchase (No Confirmation) Warning Banner
+
+/// Shown at the top of Compras (same position as `ConnectionBannerView`) whenever "Acción Rápida
+/// sin Confirmación" is on — purchases dial straight through ETECSA's confirmation step instead
+/// of stopping at it, so this stays visible as a standing reminder while the toggle is active.
+struct QuickPurchaseWarningBannerView: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 14, weight: .bold))
+            Text("Acción rápida sin confirmación activada — las compras se marcan de una vez, sin pedir confirmación")
+                .font(.system(size: 13, weight: .bold))
+        }
+        .foregroundStyle(.orange)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(Color.orange.opacity(0.15))
+        .multilineTextAlignment(.center)
+    }
+}
+
+#Preview {
+    QuickPurchaseWarningBannerView()
 }

@@ -33,6 +33,11 @@ struct USSDCode: Identifiable, Codable, Hashable {
     let type: USSDActionType
     let requiresInput: Bool
     let inputPlaceholder: String?
+    /// Alternate dial string that auto-selects ETECSA's confirmation step (e.g. `*133*1*4*1#` →
+    /// `*133*1*4*1*1#`) so the purchase executes in one shot instead of stopping at the "¿Confirma
+    /// su compra? 1. Sí" USSD reply menu. Nil for codes with no confirmation step to skip — dialing
+    /// always falls back to `code` when this is nil.
+    let noConfirmCode: String?
 
     /// Code with the given named placeholders substituted in — each dictionary key `name`
     /// replaces a `{name}` token in `code`. Used by multi-field actions like the Home transfer card.
