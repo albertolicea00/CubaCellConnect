@@ -313,7 +313,7 @@ final class SpeedTestRunner {
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
 
         let start = Date()
-        let delegate = TransferProgressDelegate { totalBytes in
+        let delegate = TransferProgressDelegate { totalBytes, _ in
             Task { @MainActor in
                 let elapsed = Date().timeIntervalSince(start)
                 guard elapsed > 0.05 else { return }
@@ -337,7 +337,7 @@ final class SpeedTestRunner {
         let payload = Data(count: byteCount)
 
         let start = Date()
-        let delegate = TransferProgressDelegate { totalBytes in
+        let delegate = TransferProgressDelegate { totalBytes, _ in
             Task { @MainActor in
                 let elapsed = Date().timeIntervalSince(start)
                 guard elapsed > 0.05 else { return }
@@ -358,11 +358,14 @@ final class SpeedTestRunner {
 
 /// Bridges `URLSessionTaskDelegate`/`URLSessionDownloadDelegate`'s progress callbacks (which
 /// aren't part of the async/await `data(for:)`/`upload(for:from:)` APIs) into a plain closure —
-/// shared by both the download and upload measurements above.
-private final class TransferProgressDelegate: NSObject, URLSessionTaskDelegate, URLSessionDownloadDelegate {
-    private let onProgress: (Int64) -> Void
+/// shared by the speed-test measurements above and `DirectorySearchView`'s database download.
+/// Reports both the running total and the expected total, since the speed test only cares about
+/// the former (throughput over elapsed time) while the database download needs both to show a
+/// determinate percentage.
+final class TransferProgressDelegate: NSObject, URLSessionTaskDelegate, URLSessionDownloadDelegate {
+    private let onProgress: (Int64, Int64) -> Void
 
-    init(onProgress: @escaping (Int64) -> Void) {
+    init(onProgress: @escaping (Int64, Int64) -> Void) {
         self.onProgress = onProgress
     }
 
@@ -373,7 +376,7 @@ private final class TransferProgressDelegate: NSObject, URLSessionTaskDelegate, 
         totalBytesSent: Int64,
         totalBytesExpectedToSend: Int64
     ) {
-        onProgress(totalBytesSent)
+        onProgress(totalBytesSent, totalBytesExpectedToSend)
     }
 
     func urlSession(
@@ -383,7 +386,7 @@ private final class TransferProgressDelegate: NSObject, URLSessionTaskDelegate, 
         totalBytesWritten: Int64,
         totalBytesExpectedToWrite: Int64
     ) {
-        onProgress(totalBytesWritten)
+        onProgress(totalBytesWritten, totalBytesExpectedToWrite)
     }
 
     /// Required by `URLSessionDownloadDelegate`; the async `download(for:delegate:)` API hands
@@ -637,8 +640,9 @@ struct DirectoryEntry: Identifiable, Hashable {
 }
 
 /// Reverse number/name lookup over a Truecaller-style dump the user drops into this app's
-/// Documents folder via Finder file sharing (`UIFileSharingEnabled`) — the app never bundles or
-/// downloads it, and doesn't assume a filename or ask which schema it is. v1 is a single
+/// Documents folder — via Finder file sharing (`UIFileSharingEnabled`), the in-app file picker, or
+/// the in-app download (`downloadURL`, wherever that's currently hosted). The app never bundles
+/// it, and doesn't assume a filename or ask which schema it is. v1 is a single
 /// `contacts(number, name, is_mobile)` table; v2 splits landline and mobile into separate
 /// `fix(number, name)` / `movil(number, name)` tables — `discoverDatabase` tells them apart by
 /// querying `sqlite_master` for the table names each shape actually has. Both dumps are 400+MB
@@ -646,6 +650,17 @@ struct DirectoryEntry: Identifiable, Hashable {
 /// callers must run `search` off the main thread and keep queries short (it refuses under 3
 /// characters) to bound how bad that scan gets.
 enum DirectoryDatabase {
+    /// Direct-file-download URL for the current (v1) dump, wherever it's currently hosted (GitHub
+    /// Releases, archive.org, ...). Whatever host this points at, it has to serve the raw bytes
+    /// directly — not an HTML landing page, and not a source/archive wrapper (e.g. GitHub's
+    /// `archive/refs/tags/...` gives repo source, never a release asset's actual bytes). The
+    /// downloader in `DirectorySearchView.downloadDatabase` names the saved file after this URL's
+    /// last path component, so it must end in the real filename (e.g. `etecsa.database.v1.db`),
+    /// not just an item/tag identifier. Move this when a new schema version or a new host replaces
+    /// it (see the release notes for `etecsa.database.v2.db`).
+    
+    static let downloadURL = URL(string: "https://....")! // todo
+
     private static let transientDestructor = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
     /// Opens `url` via the `file:...?immutable=1` URI form instead of a plain path. Plain

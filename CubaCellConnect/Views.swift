@@ -1775,9 +1775,10 @@ private struct TransferPinSettingsView: View {
 }
 
 /// Ajustes › Buscar en Directorio — reverse number/name lookup over whichever directory database
-/// file the user has copied into this app's Documents folder (Finder file sharing, or the
-/// "Importar Base de Datos" picker below; the app never downloads or bundles it itself). Its
-/// schema shape (v1/v2) is auto-detected from the file's own tables — see `DirectoryDatabase`.
+/// file the user has copied into this app's Documents folder: Finder file sharing, the "Importar
+/// Base de Datos" picker, or the "Descargar Base de Datos" button (fetches `DirectoryDatabase
+/// .downloadURL`, wherever that's currently hosted). Its schema shape (v1/v2) is auto-detected from the file's
+/// own tables — see `DirectoryDatabase`.
 struct DirectorySearchView: View {
     @Environment(AccentColorStore.self) private var accentColorStore
 
@@ -1785,6 +1786,8 @@ struct DirectorySearchView: View {
     @State private var hasSearchedForDatabase = false
     @State private var showingImporter = false
     @State private var isImporting = false
+    @State private var isDownloading = false
+    @State private var downloadProgress: Double = 0
     @State private var importErrorMessage: String?
 
     @State private var numberQuery = ""
@@ -1814,7 +1817,20 @@ struct DirectorySearchView: View {
                         description: Text("Descarga la base de datos o impórtala si ya la tienes en este dispositivo.")
                     )
 
-                    if isImporting {
+                    if isDownloading {
+                        VStack(spacing: 10) {
+                            ProgressView(value: downloadProgress)
+                                .frame(maxWidth: 200)
+                            Text("Descargando… \(Int((downloadProgress * 100).rounded()))%")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            Text("Puede tardar varios minutos, no cierres la app.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.horizontal, 32)
+                    } else if isImporting {
                         VStack(spacing: 10) {
                             ProgressView()
                             Text("Importando… puede tardar varios minutos, no cierres la app.")
@@ -1831,9 +1847,11 @@ struct DirectorySearchView: View {
                             DirectoryActionRow(
                                 title: "Descargar Base de Datos",
                                 systemImage: "arrow.down.circle.fill",
-                                isEnabled: false,
+                                isEnabled: true,
                                 tint: accentColorStore.color
-                            ) {}
+                            ) {
+                                downloadDatabase()
+                            }
 
                             Divider().padding(.leading, 52)
 
@@ -1983,6 +2001,68 @@ struct DirectorySearchView: View {
                 await MainActor.run {
                     isImporting = false
                     importErrorMessage = "No se pudo copiar el archivo: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
+
+    /// Downloads `DirectoryDatabase.downloadURL` straight into Documents, then re-runs discovery —
+    /// same size/shape validation as `importDatabase`, since a network transfer can be interrupted
+    /// mid-download just like a Files-app copy can. Uses `URLSessionDownloadDelegate` (via
+    /// `TransferProgressDelegate`, shared with the speed-test screen) so the progress bar tracks
+    /// real bytes received instead of sitting at 0% until the whole 400+MB file lands.
+    private func downloadDatabase() {
+        guard let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            importErrorMessage = "No se pudo acceder a los archivos de la app."
+            return
+        }
+        let destinationURL = documents.appendingPathComponent(DirectoryDatabase.downloadURL.lastPathComponent)
+
+        isDownloading = true
+        downloadProgress = 0
+        Task.detached(priority: .userInitiated) {
+            let delegate = TransferProgressDelegate { bytesWritten, bytesExpected in
+                guard bytesExpected > 0 else { return }
+                Task { @MainActor in
+                    downloadProgress = Double(bytesWritten) / Double(bytesExpected)
+                }
+            }
+
+            do {
+                var request = URLRequest(url: DirectoryDatabase.downloadURL)
+                request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+                let (tempURL, response) = try await URLSession.shared.download(for: request, delegate: delegate)
+
+                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                    try? FileManager.default.removeItem(at: tempURL)
+                    let status = (response as? HTTPURLResponse)?.statusCode
+                    await MainActor.run {
+                        isDownloading = false
+                        importErrorMessage = "No se pudo descargar la base de datos"
+                            + (status.map { " (HTTP \($0))" } ?? "") + "."
+                    }
+                    return
+                }
+
+                if FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.removeItem(at: destinationURL)
+                }
+                try FileManager.default.moveItem(at: tempURL, to: destinationURL)
+
+                let discovered = DirectoryDatabase.discoverDatabase()
+                let diagnosis = discovered == nil ? DirectoryDatabase.diagnose(at: destinationURL) : nil
+                await MainActor.run {
+                    databaseFile = discovered
+                    isDownloading = false
+                    if discovered == nil {
+                        importErrorMessage = "El archivo se descargó pero no tiene el formato esperado de base de datos de directorio.\n\nDiagnóstico: \(diagnosis ?? "?")"
+                    }
+                }
+            } catch {
+                try? FileManager.default.removeItem(at: destinationURL)
+                await MainActor.run {
+                    isDownloading = false
+                    importErrorMessage = "No se pudo descargar el archivo: \(error.localizedDescription)"
                 }
             }
         }
