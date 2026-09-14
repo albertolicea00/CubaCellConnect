@@ -981,12 +981,6 @@ struct SettingsView: View {
 
                 Section("Cuenta") {
                     NavigationLink {
-                        FriendsPlanActivationView()
-                    } label: {
-                        Label("Activar/Desactivar Plan Amigo", systemImage: "person.2.fill")
-                    }
-
-                    NavigationLink {
                         FriendsPlanManageView()
                     } label: {
                         Label("Gestionar Plan Amigo", systemImage: "person.2.badge.gearshape.fill")
@@ -1032,17 +1026,25 @@ struct SettingsView: View {
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
-            // TEMP DEBUG
-            .onAppear { debugPushPin = true }
         }
     }
 }
 
-/// Ajustes › Activar/Desactivar Plan Amigo — own line only, no target number needed, so both
-/// actions dial directly with no form.
-private struct FriendsPlanActivationView: View {
+/// Ajustes › Gestionar Plan Amigo — Agregar and Eliminar are two fully independent forms (each
+/// with its own Número field + contact picker) since they dial different strings; duplicating the
+/// form is simpler than making one shared control smart enough to handle both. Also carries the
+/// Settings-only "Consultar Plan Amigo" query, distinct from Home's own `friends-plan` button.
+private struct FriendsPlanManageView: View {
     @Environment(USSDCodeStore.self) private var store
     @Environment(AccentColorStore.self) private var accentColorStore
+
+    @State private var addFriendNumber = ""
+    @State private var showingAddFriendContactPicker = false
+    @State private var showsAddFriendInvalidNumberWarning = false
+
+    @State private var removeFriendNumber = ""
+    @State private var showingRemoveFriendContactPicker = false
+    @State private var showsRemoveFriendInvalidNumberWarning = false
 
     var body: some View {
         List {
@@ -1074,37 +1076,24 @@ private struct FriendsPlanActivationView: View {
                     }
                     .disabled(deactivateCode.code.isEmpty)
                 }
+
+                if let statusCode = store.code(withId: "friends-plan-status-settings") {
+                    Button {
+                        dial(statusCode)
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(statusCode.title)
+                            Spacer()
+                            Image(systemName: "arrow.right")
+                        }
+                        .foregroundStyle(accentColorStore.color)
+                    }
+                    .disabled(statusCode.code.isEmpty)
+                }
             } footer: {
                 Text("Activar el Plan Amigos tiene un costo de $25.00.")
             }
-        }
-        .navigationTitle("Plan Amigo")
-        .navigationBarTitleDisplayMode(.inline)
-    }
 
-    private func dial(_ code: USSDCode) {
-        guard !code.code.isEmpty else { return }
-        DialService.dial(code.code)
-    }
-}
-
-/// Ajustes › Gestionar Plan Amigo — Agregar and Eliminar are two fully independent forms (each
-/// with its own Número field + contact picker) since they dial different strings; duplicating the
-/// form is simpler than making one shared control smart enough to handle both. Also carries the
-/// Settings-only "Consultar Plan Amigo" query, distinct from Home's own `friends-plan` button.
-private struct FriendsPlanManageView: View {
-    @Environment(USSDCodeStore.self) private var store
-
-    @State private var addFriendNumber = ""
-    @State private var showingAddFriendContactPicker = false
-    @State private var showsAddFriendInvalidNumberWarning = false
-
-    @State private var removeFriendNumber = ""
-    @State private var showingRemoveFriendContactPicker = false
-    @State private var showsRemoveFriendInvalidNumberWarning = false
-
-    var body: some View {
-        List {
             if let addCode = store.code(withId: "friends-plan-add-member") {
                 Section("Agregar Amigo") {
                     HStack(spacing: 12) {
@@ -1160,22 +1149,6 @@ private struct FriendsPlanManageView: View {
                     .disabled(removeFriendNumber.trimmingCharacters(in: .whitespaces).isEmpty || removeCode.code.isEmpty)
                 }
             }
-
-            if let statusCode = store.code(withId: "friends-plan-status-settings") {
-                Section {
-                    Button {
-                        guard !statusCode.code.isEmpty else { return }
-                        DialService.dial(statusCode.code)
-                    } label: {
-                        HStack(spacing: 6) {
-                            Text(statusCode.title)
-                            Spacer()
-                            Image(systemName: "arrow.right")
-                        }
-                    }
-                    .disabled(statusCode.code.isEmpty)
-                }
-            }
         }
         .navigationTitle("Gestionar Plan Amigo")
         .navigationBarTitleDisplayMode(.inline)
@@ -1203,6 +1176,11 @@ private struct FriendsPlanManageView: View {
         } message: {
             Text("Este contacto no tiene un número con formato de móvil cubano (+53 y 8 dígitos). Revísalo antes de marcar.")
         }
+    }
+
+    private func dial(_ code: USSDCode) {
+        guard !code.code.isEmpty else { return }
+        DialService.dial(code.code)
     }
 
     private func dial(_ code: USSDCode, number: String) {
