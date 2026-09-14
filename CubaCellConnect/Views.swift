@@ -2251,27 +2251,6 @@ private struct HelpSettingsView: View {
                 )
             }
 
-            Section("Siri y Atajos de Voz") {
-                SettingsInfoRow(
-                    title: "¿Qué hace?",
-                    text: "No hay que configurar nada: apenas instalas la app, Siri y la app Atajos ya la reconocen."
-                )
-                SettingsInfoRow(
-                    title: "Ejemplos",
-                    text: "«Oye Siri, consulta mi saldo en CubaCell Connect», «Oye Siri, marca Bonos y Planes en USD en CubaCell Connect», «Oye Siri, llama por cobrar con CubaCell Connect», «Oye Siri, llama oculto con CubaCell Connect»."
-                )
-                SettingsInfoRow(
-                    title: "Cómo funciona por dentro",
-                    text: "Cada frase abre CubaCell Connect y marca exactamente igual que si tocaras el código o el botón de llamada — el sistema pide confirmar la llamada igual que siempre. Llamar por cobrar u oculto te pregunta el número si no lo dijiste en la frase. Requiere iOS 17 o superior."
-                )
-                Button {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                } label: {
-                    Label("Abrir Ajustes de Siri para CubaCell Connect", systemImage: "gear")
-                }
-            }
         }
         .navigationTitle("Ayuda")
         .navigationBarTitleDisplayMode(.inline)

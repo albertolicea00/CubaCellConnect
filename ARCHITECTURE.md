@@ -4,7 +4,7 @@ For contribution workflow see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 This document describes the technical architecture of CubaCell Connect, a native iOS app that lets users dial ETECSA (Cubacel) USSD service codes (`*222#` style dial strings) without needing to remember them.
 
-It is a dependency-free SwiftUI app with no backend and no network calls. Almost everything comes from one read-only bundled JSON catalog; the two exceptions are the device's own Contacts (read live via the `Contacts` framework, never sent anywhere) and a small App Group file the CallerIDExtension target reads to label `*99` collect calls (§12) — there is still no server, no analytics, and no third-party dependency anywhere in the project.
+It is a dependency-free SwiftUI app with no backend and no network calls. Almost everything comes from one read-only bundled JSON catalog; the two exceptions are the device's own Contacts (read live via the `Contacts` framework, never sent anywhere) and a small App Group file the CallerIDExtension target reads to label `*99` collect calls (§11) — there is still no server, no analytics, and no third-party dependency anywhere in the project.
 
 ---
 
@@ -42,7 +42,7 @@ It is a dependency-free SwiftUI app with no backend and no network calls. Almost
                   └── loads CubaCellConnect/codes.json (bundled, read-only)
 ```
 
-There is no MVVM view-model layer and no cross-tab navigation state machine, but there is now more than one `@Observable` store injected at the app root: `USSDCodeStore` (the catalog) and `AccentColorStore` (the user's chosen accent color) are both handed down via `.environment`; `WifiRoomsStore` and `ContactsService`/`SpeedTestRunner` are created where they're used instead. State flows one way — stores (read-only or self-contained) → views. There is no unified "code detail sheet" anymore — each `USSDCode.type` (`.ussd`, `.call`, `.sms`) drives a different tap behavior directly (dial, alert-for-input-then-dial, or open the SMS compose sheet). Persisted state includes `@AppStorage` flags (`darkModePreference`, `defaultTab`, `showNetworkStatus`, `quickPurchaseNoConfirmDefault`, the accent color hex) and the transfer PIN in the Keychain (`TransferPinStore`, §13). This is a working app with real scope now, not the ≈380-line starting point described in earlier drafts of this document — see `git log` for the actual history instead of a stale line count here.
+There is no MVVM view-model layer and no cross-tab navigation state machine, but there is now more than one `@Observable` store injected at the app root: `USSDCodeStore` (the catalog) and `AccentColorStore` (the user's chosen accent color) are both handed down via `.environment`; `WifiRoomsStore` and `ContactsService`/`SpeedTestRunner` are created where they're used instead. State flows one way — stores (read-only or self-contained) → views. There is no unified "code detail sheet" anymore — each `USSDCode.type` (`.ussd`, `.call`, `.sms`) drives a different tap behavior directly (dial, alert-for-input-then-dial, or open the SMS compose sheet). Persisted state includes `@AppStorage` flags (`darkModePreference`, `defaultTab`, `showNetworkStatus`, `quickPurchaseNoConfirmDefault`, the accent color hex) and the transfer PIN in the Keychain (`TransferPinStore`, §12). This is a working app with real scope now, not the ≈380-line starting point described in earlier drafts of this document — see `git log` for the actual history instead of a stale line count here.
 
 ---
 
@@ -52,14 +52,14 @@ There is no MVVM view-model layer and no cross-tab navigation state machine, but
 |---|---|
 | `CubaCellConnect/CubaCellConnectApp.swift` | `@main` entry point. Creates `USSDCodeStore` and `AccentColorStore` and injects both into `HomeView` via `.environment`. |
 | `CubaCellConnect/Models.swift` | `Codable` catalog models (`USSDCatalog`, `USSDCategory`, `USSDCodeGroup`, `USSDCode`, `USSDActionType`, `SMSVariant`), `CubanPhoneNumber` (the one place that validates a Cuban mobile number), the brand palette (`Color.brandNavy`, `.brandCyan`, `.appBackground`, `.appForeground`, hex round-tripping for the user's accent color), `AppTheme.codeFont`, and the WiFi navigation-room models (`WifiProvince`, `WifiRoom`, `WifiHotspotGroup`). |
-| `CubaCellConnect/Services.swift` | `USSDCodeStore` (loads/decodes `codes.json`), `AccentColorStore` (user's accent color, `UserDefaults`-backed), `WifiRoomsStore` (loads `wifi_navigation_rooms.json`), `ContactsService` (reads the device address book, rebuilds the CallerID list on every fetch — §12), `CellularMonitor`, `DialService` (builds/opens `tel://` URLs), `MapsService` (opens Apple/Google Maps as a place search), `TransferPinStore` (Keychain-backed transfer PIN, §13), `DirectoryDatabase` (SQLite reverse-lookup over a user-supplied dump, §14), `SpeedTestRunner` (ping/download/upload test against Cloudflare's public endpoints), `ReminderManager` (local-notification scheduling, §6), and Siri/App Intents (`EjecutarCodigoIntent`, `LlamarPorCobrarIntent`, `LlamarOcultoIntent`, `CubaCellShortcuts`, §7). |
+| `CubaCellConnect/Services.swift` | `USSDCodeStore` (loads/decodes `codes.json`), `AccentColorStore` (user's accent color, `UserDefaults`-backed), `WifiRoomsStore` (loads `wifi_navigation_rooms.json`), `ContactsService` (reads the device address book, rebuilds the CallerID list on every fetch — §11), `CellularMonitor`, `DialService` (builds/opens `tel://` URLs), `MapsService` (opens Apple/Google Maps as a place search), `TransferPinStore` (Keychain-backed transfer PIN, §12), `DirectoryDatabase` (SQLite reverse-lookup over a user-supplied dump, §13), `SpeedTestRunner` (ping/download/upload test against Cloudflare's public endpoints), and `ReminderManager` (local-notification scheduling, §6). |
 | `CubaCellConnect/UIComponents.swift` | Reusable, presentation-only views: `CodeRowView`, `ContactRowView`, plus `ContactPickerView` and `MessageComposeView` (thin `UIViewControllerRepresentable` wrappers around the system contact picker and SMS compose sheet). |
 | `CubaCellConnect/Views.swift` | `HomeView` (the root `TabView`), `HomeQuickActionsView` (Home tab), `CategoryListView` (Líneas de Ayuda / Compras tabs), `ContactsListView` and friends (Contactos tab), `SMSServicesView`/`SMSCodeListView`/`SMSOptionPickerView` (Servicios por SMS), `SettingsView` and everything it pushes: `WifiRoomsProvinceListView`/`WifiRoomsDetailView`, `SpeedTestView`/`SpeedGaugeView`, `DirectorySearchView` (offline), `DirectoryOnlineSearchView`, `YellowPagesSearchView`, `FriendsPlanManageView`, `TransferPinSettingsView`, and `HelpSettingsView`. This is the largest file in the project by a wide margin — check it directly rather than trusting a stale summary here as new screens get added. |
 | `CubaCellConnect/codes.json` | Static, bundled dataset: version, carrier, categories → groups → codes, each with its dial string and presentation metadata (§3). |
 | `CubaCellConnect/wifi_navigation_rooms.json` | Static, bundled dataset: one entry per province with its navigation rooms and free WIFI hotspots (§ Navigation Rooms in the README). |
 | `CubaCellConnect.xcassets/` | `AccentColor` (brand cyan, `#09C` — the *default*; the user can override it at runtime via `AccentColorStore`, unlike the asset catalog value itself) and `AppIcon`. |
-| `Shared/CallerIDStore.swift` | `CallerIDEntry` model plus read/write helpers for the App Group file both `CubaCellConnect` and `CallerIDExtension` touch — the only file compiled into *both* targets (§12). |
-| `CallerIDExtension/CallDirectoryHandler.swift` | The `CXCallDirectoryProvider` subclass — the entire CallerIDExtension target (§12). |
+| `Shared/CallerIDStore.swift` | `CallerIDEntry` model plus read/write helpers for the App Group file both `CubaCellConnect` and `CallerIDExtension` touch — the only file compiled into *both* targets (§11). |
+| `CallerIDExtension/CallDirectoryHandler.swift` | The `CXCallDirectoryProvider` subclass — the entire CallerIDExtension target (§11). |
 
 No separate persistence layer, networking layer, or dependency-injection container exists — `Services.swift` *is* the service layer, and there is exactly one store instance, created once and passed down.
 
@@ -100,7 +100,7 @@ A code carries no `category` field of its own — its category and group are ent
 
 Each `CategoryListView` is a `NavigationStack` wrapping a `List` of that category's groups/codes. Tapping a row dials/prompts/composes directly depending on `USSDCode.type` and `requiresInput` — there is no shared "code detail" sheet type; see §5.
 
-`SettingsView` is its own `NavigationStack` wrapping a `List` (not a `Form`), entirely separate from the category tabs. Unlike the original single-screen design, it now has real navigation depth — `NavigationLink`s push `SMSServicesView`, `WifiRoomsProvinceListView`, `SpeedTestView`, `DirectorySearchView`/`DirectoryOnlineSearchView`/`YellowPagesSearchView`, `FriendsPlanManageView`, `TransferPinSettingsView`, and `HelpSettingsView`. "Pestaña Inicial" (`@AppStorage("defaultTab")`) can point at one of those nested screens instead of a bare tab; `SettingsView.onAppear` auto-pushes the matching one exactly once per launch via a dedicated `isShowing*OnLaunch` flag per destination (see `HomeTab.launchOptions`/`.tabToSelect`). Persisted `@AppStorage` state now includes `darkModePreference`, `defaultTab`, `showNetworkStatus`, and `quickPurchaseNoConfirmDefault`, plus the accent color hex (`AccentColorStore`) and the transfer PIN (Keychain, not `UserDefaults` — §13).
+`SettingsView` is its own `NavigationStack` wrapping a `List` (not a `Form`), entirely separate from the category tabs. Unlike the original single-screen design, it now has real navigation depth — `NavigationLink`s push `SMSServicesView`, `WifiRoomsProvinceListView`, `SpeedTestView`, `DirectorySearchView`/`DirectoryOnlineSearchView`/`YellowPagesSearchView`, `FriendsPlanManageView`, `TransferPinSettingsView`, and `HelpSettingsView`. "Pestaña Inicial" (`@AppStorage("defaultTab")`) can point at one of those nested screens instead of a bare tab; `SettingsView.onAppear` auto-pushes the matching one exactly once per launch via a dedicated `isShowing*OnLaunch` flag per destination (see `HomeTab.launchOptions`/`.tabToSelect`). Persisted `@AppStorage` state now includes `darkModePreference`, `defaultTab`, `showNetworkStatus`, and `quickPurchaseNoConfirmDefault`, plus the accent color hex (`AccentColorStore`) and the transfer PIN (Keychain, not `UserDefaults` — §12).
 
 ---
 
@@ -114,7 +114,7 @@ There is no single "code detail" sheet — what a tap does depends on `USSDCode.
 4. **`.sms`**: opens `MessageComposeView` (wraps `MFMessageComposeViewController`) prefilled with `code` as the recipient and the resolved `smsBody` as the message — never sent silently, same one-more-tap-to-confirm shape as a `tel://` dial. Codes with `options` show a picker of valid message bodies first (`SMSOptionPickerView`); codes with `variants` show a small fixed choice instead.
 5. **Quick Purchase, no confirmation** (opt-in, Compras only): when the "Acción Rápida sin Confirmación" toggle is on and the code has a `noConfirmCode`, that string is dialed instead of `code` — it auto-selects ETECSA's own "¿Confirma su compra? 1. Sí" step in one dial instead of stopping there. See README § Direct dial vs. confirmation.
 
-There is no prefill/resolver indirection beyond the `{input}`/named-placeholder substitution above (unlike apps that inject saved user data before dialing) — separately, the Home Transferir card and the offline Directory search *do* prefill a "Clave" field from `TransferPinStore` (§13), but that's local to those specific screens, not a general mechanism.
+There is no prefill/resolver indirection beyond the `{input}`/named-placeholder substitution above (unlike apps that inject saved user data before dialing) — separately, the Home Transferir card and the offline Directory search *do* prefill a "Clave" field from `TransferPinStore` (§12), but that's local to those specific screens, not a general mechanism.
 
 ---
 
@@ -147,46 +147,17 @@ Same trigger mapping as every other `UNNotificationTrigger`-based scheduler: `.n
 |---|---|---|
 | `.openPurchases` | Comprar Paquete | Sets `tabRouter.pendingTab = .purchase` and dismisses — there is no single fixed code for "buy a package" (it's a whole catalog of choices by data/duration), so this hands the user off to Compras instead of guessing. |
 | `.dialSingleInput` | Recargar Saldo | Opens `ExecuteReminderSheet`, which asks for the card number (never knowable ahead of time — it's scratched off a physical card at purchase) and dials `store.code(withId: "recharge-card")!.resolvedCode(input:)`. |
-| `.dialTransfer` | Hacer Transferencia | Opens `ExecuteReminderSheet` with phone number prefilled from the reminder and PIN prefilled from `TransferPinStore.load()` (§13) — both editable — asks for the amount fresh, then dials `resolvedCode(with: ["phoneNumber":, "pin":, "amount":])`, the same substitution `HomeQuickActionsView`'s own Transferir card uses (§5). |
+| `.dialTransfer` | Hacer Transferencia | Opens `ExecuteReminderSheet` with phone number prefilled from the reminder and PIN prefilled from `TransferPinStore.load()` (§12) — both editable — asks for the amount fresh, then dials `resolvedCode(with: ["phoneNumber":, "pin":, "amount":])`, the same substitution `HomeQuickActionsView`'s own Transferir card uses (§5). |
 | `.none` | Personalizado | No "Ejecutar" button at all — just a note. |
 
 ### 6.5 Known limitations
 
-- No schema versioning on `Reminder`, same as `codes.json` itself (§10).
+- No schema versioning on `Reminder`, same as `codes.json` itself (§9).
 - Notifications only — a reminder is never synced anywhere; there is no iCloud/cross-device story for it (nor for anything else in this app, per §1).
 
 ---
 
-## 7. Siri & App Intents
-
-Ajustes › Ayuda (Manual de Uso) › Siri y Atajos de Voz — the last section of `HelpSettingsView`, not a `SettingsView` section itself; it's documentation with one action button, not settings — describes what exposes fixed codes and the `*99`/`#31#` calls to Siri, Spotlight, and the Shortcuts app via Apple's **App Intents** framework — not the legacy SiriKit `Intents.framework`. Every type lives directly in `Services.swift`; there is no separate Intents Extension, no `.intentdefinition` file, and no Siri capability/entitlement to add — the system finds `CubaCellShortcuts` by reflection at install time. This needs iOS 16+, which this app already exceeds (deployment target 17.0, §1).
-
-Its "Abrir Ajustes de Siri para CubaCell Connect" button opens `UIApplication.openSettingsURLString` — iOS's own per-app settings page, not anything this app controls. It exists because the one thing that can silently disable every phrase here is a device-level toggle this app has no API to read or change: Ajustes (iOS) › Siri y Buscar › CubaCell Connect › "Usar con Preguntar a Siri", on by default but user-togglable. No entitlement, no in-app toggle, and no runtime permission prompt are needed for App Intents themselves — only that one external switch is worth surfacing a shortcut to.
-
-### 7.1 Two shapes of intent
-
-- **Fixed-code dialing** (`EjecutarCodigoIntent`): `@Parameter var codigo: QuickUSSDCode`, an `AppEnum` over 5 curated no-input codes (Saldo Principal, Bonos y Planes, Plan de Datos, Saldo Pospago, Estado del Plan Amigo). `perform()` resolves the code via a fresh `USSDCodeStore()` (stateless, bundle-loaded — no need to reach the environment-injected singleton) and calls `DialService.dial(code.code)` directly, since none of these five need `{input}` substitution.
-- **Number-taking calls** (`LlamarPorCobrarIntent`, `LlamarOcultoIntent`): `@Parameter var numero: String`, validated through `CubanPhoneNumber.normalize(_:)` — the same validator `ContactsService`/`ContactPickerView` use — before building `"*99\(normalized)"` / `"#31#\(normalized)"` and dialing. An invalid number returns a spoken-dialog error instead of dialing a malformed string.
-
-All three mark `openAppWhenRun = true`: this foregrounds `HomeView` before `perform()` returns, so the system's own dial confirmation always has the app in front to appear over. Nothing here dials silently in the background — same principle as every other dial path in this app (§5).
-
-### 7.2 Why `numero` is never in the trigger phrase
-
-`CubaCellShortcuts`'s phrases for the two call intents ("Llama por cobrar con CubaCell Connect", "Llama oculto con CubaCell Connect") deliberately **omit** `\(\.$numero)`. An `AppShortcut` phrase can only embed a parameter Siri can resolve from a bounded, indexable type — an `AppEnum` (like `QuickUSSDCode` in the other intent's phrase) or an `AppEntity` — not an open-ended `String`. Leaving `numero` out of the phrase is not a missing feature: App Intents automatically prompts for any required parameter the phrase didn't fill, using `@Parameter(title:)` as the question, so Siri still asks "¿A qué número?" right after matching the phrase. Putting a raw string placeholder directly in a static phrase is unsupported and was avoided on purpose, not by oversight.
-
-### 7.3 Fixed-parameter shortcuts need a real initializer
-
-The "Consulta mi saldo en CubaCell Connect" shortcut pins `EjecutarCodigoIntent`'s `codigo` to `.saldoPrincipal` ahead of time via `EjecutarCodigoIntent(codigo: .saldoPrincipal)` — a real initializer call, not `let i = EjecutarCodigoIntent(); i.codigo = .saldoPrincipal`. The latter compiles but fails Apple's `AppIntentsSSUTraining` build phase, which statically parses shortcut-registration source for the fixed value each pre-configured intent will run with and only recognizes a direct initializer call. `EjecutarCodigoIntent` declares both `init()` (for Siri to construct and fill via the generic "Marca \(codigo)" phrase) and `init(codigo:)` (for this one fixed-phrase case) side by side — found by reproducing the training-phase failure during development, not by reading it somewhere first.
-
-### 7.4 Known limitations
-
-- Comprar Paquete has no Siri intent at all — same reason the Reminders "Ejecutar" action for it just switches tabs (§6.4) instead of dialing: there is no single fixed code for "buy a package," only a whole catalog of choices.
-- Only 5 codes are voice-reachable (`QuickUSSDCode`); the enum is curated by hand, not generated from `codes.json` — adding a sixth means a code change, not a config change.
-- Untested on-device by this change: "Hey Siri" wake-word matching and the Shortcuts app's own suggestion surfacing can only be verified on a physical device or Simulator with Siri enabled, not via `xcodebuild` alone.
-
----
-
-## 8. Theming
+## 7. Theming
 
 - **Brand palette**: `Color.brandNavy` (`rgb(0,0,102)`) and `Color.brandCyan` (`#09C`) are fixed static properties on `Color`, defined in `Models.swift`. `brandCyan` is only the *default* accent now — `AccentColorStore` (`Services.swift`) holds the user's actual choice, made via a `ColorPicker` in Ajustes › Preferencias, persisted as a hex string in `UserDefaults` (`Color` itself isn't storable there — `Color.hexString`/`init?(hex:)` in `Models.swift` do the round-trip). Every view that used to hardcode `.brandCyan`/`Color.brandCyan` for its accent now reads `accentColorStore.color` via `@Environment(AccentColorStore.self)` instead — `AccentColor` in the asset catalog still matches the *default* cyan, but the live tint can differ from it once the user picks something else. Inline `Picker`s inside a `List` don't reliably inherit `.tint()` from an ancestor for their selected-value text/chevron, so those are tinted directly rather than relying on inheritance.
 - **Adaptive colors**: `Color.appBackground`/`.appForeground` wrap `UIColor.systemBackground`/`.label` so light/dark mode "just works" by default.
@@ -196,7 +167,7 @@ The "Consulta mi saldo en CubaCell Connect" shortcut pins `EjecutarCodigoIntent`
 
 ---
 
-## 9. Platform Constraints
+## 8. Platform Constraints
 
 These shape the UX and are not fixable in code:
 
@@ -207,28 +178,28 @@ These shape the UX and are not fixable in code:
 
 ---
 
-## 10. Notable Constraints & Trade-offs (for future contributors)
+## 9. Notable Constraints & Trade-offs (for future contributors)
 
 - **No dependency injection / testability seams**: stores (`USSDCodeStore`, `AccentColorStore`, `WifiRoomsStore`) are created once and passed via `.environment` or plain `init` — there is no protocol/mock seam. Still not a real problem given the app's size, but there's now meaningfully more surface (six-plus `@Observable`/enum services) than when this was first written.
 - **Silent failure on decode errors**: a malformed `codes.json` or `wifi_navigation_rooms.json` trips `assertionFailure` in debug and silently renders an empty list in release, rather than surfacing an error — acceptable only because both files are bundled and never user-supplied.
 - **No data migrations**: `codes.json` has a `version` field that nothing currently reads; adding a new field to `USSDCode` is safe (optional fields decode fine), but renaming/retyping an existing field will break decoding for the exact build that ships it.
-- **`codes.json`/`wifi_navigation_rooms.json` are compiled-in**: adding a new code, category, or WiFi room requires a new app build and App Store review — there is no remote-config or in-app update path, unlike apps whose `version` field exists specifically to unlock that later (see Extension Points below). Contrast this with the offline Directory search (§14), which deliberately reads a file the user supplies at runtime instead.
+- **`codes.json`/`wifi_navigation_rooms.json` are compiled-in**: adding a new code, category, or WiFi room requires a new app build and App Store review — there is no remote-config or in-app update path, unlike apps whose `version` field exists specifically to unlock that later (see Extension Points below). Contrast this with the offline Directory search (§13), which deliberately reads a file the user supplies at runtime instead.
 
 ---
 
-## 11. Extension Points
+## 10. Extension Points
 
 - **New code, group, or category** → edit `codes.json` only; UI adapts automatically for a new code/group. A whole new top-level category needs a matching tab wired into `HomeView` (see §4 — the tab set is no longer a generic loop).
 - **Search** → `CategoryListView`/`SMSServicesView` already filter locally as-you-type; no `USSDCodeStore` API exists for this (`code(withId:)` and `group(named:)` are point lookups, not search).
-- **Favorites / recents** → `TransferPinStore` (§13) is already a precedent for small Keychain-backed state beside the read-only catalog; a `UserDefaults`-backed store would work the same way for something non-secret.
+- **Favorites / recents** → `TransferPinStore` (§12) is already a precedent for small Keychain-backed state beside the read-only catalog; a `UserDefaults`-backed store would work the same way for something non-secret.
 - **Remote catalog updates** → replace `USSDCodeStore.load(from:)` with a cached-remote strategy; the `version` field in the JSON exists for this.
 - **Localization** — UI copy is Spanish (not English); catalog `title`/`details` would move to localized variants keyed by the same `id`.
 
 ---
 
-## 12. Caller ID Extension (`*99` collect-call identification)
+## 11. Caller ID Extension (`*99` collect-call identification)
 
-### 10.1 Why this exists
+### 11.1 Why this exists
 
 ETECSA's `*99` collect-call service does **not** withhold the caller's number the way `#31#` (anonymous) does — it wraps it. Dialing `*99{number}` makes the call arrive on the other end with a caller ID string of the form:
 
@@ -238,7 +209,7 @@ ETECSA's `*99` collect-call service does **not** withhold the caller's number th
 
 e.g. a call to `51234567` shows up as `99535123456799` (14 digits) instead of the real number. iOS's stock Phone app has no idea what to do with that, so the incoming call just shows a meaningless 14-digit string. Since the real digits genuinely reach the device (unlike a truly anonymous call, which never transmits them — see the in-app "Ayuda" copy on this), it's possible to reverse the wrapping and show the real contact's name instead. Apple's supported mechanism for that is a **CallKit Call Directory Extension**.
 
-### 10.2 How it works
+### 11.2 How it works
 
 ```
 CubaCellConnect (main app)                 CallerIDExtension (app extension)
@@ -267,17 +238,17 @@ CXCallDirectoryManager.reloadExtension  ──▶  CallDirectoryHandler.beginReq
 - **`ContactsService.fetch()`** (in `CubaCellConnect/Services.swift`) rebuilds the full entry list from `contacts` every time it re-fetches from `CNContactStore`, writes it via `CallerIDStore.write(_:)`, then calls `CXCallDirectoryManager.sharedInstance.reloadExtension(withIdentifier:)` so iOS re-invokes the extension immediately rather than waiting for its own schedule. This keeps the Caller ID list in sync automatically — there is no separate manual "sync" button in the UI.
 - **`CallerIDExtension/CallDirectoryHandler.swift`** is the entire extension target: a `CXCallDirectoryProvider` subclass that reads the shared file and calls `addIdentificationEntry(withNextSequentialPhoneNumber:label:)` once per contact, in strictly ascending numeric order (a hard CallKit requirement — the request is rejected otherwise), then `completeRequest()`. It never touches `CNContactStore` itself and has no Contacts permission of its own — everything it shows was computed by the main app.
 
-### 10.3 Real constraints (not fixable in code)
+### 11.3 Real constraints (not fixable in code)
 
 - **Only labels contacts already in the address book.** A `*99` call from an unknown number still shows the raw wrapped digits — same limitation as Truecaller-style apps for unrecognized numbers.
 - **The user must enable it once, manually**: Ajustes del sistema › Teléfono › Bloqueo e Identificación de Llamadas › CallerID. No API lets an app turn this on for itself.
 - **Requires the App Groups capability to be signed correctly** (`group.com.cubacellconnect.shared`, declared in both targets' entitlements in `project.yml`). With automatic signing this is normally provisioned by Xcode the first time you build with a real Team ID; if identification silently doesn't show up, check that the App Group actually got created under that team in the Apple Developer portal.
 - **Only testable on a physical iPhone.** The simulator has no real telephony stack, so this cannot be verified with `xcrun simctl` screenshots the way the rest of the UI in this repo is — it needs an actual incoming `*99` call on a device with the extension enabled.
-- **A truly anonymous call (`#31#`) can never be identified this way** — see §9 platform constraints; the network never transmits the number at all in that case, so there is nothing for `CallerIDStore` to wrap or unwrap.
+- **A truly anonymous call (`#31#`) can never be identified this way** — see §8 platform constraints; the network never transmits the number at all in that case, so there is nothing for `CallerIDStore` to wrap or unwrap.
 
 ---
 
-## 13. Transfer PIN Store
+## 12. Transfer PIN Store
 
 `TransferPinStore` (`Services.swift`) persists the user's ETECSA transfer PIN in the device Keychain (`kSecClassGenericPassword`), not `UserDefaults` — it's the one piece of user-entered state in the app sensitive enough to warrant that. `.save(_:)`/`.load()`/`.delete()` wrap `SecItemAdd`/`SecItemCopyMatching`/`SecItemDelete` directly (no third-party Keychain wrapper). The stored item's accessibility is `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` — it never syncs via iCloud Keychain and is excluded from device backups, so reinstalling the app or restoring from backup loses it (by design: it's read back into a plaintext `TextField`, unlike a password, so it shouldn't survive a device transfer silently).
 
@@ -285,7 +256,7 @@ Consumers: the Home Transferir card and the offline Directory search's "Clave" f
 
 ---
 
-## 14. Directory Database (offline reverse lookup)
+## 13. Directory Database (offline reverse lookup)
 
 `DirectoryDatabase` (`Services.swift`) is a raw SQLite reader (`import SQLite3`, no wrapper library) over a Truecaller-style phone-directory dump the *user* supplies — the app neither bundles nor downloads it. It looks for any `.db` file in the app's Documents directory (reachable via Finder's "On My iPhone" file sharing, enabled via `UIFileSharingEnabled`/`LSSupportsOpeningDocumentsInPlace` in `project.yml`) and identifies its schema by querying `sqlite_master` for table names rather than trusting the filename:
 
