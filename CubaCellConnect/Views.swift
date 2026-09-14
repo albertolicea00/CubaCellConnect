@@ -877,9 +877,10 @@ struct CategoryListView: View {
 /// services, pulled from the "Servicios por SMS" group in `codes.json` (currently empty; codes
 /// go straight into the JSON once they're in hand, same as every other code in the app — never
 /// hardcoded here).
-/// Ajustes › Utilidades › Servicios por SMS — just the query/subscription groups. Configuraciones
-/// (LTE, IMEI/3G-4G check, MMS setup) lives separately under Ajustes › Cuenta instead, since it's
-/// about the line/device itself, not a service you send a query or subscribe to.
+/// Ajustes › Utilidades › Servicios por SMS — just the query/subscription groups. "Configuraciones"
+/// (LTE, IMEI/3G-4G check, MMS setup) renders directly as its own rows under Ajustes › Cuenta
+/// instead (see `SettingsView`), not as a sub-screen — those are quick one-off device/line
+/// settings, not something worth another level of navigation.
 struct SMSServicesView: View {
     var body: some View {
         SMSCodeListView(
@@ -890,21 +891,9 @@ struct SMSServicesView: View {
     }
 }
 
-/// Ajustes › Cuenta › Configuraciones SMS — LTE activation, 3G/4G IMEI check, MMS setup. Split out
-/// of `SMSServicesView` since these configure the line/device, not a query or subscription.
-struct SMSConfigurationsView: View {
-    var body: some View {
-        SMSCodeListView(
-            title: "Configuraciones SMS",
-            groupNames: ["Configuraciones"],
-            emptyStateDescription: "Los códigos de configuración se agregarán aquí próximamente."
-        )
-    }
-}
-
-/// Shared list/compose logic behind both `SMSServicesView` and `SMSConfigurationsView` — renders
-/// the given `codes.json` groups in the same compact, price-trailing row shape as Compras, and
-/// handles composing the SMS itself (the requires-input alert, the `MFMessageComposeViewController`
+/// Shared list/compose logic behind `SMSServicesView` — renders the given `codes.json` groups in
+/// the same compact, price-trailing row shape as Compras, and handles composing the SMS itself
+/// (the requires-input alert, the `MFMessageComposeViewController`
 /// sheet, and the "this device can't send texts" guard, e.g. the Simulator).
 private struct SMSCodeListView: View {
     let title: String
@@ -1053,6 +1042,15 @@ struct SettingsView: View {
     @State private var isShowingSpeedTestOnLaunch = false
     @State private var isShowingDirectoryOnLaunch = false
 
+    /// Backs the three "Configuraciones" SMS rows (LTE, 3G/4G check, MMS) in Cuenta — these dial
+    /// straight from the row, no sub-screen, so `SettingsView` needs its own compose-SMS state
+    /// same as `SMSCodeListView`'s (duplicated rather than shared, per this app's usual approach
+    /// to a handful of independent action rows).
+    @State private var pendingSMSInputCode: USSDCode?
+    @State private var smsInputText = ""
+    @State private var pendingSMS: PendingSMS?
+    @State private var showsCannotSendTextAlert = false
+
     var body: some View {
         NavigationStack {
             List {
@@ -1133,7 +1131,21 @@ struct SettingsView: View {
                         }
                         .disabled(payPerUseCode.code.isEmpty)
                     }
-                    
+
+                    if let configGroup = store.group(named: "Configuraciones") {
+                        ForEach(configGroup.codes) { code in
+                            Button {
+                                selectSMS(code)
+                            } label: {
+                                HStack {
+                                    Text(code.title)
+                                    Spacer()
+                                    Image(systemName: "arrow.right")
+                                }
+                            }
+                        }
+                    }
+
                     NavigationLink {
                         FriendsPlanManageView()
                     } label: {
@@ -1144,12 +1156,6 @@ struct SettingsView: View {
                         TransferPinSettingsView()
                     } label: {
                         Label("Gestionar PIN de Transferencia", systemImage: "key.fill")
-                    }
-
-                    NavigationLink {
-                        SMSConfigurationsView()
-                    } label: {
-                        Label("Configuraciones SMS", systemImage: "antenna.radiowaves.left.and.right")
                     }
                 }
 
@@ -1203,7 +1209,53 @@ struct SettingsView: View {
                     isShowingDirectoryOnLaunch = true
                 }
             }
+            .alert(
+                pendingSMSInputCode?.title ?? "",
+                isPresented: Binding(
+                    get: { pendingSMSInputCode != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            pendingSMSInputCode = nil
+                            smsInputText = ""
+                        }
+                    }
+                ),
+                presenting: pendingSMSInputCode
+            ) { code in
+                TextField(code.inputPlaceholder ?? "Dato", text: $smsInputText)
+                    .keyboardType(.phonePad)
+                Button("Continuar") { composeSMS(code, input: smsInputText) }
+                Button("Cancelar", role: .cancel) {}
+            } message: { code in
+                Text(code.details)
+            }
+            .alert("No se Puede Enviar SMS", isPresented: $showsCannotSendTextAlert) {
+                Button("Entendido", role: .cancel) {}
+            } message: {
+                Text("Este dispositivo no puede enviar mensajes de texto (por ejemplo, el Simulador de Xcode no soporta SMS).")
+            }
+            .sheet(item: $pendingSMS) { pending in
+                MessageComposeView(recipient: pending.recipient, body: pending.body)
+                    .ignoresSafeArea()
+            }
         }
+    }
+
+    private func selectSMS(_ code: USSDCode) {
+        if code.requiresInput {
+            smsInputText = ""
+            pendingSMSInputCode = code
+        } else {
+            composeSMS(code, input: "")
+        }
+    }
+
+    private func composeSMS(_ code: USSDCode, input: String) {
+        guard MFMessageComposeViewController.canSendText() else {
+            showsCannotSendTextAlert = true
+            return
+        }
+        pendingSMS = PendingSMS(recipient: code.code, body: code.resolvedSMSBody(input: input))
     }
 }
 
