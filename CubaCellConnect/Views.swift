@@ -877,7 +877,7 @@ struct CategoryListView: View {
 /// services, pulled from the "Servicios por SMS" group in `codes.json` (currently empty; codes
 /// go straight into the JSON once they're in hand, same as every other code in the app — never
 /// hardcoded here).
-struct SMSSubscriptionsView: View {
+struct SMSServicesView: View {
     @Environment(USSDCodeStore.self) private var store
     @Environment(AccentColorStore.self) private var accentColorStore
 
@@ -886,10 +886,13 @@ struct SMSSubscriptionsView: View {
     @State private var pendingSMS: PendingSMS?
     @State private var showsCannotSendTextAlert = false
 
-    /// Fixed, known group names — each maps to one SMS destination number (2266, 4222, 8000).
-    /// Paid subscriptions land in their own group(s) here too once their codes are in hand.
+    /// Fixed, known group names — "Consultas" (2266, free), "Configuraciones" (2266/4222 — LTE,
+    /// IMEI/3G-4G check, MMS setup, all grouped together), "SMS Suscripciones" (8000, the actual
+    /// ongoing subscriptions, priced $0.00 since only *those* are true subscriptions — the other
+    /// two groups are one-off queries/config, not something you're "subscribed" to). Paid
+    /// subscriptions land in their own group(s) here too once their codes are in hand.
     private var groups: [USSDCodeGroup] {
-        ["SMS al 2266", "Configurar MMS", "SMS Services"].compactMap { store.group(named: $0) }
+        ["Consultas", "Configuraciones", "SMS Suscripciones"].compactMap { store.group(named: $0) }
     }
 
     private var hasAnyCodes: Bool {
@@ -910,9 +913,23 @@ struct SMSSubscriptionsView: View {
                         if !group.codes.isEmpty {
                             Section(group.name ?? "") {
                                 ForEach(group.codes) { code in
-                                    CodeRowView(code: code)
-                                        .contentShape(Rectangle())
-                                        .onTapGesture { select(code) }
+                                    // Same compact, price-trailing row shape as Compras — set
+                                    // "compact": true on every code here so they all render like
+                                    // it, price or not.
+                                    Button {
+                                        select(code)
+                                    } label: {
+                                        HStack {
+                                            Text(code.title)
+                                            Spacer()
+                                            if let price = code.price {
+                                                Text(price)
+                                                    .font(.subheadline.weight(.semibold))
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                            Image(systemName: "arrow.right")
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -983,7 +1000,7 @@ private struct PendingSMS: Identifiable {
 
 #Preview {
     NavigationStack {
-        SMSSubscriptionsView()
+        SMSServicesView()
     }
     .environment(USSDCodeStore())
     .environment(AccentColorStore())
@@ -1055,7 +1072,7 @@ struct SettingsView: View {
                     }
 
                     NavigationLink {
-                        SMSSubscriptionsView()
+                        SMSServicesView()
                     } label: {
                         Label("Servicios por SMS", systemImage: "envelope.badge")
                     }
