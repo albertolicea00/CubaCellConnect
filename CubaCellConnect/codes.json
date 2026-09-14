@@ -252,7 +252,36 @@
           ]
         },
         {
-          "name": "SMS Suscripciones",
+          "name": "DHL y Vuelos",
+          "codes": [
+            {
+              "id": "sms-8888-dhl",
+              "code": "8888",
+              "smsBody": "DHL {input}",
+              "title": "Rastreo DHL",
+              "details": "Envía tu número de guía DHL por SMS para rastrear tu envío.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de guía",
+              "price": "$4.00",
+              "compact": true
+            },
+            {
+              "id": "sms-8888-vuelo",
+              "code": "8888",
+              "smsBody": "VUELO {input}",
+              "title": "Información de Vuelo",
+              "details": "Envía el número de vuelo por SMS para consultar su información.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Número de vuelo",
+              "price": "$4.00",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "name": "Tarifas y Servicios",
           "codes": [
             {
               "id": "sms-8000-follow",
@@ -298,52 +327,6 @@
               "inputPlaceholder": "Texto de la consulta",
               "price": "$4.00",
               "compact": true
-            }
-          ]
-        },
-        {
-          "name": "DHL y Vuelos",
-          "codes": [
-            {
-              "id": "sms-8888-dhl",
-              "code": "8888",
-              "smsBody": "DHL {input}",
-              "title": "Rastreo DHL",
-              "details": "Envía tu número de guía DHL por SMS para rastrear tu envío.",
-              "type": "sms",
-              "requiresInput": true,
-              "inputPlaceholder": "Número de guía",
-              "price": "$4.00",
-              "compact": true
-            },
-            {
-              "id": "sms-8888-vuelo",
-              "code": "8888",
-              "smsBody": "VUELO {input}",
-              "title": "Información de Vuelo",
-              "details": "Envía el número de vuelo por SMS para consultar su información.",
-              "type": "sms",
-              "requiresInput": true,
-              "inputPlaceholder": "Número de vuelo",
-              "price": "$4.00",
-              "compact": true
-            }
-          ]
-        },
-        {
-          "name": "Tarifas y Servicios",
-          "codes": [
-            {
-              "id": "sms-8888-telectrica",
-              "code": "8888",
-              "smsBody": "TELECTRICA {input}",
-              "title": "Tarifa Eléctrica",
-              "details": "Envía el rate de consumo por SMS para calcular la tarifa eléctrica.",
-              "type": "sms",
-              "requiresInput": true,
-              "inputPlaceholder": "Rate de consumo",
-              "price": "$4.00",
-              "compact": true
             },
             {
               "id": "sms-8888-cambio",
@@ -371,10 +354,22 @@
               "id": "sms-2266-tarifa",
               "code": "2266",
               "smsBody": "tarifa",
-              "title": "Tarifa Actual",
-              "details": "Consulta tu tarifa actual por SMS.",
+              "title": "Tarifas de  ETECSA",
+              "details": "Consulta tu tarifa actual de ETECSA por SMS.",
               "type": "sms",
               "requiresInput": false,
+              "compact": true
+            },
+            {
+              "id": "sms-8888-telectrica",
+              "code": "8888",
+              "smsBody": "TELECTRICA {input}",
+              "title": "Tarifa Eléctrica",
+              "details": "Envía el rate de consumo por SMS para calcular la tarifa eléctrica.",
+              "type": "sms",
+              "requiresInput": true,
+              "inputPlaceholder": "Rate de consumo",
+              "price": "$4.00",
               "compact": true
             }
           ]
@@ -744,7 +739,7 @@
         {
           "name": "Recetas, Frases y Horóscopos",
           "codes": [
-                        {
+            {
               "id": "sms-8888-receta",
               "code": "8888",
               "smsBody": "RECETA {input}",

@@ -887,7 +887,7 @@ struct SMSServicesView: View {
     var body: some View {
         SMSCodeListView(
             title: "Servicios por SMS",
-            leadingGroupNames: ["Consultas", "SMS Suscripciones", "DHL y Vuelos", "Tarifas y Servicios"],
+            leadingGroupNames: ["Consultas", "Tarifas y Servicios", "DHL y Vuelos"],
             trailingGroupNames: ["Noticias", "Recetas, Frases y Horóscopos"],
             emptyStateDescription: "Los códigos de suscripción de SMS se agregarán aquí próximamente."
         ) {
