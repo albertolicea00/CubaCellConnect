@@ -627,7 +627,7 @@ private struct ContactCallOptionsSheet: View {
                         dialFriendsPlanManage(manageFriendsPlanCode)
                     } label: {
                         HStack {
-                            Text("Agregar/Eliminar de mi Plan de Amigos")
+                            Text("Adicionar/Eliminar de mi Plan de Amigos")
                             Spacer()
                             Image(systemName: "arrow.right")
                         }
@@ -979,7 +979,7 @@ struct SettingsView: View {
                 if let friendsPlanGroup = store.group(named: "Gestionar Plan Amigo") {
                     Section("Gestionar Plan Amigo") {
                         // "Activar/Desactivar" is about your own line — no target number needed,
-                        // dials directly. "Agregar/Eliminar Amigo" needs one, so it gets an
+                        // dials directly. "Adicionar/Eliminar Amigo" needs one, so it gets an
                         // inline Número field (+ contact picker) right in this section instead,
                         // same shape as Home's Transferir card.
                         ForEach(friendsPlanGroup.codes.filter { $0.id != "friends-plan-manage-member" }) { code in

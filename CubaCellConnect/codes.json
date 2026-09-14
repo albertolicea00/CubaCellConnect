@@ -132,7 +132,7 @@
             {
               "id": "friends-plan-manage-member",
               "code": "",
-              "title": "Agregar/Eliminar Amigo de mi Plan",
+              "title": "Adicionar/Eliminar Amigo de mi Plan",
               "details": "Código pendiente de agregar.",
               "type": "ussd",
               "requiresInput": false
