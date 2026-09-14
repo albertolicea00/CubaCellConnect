@@ -1032,6 +1032,8 @@ struct SettingsView: View {
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
+            // TEMP DEBUG
+            .onAppear { debugPushPin = true }
         }
     }
 }
@@ -1215,114 +1217,69 @@ private struct FriendsPlanManageView: View {
 private struct TransferPinSettingsView: View {
     @Environment(USSDCodeStore.self) private var store
 
-    @State private var isChangePinExpanded = false
     @State private var currentPin = ""
     @State private var newPin = ""
 
-    @State private var isSavePinExpanded = false
     @State private var savedPin = ""
     @State private var isSavedPinPersisted = false
 
     var body: some View {
         List {
             Section("Cambiar Clave") {
-                if isChangePinExpanded {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 12) {
-                            TextField("Clave actual", text: $currentPin)
-                                .textContentType(.password)
-                                .keyboardType(.numberPad)
-                            Divider()
-                            TextField("Clave nueva", text: $newPin)
-                                .textContentType(.newPassword)
-                                .keyboardType(.numberPad)
-                        }
+                HStack(spacing: 12) {
+                    TextField("Clave actual", text: $currentPin)
+                        .textContentType(.password)
+                        .keyboardType(.numberPad)
+                    Divider()
+                    TextField("Clave nueva", text: $newPin)
+                        .textContentType(.newPassword)
+                        .keyboardType(.numberPad)
+                }
 
-                        if showsSamePinError {
-                            Text("La clave nueva es igual a la actual.")
-                                .font(.footnote)
-                                .foregroundStyle(.red)
-                        }
+                if showsSamePinError {
+                    Text("La clave nueva es igual a la actual.")
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                }
 
-                        HStack {
-                            Button("Cancelar", role: .cancel) {
-                                withAnimation {
-                                    currentPin = ""
-                                    newPin = ""
-                                    isChangePinExpanded = false
-                                }
-                            }
-                            Spacer()
-                            Button {
-                                changePin()
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Text("Cambiar Clave")
-                                    Image(systemName: "arrow.right")
-                                }
-                            }
-                            .disabled(isChangePinDisabled)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                } else {
-                    Button {
-                        withAnimation { isChangePinExpanded = true }
-                    } label: {
-                        Label("Cambiar Clave", systemImage: "key.fill")
+                Button {
+                    changePin()
+                } label: {
+                    HStack(spacing: 6) {
+                        Spacer()
+                        Text("Cambiar Clave")
+                        Image(systemName: "arrow.right")
                     }
                 }
+                .disabled(isChangePinDisabled)
             }
 
-            Section("Guardar Clave") {
-                if isSavePinExpanded {
-                    VStack(alignment: .leading, spacing: 10) {
-                        PinRevealField(title: "Clave", text: $savedPin, isMasked: true)
+            Section {
+                PinRevealField(title: "Clave", text: $savedPin, isMasked: true)
 
-                        Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-
-                        HStack {
-                            Button("Cancelar", role: .cancel) {
-                                withAnimation {
-                                    savedPin = TransferPinStore.load() ?? ""
-                                    isSavePinExpanded = false
-                                }
-                            }
-                            Spacer()
-                            Button {
-                                TransferPinStore.save(savedPin)
-                                isSavedPinPersisted = true
-                                withAnimation { isSavePinExpanded = false }
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Text("Guardar Clave")
-                                    Image(systemName: "arrow.right")
-                                }
-                            }
-                            .disabled(savedPin.trimmingCharacters(in: .whitespaces).isEmpty)
-                        }
-
-                        if isSavedPinPersisted {
-                            Button("Olvidar Clave Guardada", role: .destructive) {
-                                TransferPinStore.delete()
-                                withAnimation {
-                                    savedPin = ""
-                                    isSavedPinPersisted = false
-                                    isSavePinExpanded = false
-                                }
-                            }
-                        }
-                    }
-                    .padding(.vertical, 4)
-                } else {
-                    Button {
-                        withAnimation { isSavePinExpanded = true }
-                    } label: {
-                        Label("Guardar Clave", systemImage: "lock.fill")
+                Button {
+                    TransferPinStore.save(savedPin)
+                    isSavedPinPersisted = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Spacer()
+                        Text("Guardar Clave")
+                        Image(systemName: "arrow.right")
                     }
                 }
+                .disabled(savedPin.trimmingCharacters(in: .whitespaces).isEmpty)
+
+                if isSavedPinPersisted {
+                    Button("Olvidar Clave Guardada", role: .destructive) {
+                        TransferPinStore.delete()
+                        savedPin = ""
+                        isSavedPinPersisted = false
+                    }
+                }
+            } header: {
+                Text("Guardar Clave")
+            } footer: {
+                Text("Se guarda cifrada en el Llavero de este dispositivo (nunca sale de él) y se rellena sola en el campo Clave al transferir, tanto en Home como dentro de un contacto.")
             }
         }
         .navigationTitle("PIN de Transferencia")
@@ -1359,11 +1316,8 @@ private struct TransferPinSettingsView: View {
         TransferPinStore.save(newPin)
         savedPin = newPin
         isSavedPinPersisted = true
-        withAnimation {
-            currentPin = ""
-            newPin = ""
-            isChangePinExpanded = false
-        }
+        currentPin = ""
+        newPin = ""
     }
 }
 
