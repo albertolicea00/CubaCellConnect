@@ -25,6 +25,9 @@ All codes live in `CubaCellConnect/codes.json`. When adding or changing a code:
 - `type` is `ussd` for dialed sequences ending in `#`, `call` for plain numbers.
 - Cite a source (ETECSA announcement, official page) in your PR description.
 
+> [!IMPORTANT]
+> `codes.json` is also consumed by the web version of the project. Modifying its schema or structure without coordination can break the web interface.
+
 ## Pull Request Process
 
 1. Create a feature branch from `main`: `git checkout -b feat/short-description`.
