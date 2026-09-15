@@ -28,6 +28,7 @@ An iPhone app to quickly access the **USSD service codes of ETECSA (Cubacel)** :
 - 📶 **Internet Speed Test** — Built-in ping, download, and upload speed test gauge powered by Cloudflare endpoints.
 - 👥 **Account & PIN Management** — Store transfer PIN in Keychain and manage Plan Amigo numbers easily.
 - 🔔 **Local Reminders** — Schedule recurring alerts for plan purchases, balance top-ups, or transfers with 1-tap dial action.
+- 🎙️ **Siri & Voice Shortcuts** — Execute balance queries, quick codes, and collect (`*99` / 99) or anonymous (`#31#` / oculto / privado) calls via native voice commands using `AppIntents`.
 - 🌗 **Customization & Settings** — Light/Dark theme support, custom accent color picker, and configurable launch tab.
 
 ### Upcoming
@@ -89,8 +90,6 @@ Provides local (user-imported database) and online web search options under Ajus
 Includes an offline directory of official ETECSA navigation rooms and public Wi-Fi hotspots by province ([`wifi-rooms-sync-check`](.github/workflows/wifi-rooms-sync-check.yml) action monitors source data drift).
 
 ## 🚧 Known Limitations
-
-- **No Siri / Voice Shortcuts integration.** Previously implemented via `AppIntents`, then removed on purpose. Every intent still had to foreground the app and go through the exact same `tel://` dial-confirmation prompt as tapping a code in the UI — so a voice command saved no real steps over unlocking the phone and tapping the code (same trade-off as the widget decision below), while adding a whole extra surface (intents, `AppShortcutsProvider`, a Siri-settings help block) to maintain.
 
 - **Directory database not integrated with Caller ID (`*99`).** The directory database (see above) is intentionally kept separate from `CallerIDStore`/`CallDirectoryHandler` (see [ARCHITECTURE.md § 11](ARCHITECTURE.md#11-caller-id-extension-99-collect-call-identification)), which only ever loads from the device's own Contacts. A CallKit Call Directory Extension has a hard cap on how many identification entries it can register (historically on the order of 100k–200k) — the directory dump has millions of rows (v1: ~4.6M; v2: ~4.8M combined), so registering it wholesale would get the extension rejected/disabled by iOS. Feeding it in would need a drastic filter (e.g. only numbers already in the device's own contacts, which is exactly what happens today) to fit under that ceiling.
 

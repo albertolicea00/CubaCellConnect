@@ -16,6 +16,12 @@ targets:
       path: CubaCellConnect/Info.plist
       properties:
         CFBundleDisplayName: CubaCell Connect
+        CFBundleSpokenName: CubaCell
+        INAlternativeAppNames:
+          - INAlternativeAppName: Cubacel
+            INAlternativeAppNamePronunciationHint: ku-ba-sel
+          - INAlternativeAppName: CubaCell
+          - INAlternativeAppName: Cuba Cell
         CFBundleShortVersionString: 1.2.4
         CFBundleVersion: "1"
         UILaunchScreen: {}

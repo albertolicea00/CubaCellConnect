@@ -1,3 +1,4 @@
+import AppIntents
 import CallKit
 import Contacts
 import CoreTelephony
@@ -1048,4 +1049,173 @@ final class ReminderManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 }
+
+// MARK: - Siri / App Intents
+/// Lets Siri, Spotlight, and the Shortcuts app dial a code or place a `*99`/`#31#` call directly —
+/// "Oye Siri, marca Saldo Principal en CubaCell", "Oye Siri, llama con 99 a Pepe en CubaCell".
+/// Built on `AppIntents` (not legacy SiriKit `Intents.framework`), needing no separate extension target:
+/// the system discovers `CubaCellShortcuts` by reflection at install time. Every intent marks
+/// `openAppWhenRun` so the system's own dial confirmation always has the app in the foreground to
+/// appear over — nothing dials silently in the background.
+enum QuickUSSDCode: String, AppEnum {
+    case saldoPrincipal, bonosYPlanes, planDeDatos, saldoPospago, estadoPlanAmigo
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Código Rápido"
+
+    static var caseDisplayRepresentations: [QuickUSSDCode: DisplayRepresentation] = [
+        .saldoPrincipal: "Saldo Principal",
+        .bonosYPlanes: "Bonos y Planes en USD",
+        .planDeDatos: "Plan de Datos",
+        .saldoPospago: "Saldo Pospago o Institucional",
+        .estadoPlanAmigo: "Estado del Plan Amigos",
+    ]
+
+    /// The bundled `USSDCode.id` (`codes.json`, Home category) this quick action dials — all five
+    /// are fixed, no-input codes, so there's nothing to prompt for before dialing.
+    var codeId: String {
+        switch self {
+        case .saldoPrincipal: return "main-balance"
+        case .bonosYPlanes: return "bonus-usd-plans"
+        case .planDeDatos: return "data-plan"
+        case .saldoPospago: return "postpaid-balance"
+        case .estadoPlanAmigo: return "friends-plan-status-settings"
+        }
+    }
+}
+
+struct EjecutarCodigoIntent: AppIntent {
+    static var title: LocalizedStringResource = "Marcar Código Rápido"
+    static var description = IntentDescription("Marca uno de los códigos rápidos de CubaCell Connect: saldo, bonos, plan de datos, saldo pospago o estado del Plan Amigo.")
+    static var openAppWhenRun: Bool = true
+
+    @Parameter(title: "Código")
+    var codigo: QuickUSSDCode
+
+    init() {}
+
+    init(codigo: QuickUSSDCode) {
+        self.codigo = codigo
+    }
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Marcar \(\.$codigo)")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let code = USSDCodeStore().code(withId: codigo.codeId) else {
+            return .result(dialog: "No se encontró ese código.")
+        }
+        guard DialService.dial(code.code) else {
+            return .result(dialog: "No se pudo abrir el marcador en este dispositivo.")
+        }
+        return .result(dialog: "Marcando \(code.title)...")
+    }
+}
+
+struct LlamarPorCobrarIntent: AppIntent {
+    static var title: LocalizedStringResource = "Llamar por Cobrar (*99)"
+    static var description = IntentDescription("Marca una llamada por cobrar (*99) a un número móvil cubano usando CubaCell Connect.")
+    static var openAppWhenRun: Bool = true
+
+    @Parameter(title: "Número")
+    var numero: String
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Llamar por cobrar a \(\.$numero)")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let normalized = CubanPhoneNumber.normalize(numero) else {
+            return .result(dialog: "Ese no parece un número móvil cubano válido.")
+        }
+        guard DialService.dial("*99\(normalized)") else {
+            return .result(dialog: "No se pudo abrir el marcador en este dispositivo.")
+        }
+        return .result(dialog: "Llamando por cobrar a \(normalized)...")
+    }
+}
+
+struct LlamarOcultoIntent: AppIntent {
+    static var title: LocalizedStringResource = "Llamar Oculto (#31#)"
+    static var description = IntentDescription("Marca una llamada con número oculto (#31#) a un número móvil cubano usando CubaCell Connect.")
+    static var openAppWhenRun: Bool = true
+
+    @Parameter(title: "Número")
+    var numero: String
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Llamar oculto a \(\.$numero)")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let normalized = CubanPhoneNumber.normalize(numero) else {
+            return .result(dialog: "Ese no parece un número móvil cubano válido.")
+        }
+        guard DialService.dial("#31#\(normalized)") else {
+            return .result(dialog: "No se pudo abrir el marcador en este dispositivo.")
+        }
+        return .result(dialog: "Llamando oculto a \(normalized)...")
+    }
+}
+
+struct CubaCellShortcuts: AppShortcutsProvider {
+    @AppShortcutsBuilder
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: EjecutarCodigoIntent(),
+            phrases: [
+                "Marca \(\.$codigo) en \(.applicationName)",
+                "Ejecuta \(\.$codigo) en \(.applicationName)",
+            ],
+            shortTitle: "Código Rápido",
+            systemImageName: "number"
+        )
+
+        AppShortcut(
+            intent: EjecutarCodigoIntent(codigo: .saldoPrincipal),
+            phrases: [
+                "Consulta mi saldo en \(.applicationName)",
+                "Cuánto saldo tengo en \(.applicationName)",
+            ],
+            shortTitle: "Consultar Saldo",
+            systemImageName: "banknote"
+        )
+
+        AppShortcut(
+            intent: LlamarPorCobrarIntent(),
+            phrases: [
+                "Llama por cobrar con \(.applicationName)",
+                "Haz una llamada por cobrar en \(.applicationName)",
+                "Llama con 99 en \(.applicationName)",
+                "Llama con *99 en \(.applicationName)",
+                "Llama pagando el en \(.applicationName)",
+                "Llama por cobrar a \(\.$numero) en \(.applicationName)",
+                "Llama con 99 a \(\.$numero) en \(.applicationName)",
+                "Llama con *99 a \(\.$numero) en \(.applicationName)",
+                "Llama pagando el a \(\.$numero) en \(.applicationName)",
+            ],
+            shortTitle: "Llamar por Cobrar",
+            systemImageName: "phone.arrow.up.right"
+        )
+
+        AppShortcut(
+            intent: LlamarOcultoIntent(),
+            phrases: [
+                "Llama oculto con \(.applicationName)",
+                "Haz una llamada con número oculto en \(.applicationName)",
+                "Llama con privado en \(.applicationName)",
+                "Llama con oculto en \(.applicationName)",
+                "Llama oculto a \(\.$numero) en \(.applicationName)",
+                "Llama con privado a \(\.$numero) en \(.applicationName)",
+                "Llama con oculto a \(\.$numero) en \(.applicationName)",
+            ],
+            shortTitle: "Llamar Oculto",
+            systemImageName: "eye.slash"
+        )
+    }
+}
+
 

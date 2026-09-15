@@ -2251,6 +2251,32 @@ private struct HelpSettingsView: View {
                 )
             }
 
+            Section("Siri y Atajos de Voz") {
+                SettingsInfoRow(
+                    title: "¿Qué hace?",
+                    text: "No hay que configurar nada: al instalar la app, Siri y Atajos la reconocen automáticamente. Puedes usar tanto «CubaCell Connect» como simplemente «CubaCell» o «Cubacel»."
+                )
+                SettingsInfoRow(
+                    title: "Frases para llamar oculto o por cobrar (*99)",
+                    text: "«Oye Siri, llama con 99 a [Número/Contacto] en CubaCell», «Oye Siri, llama con *99 en CubaCell», «Oye Siri, llama pagando el a [Número/Contacto] en CubaCell», «Oye Siri, llama con oculto a [Número/Contacto] en CubaCell», «Oye Siri, llama con privado en CubaCell»."
+                )
+                SettingsInfoRow(
+                    title: "Consultar saldo y servicios",
+                    text: "«Oye Siri, consulta mi saldo en CubaCell», «Oye Siri, marca Bonos y Planes en CubaCell»."
+                )
+                SettingsInfoRow(
+                    title: "Cómo funciona por dentro",
+                    text: "Cada frase abre la app y marca exactamente igual que si tocaras el botón en pantalla — el sistema pide confirmación para realizar la llamada."
+                )
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Label("Abrir Ajustes de Siri para CubaCell", systemImage: "gear")
+                }
+            }
+
         }
         .navigationTitle("Ayuda")
         .navigationBarTitleDisplayMode(.inline)
