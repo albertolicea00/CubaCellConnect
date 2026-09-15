@@ -1083,6 +1083,52 @@ enum QuickUSSDCode: String, AppEnum {
     }
 }
 
+enum PlanCompra: String, AppEnum {
+    case plan45GB, planDiario, planToDus, combo2GB, combo4GB, combo6GB, sms20, sms50, sms90, sms120, voz5min, voz10min, voz15min, voz25min, voz40min
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Plan de Compras"
+
+    static var caseDisplayRepresentations: [PlanCompra: DisplayRepresentation] = [
+        .plan45GB: "Plan de 4.5GB",
+        .planDiario: "Plan Diario de 200MB",
+        .planToDus: "Plan ToDus",
+        .combo2GB: "Combo 2GB + 15MIN + 20SMS",
+        .combo4GB: "Combo 4GB + 35MIN + 40SMS",
+        .combo6GB: "Combo 6GB + 60MIN + 70SMS",
+        .sms20: "Plan de 20 SMS",
+        .sms50: "Plan de 50 SMS",
+        .sms90: "Plan de 90 SMS",
+        .sms120: "Plan de 120 SMS",
+        .voz5min: "Plan de 5 Minutos",
+        .voz10min: "Plan de 10 Minutos",
+        .voz15min: "Plan de 15 Minutos",
+        .voz25min: "Plan de 25 Minutos",
+        .voz40min: "Plan de 40 Minutos",
+    ]
+
+    /// Returns the base safe `code` (e.g. `*133*1*4*1#`), NOT `noConfirmCode` (`*133*1*4*1*1#`),
+    /// ensuring ETECSA's native confirmation dialog appears for safety.
+    var codeId: String {
+        switch self {
+        case .plan45GB: return "data-bundle-45gb"
+        case .planDiario: return "data-daily-plan"
+        case .planToDus: return "data-todus-plan"
+        case .combo2GB: return "data-bundle-2gb-combo"
+        case .combo4GB: return "data-bundle-4gb-combo"
+        case .combo6GB: return "data-bundle-6gb-combo"
+        case .sms20: return "sms-bundle-20"
+        case .sms50: return "sms-bundle-50"
+        case .sms90: return "sms-bundle-90"
+        case .sms120: return "sms-bundle-120"
+        case .voz5min: return "voice-bundle-5min"
+        case .voz10min: return "voice-bundle-10min"
+        case .voz15min: return "voice-bundle-15min"
+        case .voz25min: return "voice-bundle-25min"
+        case .voz40min: return "voice-bundle-40min"
+        }
+    }
+}
+
 struct EjecutarCodigoIntent: AppIntent {
     static var title: LocalizedStringResource = "Marcar Código Rápido"
     static var description = IntentDescription("Marca uno de los códigos rápidos de CubaCell Connect: saldo, bonos, plan de datos, saldo pospago o estado del Plan Amigo.")
@@ -1110,6 +1156,37 @@ struct EjecutarCodigoIntent: AppIntent {
             return .result(dialog: "No se pudo abrir el marcador en este dispositivo.")
         }
         return .result(dialog: "Marcando \(code.title)...")
+    }
+}
+
+struct ComprarPlanIntent: AppIntent {
+    static var title: LocalizedStringResource = "Comprar Plan"
+    static var description = IntentDescription("Abre el marcador para comprar un plan de datos, combo, SMS o voz de ETECSA usando el código estable y seguro (con confirmación).")
+    static var openAppWhenRun: Bool = true
+
+    @Parameter(title: "Plan")
+    var plan: PlanCompra
+
+    init() {}
+
+    init(plan: PlanCompra) {
+        self.plan = plan
+    }
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Comprar \(\.$plan)")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        guard let codeObj = USSDCodeStore().code(withId: plan.codeId) else {
+            return .result(dialog: "No se encontró ese plan.")
+        }
+        // Always dial codeObj.code (the safe code without auto-confirming *1)
+        guard DialService.dial(codeObj.code) else {
+            return .result(dialog: "No se pudo abrir el marcador en este dispositivo.")
+        }
+        return .result(dialog: "Abriendo compra de \(codeObj.title)...")
     }
 }
 
@@ -1185,6 +1262,17 @@ struct CubaCellShortcuts: AppShortcutsProvider {
         )
 
         AppShortcut(
+            intent: ComprarPlanIntent(),
+            phrases: [
+                "Compra \(\.$plan) en \(.applicationName)",
+                "Comprar \(\.$plan) en \(.applicationName)",
+                "Compra el \(\.$plan) en \(.applicationName)",
+            ],
+            shortTitle: "Comprar Plan",
+            systemImageName: "cart"
+        )
+
+        AppShortcut(
             intent: LlamarPorCobrarIntent(),
             phrases: [
                 "Llama por cobrar con \(.applicationName)",
@@ -1192,10 +1280,6 @@ struct CubaCellShortcuts: AppShortcutsProvider {
                 "Llama con 99 en \(.applicationName)",
                 "Llama con *99 en \(.applicationName)",
                 "Llama pagando el en \(.applicationName)",
-                "Llama por cobrar a \(\.$numero) en \(.applicationName)",
-                "Llama con 99 a \(\.$numero) en \(.applicationName)",
-                "Llama con *99 a \(\.$numero) en \(.applicationName)",
-                "Llama pagando el a \(\.$numero) en \(.applicationName)",
             ],
             shortTitle: "Llamar por Cobrar",
             systemImageName: "phone.arrow.up.right"
@@ -1208,9 +1292,6 @@ struct CubaCellShortcuts: AppShortcutsProvider {
                 "Haz una llamada con número oculto en \(.applicationName)",
                 "Llama con privado en \(.applicationName)",
                 "Llama con oculto en \(.applicationName)",
-                "Llama oculto a \(\.$numero) en \(.applicationName)",
-                "Llama con privado a \(\.$numero) en \(.applicationName)",
-                "Llama con oculto a \(\.$numero) en \(.applicationName)",
             ],
             shortTitle: "Llamar Oculto",
             systemImageName: "eye.slash"

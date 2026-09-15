@@ -2265,6 +2265,10 @@ private struct HelpSettingsView: View {
                     text: "«Oye Siri, consulta mi saldo en CubaCell», «Oye Siri, marca Bonos y Planes en CubaCell»."
                 )
                 SettingsInfoRow(
+                    title: "Comprar planes por voz (código seguro)",
+                    text: "«Oye Siri, compra Plan de 4.5GB en CubaCell», «Oye Siri, compra Combo 2GB en CubaCell», «Oye Siri, compra Plan de 20 SMS en CubaCell». Usa siempre el código estándar seguro que abre la pantalla de confirmación de ETECSA antes de realizar la compra."
+                )
+                SettingsInfoRow(
                     title: "Cómo funciona por dentro",
                     text: "Cada frase abre la app y marca exactamente igual que si tocaras el botón en pantalla — el sistema pide confirmación para realizar la llamada."
                 )
