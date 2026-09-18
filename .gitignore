@@ -67,3 +67,8 @@ fastlane/test_output
 .agent
 .vscode
 .ignore
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3

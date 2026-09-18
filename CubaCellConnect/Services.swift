@@ -1238,6 +1238,10 @@ struct LlamarOcultoIntent: AppIntent {
     }
 }
 
+/// Dynamic mapping of \.applicationName:
+/// In Swift, when you write phrases like "Check my balance in \(.applicationName)", iOS replaces
+/// \.applicationName not only with the app’s official name (“CubaCell Connect”), but also with all spoken aliases defined in CFBundleSpokenName and INAlternativeAppNames in the Info.plist
+/// (“CubaCell”, “Cubacel”, “Cuba Cell”). That’s why the user can simply say “in CubaCell” or “in Cubacel”.
 struct CubaCellShortcuts: AppShortcutsProvider {
     @AppShortcutsBuilder
     static var appShortcuts: [AppShortcut] {
